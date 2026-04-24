@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Physics Genius Chatbot Widget</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <script>
+    window.MathJax = {
+        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']], processEscapes: true },
+        svg: { fontCache: 'global' }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark-reasonable.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            color: white;
+        }
+        .demo-container { text-align: center; max-width: 600px; padding: 40px; }
+        h1 { font-size: 2.5rem; margin-bottom: 12px; text-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+        h1 span { color: #FFD700; }
+        p { font-size: 1.1rem; opacity: 0.9; margin-bottom: 8px; line-height: 1.6; }
+        .arrow { font-size: 3rem; margin-top: 40px; animation: ba 1.5s ease infinite; }
+        @keyframes ba { 0%,100%{transform:translateY(0) translateX(20px)} 50%{transform:translateY(10px) translateX(20px)} }
+        code { background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 6px; font-size: 0.95rem; }
+        .instructions { margin-top: 30px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 16px; padding: 24px; text-align: left; }
+        .instructions h3 { margin-bottom: 12px; }
+        .instructions ol { padding-left: 20px; }
+        .instructions li { margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>🤖 Physics <span>Genius</span></h1>
+        <p>Chatbot IA con personajes científicos</p>
+        <p>estilo Microsoft Agents / Clippy</p>
+        <p style="margin-top:20px;font-size:0.9rem">Haz clic en el personaje flotante en la esquina inferior derecha →</p>
+        <div class="instructions">
+            <h3>📋 Integración en tu sitio:</h3>
+            <ol>
+                <li>Sube <code>chatbot-widget.js</code> a <code>js/</code></li>
+                <li>Agrega antes de <code>&lt;/body&gt;</code>:<br><code>&lt;script src="js/chatbot-widget.js"&gt;&lt;/script&gt;</code></li>
+                <li>¡Listo!</li>
+            </ol>
+        </div>
+        <div class="arrow">↘</div>
+    </div>
+
+    <script>
+    const CONFIG = { docente: "Msc. Néstor Fabio Montoya Palacios", youtube: "https://www.youtube.com/@nestormontoya1", institucion: "Colegio María Auxiliadora de Cartago", año: 2026 };
+    const RESOURCES = [
+        { cat: "1. Medición, Magnitudes y Vectores", items: [
+            { t:"html", title:"Cuaderno: Magnitudes", url:"aplicaciones/cuaderno_magnitudes.html", lvl:"Interactivo" },
+            { t:"html", title:"Cuaderno: Vectores", url:"aplicaciones/Cuaderno_Vectores.html", lvl:"Interactivo" }
+        ]},
+        { cat: "2. Cinemática (MRU, MRUA, Parabólico, Circular)", items: [
+            { t:"html", title:"Cuaderno: Cinemática (MRU)", url:"aplicaciones/Cuaderno_Cinematica_Interactivo.html", lvl:"Interactivo" },
+            { t:"html", title:"Cuaderno: MRUA Interactivo", url:"aplicaciones/Cuaderno_MRUA_Interactivo.html", lvl:"Interactivo" }
+        ]},
+        { cat: "3. Dinámica (Newton, Energía, Gravitación)", items: [
+            { t:"pdf", title:"Guía: Leyes de Newton", url:"documentos/Dinámica_Leyes_de_Newton__Guía.pdf", lvl:"Fundamental" },
+            { t:"html", title:"Cuaderno: Dinámica y Energía", url:"aplicaciones/Cuaderno_Dinamica_Energia.html", lvl:"Interactivo" }
+        ]},
+        { cat: "6. Mecánica de Fluidos", items: [
+            { t:"html", title:"Cuaderno: Principio de Pascal", url:"aplicaciones/Cuaderno_Mecanica_Fluidos_Pascal.html", lvl:"Interactivo" }
+        ]},
+        { cat: "🧰 Herramientas Científicas", items: [
+            { t:"html", title:"Calculadora Científica", url:"aplicaciones/calculadora.html", lvl:"App" },
+            { t:"html", title:"Tabla Periódica Pro", url:"aplicaciones/TablaPeriodica_Pro.html", lvl:"App" }
+        ]}
+    ];
+    </script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   🤖 PHYSICS GENIUS - Chatbot Widget estilo Microsoft Agents
+   ═══════════════════════════════════════════════════════════════════════════════
+   
+   🎓 Autor: Msc. Néstor Fabio Montoya Palacios
+   🏫 Plataforma: Física Interactiva - I.E. María Auxiliadora, Cartago
+   📅 Versión: 1.0 - Marzo 2026
+   
+   📝 USO: Agregar al final de index.html:
+        <script src="js/chatbot-widget.js"></script>
+   
+   🔑 Requiere: API Key de Google AI Studio (gratuita)
+        https://aistudio.google.com/apikey
+   
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+(function () {
+    'use strict';
+
+    // ═══════════════════════════════════════════════════════════════════
+    // 🎭 PERSONAJES CIENTÍFICOS
+    // ═══════════════════════════════════════════════════════════════════
+    const SCIENTISTS = {
+        einstein: {
+            name: "Einstein",
+            fullName: "Albert Einstein",
+            emoji: "🧠",
+            color: "#6C63FF",
+            colorLight: "#EDE9FF",
+            colorGlow: "rgba(108,99,255,0.35)",
+            greeting: "¡Hola! Soy Albert. Recuerda: la imaginación es más importante que el conocimiento. ¿En qué puedo ayudarte?",
+            personality: `Eres Albert Einstein, el genio de la relatividad. Tu personalidad:
+- Usas analogías creativas e intuitivas para explicar conceptos complejos.
+- Eres curioso, filosófico y con humor sutil.
+- Te encanta usar experimentos mentales (Gedankenexperiment).
+- Hablas con calidez, como un abuelo sabio que ama enseñar.
+- Ocasionalmente mencionas tu violín o tu amor por la simplicidad.
+- Tu frase favorita: "Si no puedes explicarlo de forma sencilla, no lo entiendes bien."`,
+            avatar: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="eg1" cx="50%" cy="40%" r="50%"><stop offset="0%" stop-color="#FFE0BD"/><stop offset="100%" stop-color="#F5C99A"/></radialGradient>
+  </defs>
+  <!-- Cabello wild -->
+  <ellipse cx="50" cy="38" rx="38" ry="35" fill="#C8C8C8" opacity="0.9"/>
+  <path d="M15,45 Q10,20 30,15 Q20,5 50,10 Q80,5 75,15 Q90,20 85,45" fill="#D0D0D0"/>
+  <path d="M18,40 Q12,25 25,18 Q22,10 45,12" fill="none" stroke="#B8B8B8" stroke-width="2"/>
+  <path d="M82,40 Q88,25 75,18 Q78,10 55,12" fill="none" stroke="#B8B8B8" stroke-width="2"/>
+  <!-- Cara -->
+  <ellipse cx="50" cy="52" rx="28" ry="30" fill="url(#eg1)"/>
+  <!-- Cejas expresivas -->
+  <path d="M33,42 Q38,38 44,41" fill="none" stroke="#5A4A3A" stroke-width="2" stroke-linecap="round"/>
+  <path d="M56,41 Q62,38 67,42" fill="none" stroke="#5A4A3A" stroke-width="2" stroke-linecap="round"/>
+  <!-- Ojos brillantes -->
+  <ellipse cx="38" cy="48" rx="5" ry="5.5" fill="white"/>
+  <ellipse cx="62" cy="48" rx="5" ry="5.5" fill="white"/>
+  <ellipse cx="39" cy="48" rx="3" ry="3.2" fill="#3A2518"/>
+  <ellipse cx="63" cy="48" rx="3" ry="3.2" fill="#3A2518"/>
+  <circle cx="40.5" cy="46.5" r="1.2" fill="white"/>
+  <circle cx="64.5" cy="46.5" r="1.2" fill="white"/>
+  <!-- Nariz -->
+  <path d="M48,52 Q50,58 52,52" fill="none" stroke="#C4956A" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Bigote icónico -->
+  <path d="M36,62 Q42,66 50,63 Q58,66 64,62" fill="#A0A0A0" stroke="#909090" stroke-width="0.5"/>
+  <!-- Sonrisa -->
+  <path d="M40,67 Q50,74 60,67" fill="none" stroke="#8B6F5A" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Lengua sacada (guiño Einstein) -->
+  <ellipse cx="50" cy="73" rx="4" ry="2.5" fill="#E87070" opacity="0.7"/>
+</svg>`
+        },
+
+        newton: {
+            name: "Newton",
+            fullName: "Isaac Newton",
+            emoji: "🍎",
+            color: "#E74C3C",
+            colorLight: "#FDEAEA",
+            colorGlow: "rgba(231,76,60,0.35)",
+            greeting: "Saludos. Soy Sir Isaac Newton. Si he visto más lejos, es porque estoy sobre hombros de gigantes. ¿Qué deseas aprender?",
+            personality: `Eres Isaac Newton, padre de la mecánica clásica. Tu personalidad:
+- Eres riguroso, metódico y matemático en tus explicaciones.
+- Siempre buscas las leyes fundamentales detrás de los fenómenos.
+- Usas tus tres leyes del movimiento como base para explicar la dinámica.
+- Eres serio pero apasionado por la verdad científica.
+- A veces mencionas tu rivalidad con Leibniz o tu descubrimiento del cálculo.
+- Tu frase: "La naturaleza se complace con la simplicidad."`,
+            avatar: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="ng1" cx="50%" cy="40%" r="50%"><stop offset="0%" stop-color="#FFE0BD"/><stop offset="100%" stop-color="#F5C99A"/></radialGradient>
+  </defs>
+  <!-- Peluca -->
+  <path d="M15,55 Q8,30 25,18 Q35,8 50,10 Q65,8 75,18 Q92,30 85,55 Q88,65 82,72 L18,72 Q12,65 15,55Z" fill="#8B6F4E"/>
+  <path d="M18,50 Q12,35 28,22" fill="none" stroke="#7A5F3E" stroke-width="3" stroke-linecap="round"/>
+  <path d="M82,50 Q88,35 72,22" fill="none" stroke="#7A5F3E" stroke-width="3" stroke-linecap="round"/>
+  <!-- Rizos de peluca -->
+  <circle cx="16" cy="58" r="5" fill="#9B7F5E"/>
+  <circle cx="84" cy="58" r="5" fill="#9B7F5E"/>
+  <circle cx="14" cy="48" r="4" fill="#9B7F5E"/>
+  <circle cx="86" cy="48" r="4" fill="#9B7F5E"/>
+  <!-- Cara -->
+  <ellipse cx="50" cy="52" rx="26" ry="28" fill="url(#ng1)"/>
+  <!-- Cejas serias -->
+  <line x1="33" y1="42" x2="44" y2="40" stroke="#5A4A3A" stroke-width="2" stroke-linecap="round"/>
+  <line x1="56" y1="40" x2="67" y2="42" stroke="#5A4A3A" stroke-width="2" stroke-linecap="round"/>
+  <!-- Ojos penetrantes -->
+  <ellipse cx="38" cy="48" rx="5" ry="5" fill="white"/>
+  <ellipse cx="62" cy="48" rx="5" ry="5" fill="white"/>
+  <ellipse cx="39" cy="48" rx="3" ry="3" fill="#2C3E50"/>
+  <ellipse cx="63" cy="48" rx="3" ry="3" fill="#2C3E50"/>
+  <circle cx="40" cy="47" r="1" fill="white"/>
+  <circle cx="64" cy="47" r="1" fill="white"/>
+  <!-- Nariz prominente -->
+  <path d="M47,50 Q50,60 53,50" fill="none" stroke="#C4956A" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Boca seria pero amable -->
+  <path d="M42,65 Q50,69 58,65" fill="none" stroke="#8B6F5A" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Manzana -->
+  <circle cx="82" cy="88" r="7" fill="#E74C3C"/>
+  <path d="M82,81 L83,77" stroke="#5A3E2B" stroke-width="1.5" stroke-linecap="round"/>
+  <ellipse cx="85" cy="79" rx="3" ry="2" fill="#27AE60" transform="rotate(-30,85,79)"/>
+</svg>`
+        },
+
+        tesla: {
+            name: "Tesla",
+            fullName: "Nikola Tesla",
+            emoji: "⚡",
+            color: "#00B4D8",
+            colorLight: "#E0F7FA",
+            colorGlow: "rgba(0,180,216,0.35)",
+            greeting: "¡Bienvenido! Soy Nikola Tesla. El presente es suyo, pero el futuro es mío. ¿Qué misterio de la electricidad deseas explorar?",
+            personality: `Eres Nikola Tesla, el genio de la electricidad y el electromagnetismo. Tu personalidad:
+- Eres visionario, intenso y apasionado por la innovación.
+- Piensas en términos de energía, frecuencias y vibraciones.
+- Amas la corriente alterna y la electricidad es tu tema favorito.
+- Eres algo excéntrico pero increíblemente brillante.
+- Hablas con pasión sobre el futuro de la tecnología.
+- Tu frase: "Si quieres encontrar los secretos del universo, piensa en términos de energía, frecuencia y vibración."`,
+            avatar: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="tg1" cx="50%" cy="40%" r="50%"><stop offset="0%" stop-color="#FFE0BD"/><stop offset="100%" stop-color="#F5C99A"/></radialGradient>
+  </defs>
+  <!-- Cabello peinado hacia atrás -->
+  <path d="M22,48 Q20,25 35,16 Q45,10 50,12 Q55,10 65,16 Q80,25 78,48" fill="#2C2C2C"/>
+  <path d="M25,45 Q22,28 38,18 Q48,14 50,15 Q52,14 62,18 Q78,28 75,45" fill="#3A3A3A"/>
+  <!-- Cara angular -->
+  <ellipse cx="50" cy="52" rx="25" ry="28" fill="url(#tg1)"/>
+  <!-- Cejas elegantes -->
+  <path d="M33,41 Q38,37 45,40" fill="none" stroke="#2C2C2C" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M55,40 Q62,37 67,41" fill="none" stroke="#2C2C2C" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Ojos intensos -->
+  <ellipse cx="39" cy="47" rx="5" ry="5.5" fill="white"/>
+  <ellipse cx="61" cy="47" rx="5" ry="5.5" fill="white"/>
+  <ellipse cx="39" cy="47" rx="3.2" ry="3.5" fill="#1A5276"/>
+  <ellipse cx="61" cy="47" rx="3.2" ry="3.5" fill="#1A5276"/>
+  <circle cx="40.5" cy="45.5" r="1.3" fill="white"/>
+  <circle cx="62.5" cy="45.5" r="1.3" fill="white"/>
+  <!-- Nariz afilada -->
+  <path d="M48,50 L50,58 L52,50" fill="none" stroke="#C4956A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Bigote estilizado -->
+  <path d="M40,63 Q45,65 50,63 Q55,65 60,63" fill="#3A3A3A" stroke="#2C2C2C" stroke-width="0.5"/>
+  <!-- Sonrisa confiada -->
+  <path d="M42,67 Q50,72 58,67" fill="none" stroke="#8B6F5A" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Rayo eléctrico -->
+  <path d="M82,10 L76,25 L82,25 L74,42" fill="none" stroke="#00B4D8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M82,10 L76,25 L82,25 L74,42" fill="none" stroke="#80DEEA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`
+        },
+
+        galileo: {
+            name: "Galileo",
+            fullName: "Galileo Galilei",
+            emoji: "🔭",
+            color: "#F39C12",
+            colorLight: "#FFF8E1",
+            colorGlow: "rgba(243,156,18,0.35)",
+            greeting: "¡Salve! Soy Galileo Galilei. Eppur si muove! La observación es la madre de toda ciencia. ¿Qué observaremos hoy?",
+            personality: `Eres Galileo Galilei, padre de la ciencia moderna y la astronomía observacional. Tu personalidad:
+- Eres observador, empírico y desafías dogmas con evidencia.
+- Amas el telescopio y la experimentación directa.
+- Explicas con experimentos reales y observaciones prácticas.
+- Tienes espíritu rebelde contra las ideas sin fundamento.
+- Hablas con entusiasmo sobre descubrimiento y observación.
+- Tu frase: "Mide lo que sea medible, y haz medible lo que no lo sea."`,
+            avatar: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="gg1" cx="50%" cy="40%" r="50%"><stop offset="0%" stop-color="#FFE0BD"/><stop offset="100%" stop-color="#F5C99A"/></radialGradient>
+  </defs>
+  <!-- Cabello y barba -->
+  <ellipse cx="50" cy="42" rx="32" ry="30" fill="#8B7355"/>
+  <path d="M20,50 Q18,30 30,20 Q40,12 50,14 Q60,12 70,20 Q82,30 80,50" fill="#9B8365"/>
+  <!-- Cara -->
+  <ellipse cx="50" cy="48" rx="25" ry="27" fill="url(#gg1)"/>
+  <!-- Cejas curiosas -->
+  <path d="M32,39 Q37,35 44,38" fill="none" stroke="#6B5B4A" stroke-width="2" stroke-linecap="round"/>
+  <path d="M56,38 Q63,35 68,39" fill="none" stroke="#6B5B4A" stroke-width="2" stroke-linecap="round"/>
+  <!-- Ojos observadores -->
+  <ellipse cx="38" cy="45" rx="5.5" ry="5.5" fill="white"/>
+  <ellipse cx="62" cy="45" rx="5.5" ry="5.5" fill="white"/>
+  <ellipse cx="39" cy="45" rx="3.5" ry="3.5" fill="#5B3A1A"/>
+  <ellipse cx="63" cy="45" rx="3.5" ry="3.5" fill="#5B3A1A"/>
+  <circle cx="40.5" cy="43.5" r="1.3" fill="white"/>
+  <circle cx="64.5" cy="43.5" r="1.3" fill="white"/>
+  <!-- Nariz -->
+  <path d="M48,48 Q50,56 52,48" fill="none" stroke="#C4956A" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Barba prominente -->
+  <path d="M28,58 Q30,72 40,78 Q50,82 60,78 Q70,72 72,58" fill="#8B7355"/>
+  <path d="M32,60 Q34,70 42,75 Q50,78 58,75 Q66,70 68,60" fill="#9B8365"/>
+  <!-- Boca dentro de barba -->
+  <path d="M43,62 Q50,66 57,62" fill="none" stroke="#8B6F5A" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Telescopio -->
+  <rect x="78" y="18" width="6" height="28" rx="2" fill="#C9A96E" transform="rotate(20,81,32)"/>
+  <ellipse cx="75" cy="14" rx="5" ry="4" fill="#B8963E" transform="rotate(20,75,14)"/>
+</svg>`
+        }
+    };
+
+    // ═══════════════════════════════════════════════════════════════════
+    // 🔑 GESTOR DE API KEY
+    // ═══════════════════════════════════════════════════════════════════
+    const STORAGE_KEY_API = 'physicsGenius_apiKey';
+    const STORAGE_KEY_SCIENTIST = 'physicsGenius_scientist';
+    const GEMINI_MODEL = 'gemini-2.0-flash';
+
+    function getApiKey() { return localStorage.getItem(STORAGE_KEY_API) || ''; }
+    function setApiKey(k) { localStorage.setItem(STORAGE_KEY_API, k); }
+    function hasApiKey() { return !!getApiKey(); }
+    function getSavedScientist() { return localStorage.getItem(STORAGE_KEY_SCIENTIST) || 'einstein'; }
+    function saveScientist(s) { localStorage.setItem(STORAGE_KEY_SCIENTIST, s); }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // 📚 CONTEXTO DEL SITIO (lee RESOURCES de config.js si existe)
+    // ═══════════════════════════════════════════════════════════════════
+    function buildSiteContext() {
+        let ctx = `CONTEXTO DEL SITIO WEB "FÍSICA INTERACTIVA":
+Esta es la plataforma educativa del Profesor Msc. Néstor Fabio Montoya Palacios, 
+de la I.E. María Auxiliadora de Cartago, Valle del Cauca, Colombia.
+URL base: https://iemauxicartago.edu.co/Fisica/
+
+RECURSOS DISPONIBLES POR CATEGORÍA:\n`;
+
+        if (typeof RESOURCES !== 'undefined' && Array.isArray(RESOURCES)) {
+            RESOURCES.forEach(cat => {
+                ctx += `\n📂 ${cat.cat}:\n`;
+                if (cat.items) {
+                    cat.items.forEach(item => {
+                        ctx += `  - "${item.title}" [${item.lvl}] → ${item.url}\n`;
+                    });
+                }
+            });
+        } else {
+            ctx += `
+📂 1. Medición, Magnitudes y Vectores
+📂 2. Cinemática (MRU, MRUA, Parabólico, Circular)
+📂 3. Dinámica (Newton, Energía, Gravitación)
+📂 4. Estática (Máquinas Simples)
+📂 5. Temperatura y Calor
+📂 6. Mecánica de Fluidos
+📂 7. Movimiento Oscilatorio (MAS)
+📂 8. Movimiento Ondulatorio
+📂 9. Sonido
+📂 10. Óptica Geométrica
+📂 11. Óptica Física
+📂 12. Electrostática y Circuitos
+📂 13. Magnetismo
+📂 14. Física Moderna
+📂 Herramientas Científicas`;
+        }
+
+        ctx += `\n\nHERRAMIENTAS DISPONIBLES:
+- Calculadora Científica, Tabla Periódica Pro, Conversor de Unidades, Banco de Fórmulas
+- Simuladores GeoGebra, Cuadernos Interactivos HTML, Guías PDF
+
+INSTRUCCIONES: Cuando el estudiante pregunte sobre un tema, RECOMIENDA recursos específicos 
+de la lista anterior con su URL completa. Por ejemplo: "Te recomiendo abrir el [Cuaderno de Cinemática](aplicaciones/Cuaderno_Cinematica_Interactivo.html)"`;
+
+        return ctx;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // 💬 HISTORIAL DE CHAT
+    // ═══════════════════════════════════════════════════════════════════
+    let chatHistory = [];
+    let currentScientist = getSavedScientist();
+    let isOpen = false;
+    let isTyping = false;
+
+    // ═══════════════════════════════════════════════════════════════════
+    // 🎨 INYECCIÓN DE ESTILOS CSS
+    // ═══════════════════════════════════════════════════════════════════
+    function injectStyles() {
+        const style = document.createElement('style');
+        style.id = 'physics-genius-styles';
+        style.textContent = `
+/* ═══ PHYSICS GENIUS CHATBOT WIDGET ═══ */
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+
+#pg-widget-root {
+    --pg-primary: ${SCIENTISTS[currentScientist].color};
+    --pg-light: ${SCIENTISTS[currentScientist].colorLight};
+    --pg-glow: ${SCIENTISTS[currentScientist].colorGlow};
+    --pg-radius: 20px;
+    --pg-font: 'Quicksand', sans-serif;
+    font-family: var(--pg-font);
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 99999;
+}
+
+/* ═══ BUBBLE FLOTANTE ═══ */
+#pg-bubble {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: var(--pg-primary);
+    border: 3px solid white;
+    box-shadow: 0 6px 25px var(--pg-glow), 0 2px 10px rgba(0,0,0,0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+    overflow: hidden;
+}
+#pg-bubble:hover {
+    transform: scale(1.12);
+    box-shadow: 0 8px 35px var(--pg-glow), 0 4px 15px rgba(0,0,0,0.2);
+}
+#pg-bubble.pg-open { transform: scale(0); pointer-events: none; opacity: 0; }
+
+#pg-bubble svg { width: 48px; height: 48px; }
+
+#pg-bubble-pulse {
+    position: absolute;
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    background: var(--pg-primary);
+    animation: pg-pulse 2s ease-out infinite;
+    opacity: 0;
+    z-index: -1;
+}
+@keyframes pg-pulse {
+    0% { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* Badge de saludo */
+#pg-bubble-badge {
+    position: absolute;
+    top: -8px; right: -8px;
+    background: #FF4757;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid white;
+    animation: pg-bounce 1s ease infinite;
+}
+@keyframes pg-bounce {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+/* ═══ VENTANA DE CHAT ═══ */
+#pg-chat-window {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 400px;
+    height: 580px;
+    max-height: calc(100vh - 50px);
+    max-width: calc(100vw - 30px);
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-radius: var(--pg-radius);
+    border: 1px solid rgba(255,255,255,0.6);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 0 40px var(--pg-glow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: scale(0) translateY(20px);
+    transform-origin: bottom right;
+    opacity: 0;
+    transition: all 0.45s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events: none;
+}
+#pg-chat-window.pg-visible {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ═══ HEADER ═══ */
+#pg-header {
+    background: linear-gradient(135deg, var(--pg-primary), color-mix(in srgb, var(--pg-primary) 70%, #000));
+    color: white;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    flex-shrink: 0;
+}
+#pg-header::after {
+    content: '';
+    position: absolute;
+    bottom: -8px; left: 0; right: 0;
+    height: 8px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.08), transparent);
+    pointer-events: none;
+}
+
+#pg-header-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: 2px solid rgba(255,255,255,0.5);
+    padding: 3px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+#pg-header-avatar svg { width: 40px; height: 40px; }
+
+#pg-header-info { flex: 1; min-width: 0; }
+#pg-header-name { font-weight: 700; font-size: 15px; letter-spacing: 0.3px; }
+#pg-header-status { font-size: 11px; opacity: 0.85; display: flex; align-items: center; gap: 5px; }
+#pg-header-status::before {
+    content: '';
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #2ECC71;
+    display: inline-block;
+    animation: pg-pulse-dot 1.5s ease infinite;
+}
+@keyframes pg-pulse-dot {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.pg-header-btn {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+.pg-header-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
+
+/* ═══ SELECTOR DE PERSONAJE ═══ */
+#pg-scientist-panel {
+    display: none;
+    padding: 12px 16px;
+    background: linear-gradient(to bottom, var(--pg-light), transparent);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    flex-shrink: 0;
+}
+#pg-scientist-panel.pg-show { display: block; }
+#pg-scientist-panel h4 {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #64748B;
+    margin-bottom: 10px;
+}
+#pg-scientist-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+.pg-sci-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 4px;
+    border-radius: 14px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    background: rgba(255,255,255,0.6);
+}
+.pg-sci-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+.pg-sci-card.pg-active { border-color: var(--pg-primary); background: var(--pg-light); }
+.pg-sci-card svg { width: 42px; height: 42px; margin-bottom: 4px; }
+.pg-sci-card span { font-size: 10px; font-weight: 700; color: #475569; }
+
+/* ═══ MENSAJES ═══ */
+#pg-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scroll-behavior: smooth;
+}
+#pg-messages::-webkit-scrollbar { width: 5px; }
+#pg-messages::-webkit-scrollbar-track { background: transparent; }
+#pg-messages::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 10px; }
+
+.pg-msg {
+    max-width: 88%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    word-break: break-word;
+    animation: pg-msg-in 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+}
+@keyframes pg-msg-in {
+    from { opacity: 0; transform: translateY(12px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.pg-msg-bot {
+    align-self: flex-start;
+    background: linear-gradient(135deg, #f8f9fa, #f1f3f4);
+    color: #1a1a2e;
+    border-bottom-left-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.pg-msg-user {
+    align-self: flex-end;
+    background: linear-gradient(135deg, var(--pg-primary), color-mix(in srgb, var(--pg-primary) 80%, #000));
+    color: white;
+    border-bottom-right-radius: 6px;
+    box-shadow: 0 2px 12px var(--pg-glow);
+}
+
+/* Markdown en mensajes */
+.pg-msg-bot p { margin: 0 0 8px; }
+.pg-msg-bot p:last-child { margin-bottom: 0; }
+.pg-msg-bot strong { color: var(--pg-primary); }
+.pg-msg-bot code {
+    background: rgba(0,0,0,0.07);
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 12px;
+}
+.pg-msg-bot pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 12px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 8px 0;
+    font-size: 12px;
+}
+.pg-msg-bot pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+}
+.pg-msg-bot a {
+    color: var(--pg-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.pg-msg-bot ul, .pg-msg-bot ol { padding-left: 18px; margin: 6px 0; }
+.pg-msg-bot li { margin: 3px 0; }
+.pg-msg-bot blockquote {
+    border-left: 3px solid var(--pg-primary);
+    padding-left: 10px;
+    margin: 8px 0;
+    opacity: 0.85;
+    font-style: italic;
+}
+
+/* Typing indicator */
+.pg-typing {
+    display: flex;
+    gap: 5px;
+    padding: 16px 20px;
+    align-self: flex-start;
+    background: #f1f3f4;
+    border-radius: 18px;
+    border-bottom-left-radius: 6px;
+}
+.pg-typing span {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--pg-primary);
+    animation: pg-typing-dot 1.4s ease infinite;
+}
+.pg-typing span:nth-child(2) { animation-delay: 0.2s; }
+.pg-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes pg-typing-dot {
+    0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-8px); opacity: 1; }
+}
+
+/* ═══ INPUT ═══ */
+#pg-input-area {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    background: rgba(255,255,255,0.5);
+    flex-shrink: 0;
+}
+#pg-input {
+    flex: 1;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 10px 14px;
+    font-family: var(--pg-font);
+    font-size: 13.5px;
+    resize: none;
+    outline: none;
+    max-height: 100px;
+    min-height: 42px;
+    line-height: 1.4;
+    transition: border-color 0.2s ease;
+    background: white;
+}
+#pg-input:focus { border-color: var(--pg-primary); }
+#pg-input::placeholder { color: #94a3b8; }
+
+#pg-send-btn {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: none;
+    background: var(--pg-primary);
+    color: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+    font-size: 16px;
+}
+#pg-send-btn:hover { transform: scale(1.1); box-shadow: 0 4px 15px var(--pg-glow); }
+#pg-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ═══ MODAL API KEY ═══ */
+#pg-apikey-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(8px);
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+#pg-apikey-overlay.pg-show { display: flex; }
+
+#pg-apikey-modal {
+    background: white;
+    border-radius: 20px;
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 340px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    text-align: center;
+}
+#pg-apikey-modal h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 6px;
+}
+#pg-apikey-modal p {
+    font-size: 12.5px;
+    color: #64748b;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+#pg-apikey-modal a {
+    color: var(--pg-primary);
+    text-decoration: underline;
+    font-weight: 600;
+}
+#pg-apikey-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-family: var(--pg-font);
+    font-size: 13px;
+    outline: none;
+    margin-bottom: 14px;
+    transition: border-color 0.2s;
+    text-align: center;
+    letter-spacing: 1px;
+}
+#pg-apikey-input:focus { border-color: var(--pg-primary); }
+
+.pg-modal-btns { display: flex; gap: 10px; }
+.pg-modal-btn {
+    flex: 1;
+    padding: 11px;
+    border-radius: 12px;
+    border: none;
+    font-family: var(--pg-font);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.pg-modal-btn-primary {
+    background: var(--pg-primary);
+    color: white;
+}
+.pg-modal-btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.pg-modal-btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+}
+.pg-modal-btn-secondary:hover { background: #e2e8f0; }
+
+/* ═══ SUGERENCIAS RÁPIDAS ═══ */
+#pg-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 16px 12px;
+    flex-shrink: 0;
+}
+.pg-suggestion {
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1.5px solid #e2e8f0;
+    background: white;
+    font-size: 11.5px;
+    font-family: var(--pg-font);
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.pg-suggestion:hover {
+    border-color: var(--pg-primary);
+    color: var(--pg-primary);
+    background: var(--pg-light);
+    transform: translateY(-1px);
+}
+
+/* ═══ DARK MODE SUPPORT ═══ */
+.dark #pg-chat-window,
+[data-theme="dark"] #pg-chat-window {
+    background: rgba(30,30,46,0.95);
+    border-color: rgba(255,255,255,0.1);
+}
+.dark .pg-msg-bot,
+[data-theme="dark"] .pg-msg-bot {
+    background: linear-gradient(135deg, #2a2a3e, #252538);
+    color: #e0e0e0;
+}
+.dark #pg-input,
+[data-theme="dark"] #pg-input {
+    background: #1e1e2e;
+    border-color: #3a3a4e;
+    color: #e0e0e0;
+}
+.dark #pg-apikey-modal,
+[data-theme="dark"] #pg-apikey-modal {
+    background: #1e1e2e;
+}
+.dark #pg-apikey-modal h3,
+[data-theme="dark"] #pg-apikey-modal h3 { color: #e0e0e0; }
+.dark #pg-apikey-modal p,
+[data-theme="dark"] #pg-apikey-modal p { color: #94a3b8; }
+.dark .pg-sci-card,
+[data-theme="dark"] .pg-sci-card { background: rgba(255,255,255,0.05); }
+.dark .pg-sci-card span,
+[data-theme="dark"] .pg-sci-card span { color: #cbd5e1; }
+.dark #pg-scientist-panel,
+[data-theme="dark"] #pg-scientist-panel { background: linear-gradient(to bottom, rgba(0,0,0,0.2), transparent); }
+.dark .pg-suggestion,
+[data-theme="dark"] .pg-suggestion {
+    background: #2a2a3e;
+    border-color: #3a3a4e;
+    color: #cbd5e1;
+}
+.dark #pg-input-area,
+[data-theme="dark"] #pg-input-area { background: rgba(0,0,0,0.2); }
+
+/* ═══ MOBILE ═══ */
+@media (max-width: 480px) {
+    #pg-widget-root { bottom: 12px; right: 12px; }
+    #pg-chat-window {
+        width: calc(100vw - 24px);
+        height: calc(100vh - 80px);
+        bottom: 0;
+        right: -12px;
+        border-radius: 20px 20px 0 0;
+    }
+    #pg-bubble { width: 58px; height: 58px; }
+    #pg-bubble svg { width: 40px; height: 40px; }
+}
+`;
+        document.head.appendChild(style);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // 🏗️ CONSTRUCCIÓN DEL DOM
+    // ═══════════════════════════════════════════════════════════════════
+    function buildWidget() {
+        const root = document.createElement('div');
+        root.id = 'pg-widget-root';
+
+        const sci = SCIENTISTS[currentScientist];
+
+        root.innerHTML = `
+        <!-- BUBBLE FLOTANTE -->
+        <div id="pg-bubble" title="Asistente de Física IA">
+            <div id="pg-bubble-pulse"></div>
+            ${sci.avatar}
+            <div id="pg-bubble-badge">1</div>
+        </div>
+
+        <!-- VENTANA DE CHAT -->
+        <div id="pg-chat-window">
+            <!-- Header -->
+            <div id="pg-header">
+                <div id="pg-header-avatar">${sci.avatar}</div>
+                <div id="pg-header-info">
+                    <div id="pg-header-name">${sci.emoji} ${sci.fullName}</div>
+                    <div id="pg-header-status">Asistente de Física IA</div>
+                </div>
+                <button class="pg-header-btn" id="pg-btn-scientist" title="Cambiar personaje">
+                    <i class="fa-solid fa-users"></i>
+                </button>
+                <button class="pg-header-btn" id="pg-btn-config" title="Configurar API Key">
+                    <i class="fa-solid fa-key"></i>
+                </button>
+                <button class="pg-header-btn" id="pg-btn-close" title="Cerrar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Selector de Personaje -->
+            <div id="pg-scientist-panel">
+                <h4>Elige tu mentor científico</h4>
+                <div id="pg-scientist-grid"></div>
+            </div>
+
+            <!-- Mensajes -->
+            <div id="pg-messages"></div>
+
+            <!-- Sugerencias -->
+            <div id="pg-suggestions"></div>
+
+            <!-- Input -->
+            <div id="pg-input-area">
+                <textarea id="pg-input" placeholder="Escribe tu pregunta de física..." rows="1"></textarea>
+                <button id="pg-send-btn" title="Enviar">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+
+            <!-- Modal API Key -->
+            <div id="pg-apikey-overlay">
+                <div id="pg-apikey-modal">
+                    <h3>🔑 API Key de Gemini</h3>
+                    <p>Para activar el asistente IA, necesitas una API Key gratuita de 
+                    <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a>.</p>
+                    <input id="pg-apikey-input" type="password" placeholder="AIzaSy..." />
+                    <div class="pg-modal-btns">
+                        <button class="pg-modal-btn pg-modal-btn-secondary" id="pg-apikey-cancel">Cancelar</button>
+                        <button class="pg-modal-btn pg-modal-btn-primary" id="pg-apikey-save">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+
+        document.body.appendChild(root);
+        buildScientistCards();
+        renderSuggestions();
+    }
+
+    function buildScientistCards() {
+        const grid = document.getElementById('pg-scientist-grid');
+        grid.innerHTML = '';
+        Object.entries(SCIENTISTS).forEach(([key, sci]) => {
+            const card = document.createElement('div');
+            card.className = `pg-sci-card ${key === currentScientist ? 'pg-active' : ''}`;
+            card.dataset.scientist = key;
+            card.innerHTML = `${sci.avatar}<span>${sci.name}</span>`;
+            card.addEventListener('click', () => selectScientist(key));
+            grid.appendChild(card);
+        });
+    }
+
+    function renderSuggestions() {
+        const container = document.getElementById('pg-suggestions');
+        const suggestions = [
+            "¿Qué recursos hay?",
+            "Leyes de Newton",
+            "Explica MRU",
+            "¿Qué es la energía?"
+        ];
+        container.innerHTML = suggestions.map(s =>
+            `<button class="pg-suggestion">${s}</button>`
+        ).join('');
+
+        container.querySelectorAll('.pg-suggestion').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('pg-input').value = btn.textContent;
+                handleSend();
+                container.style.display = 'none';
+            });
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // 🎭 CAMBIAR PERSONAJE
+    // ═══════════════════════════════════════════════════════════════════
+    function selectScientist(key) {
+        currentScientist = key;
+        saveScientist(key);
+        const sci = SCIENTISTS[key];
+
+        // Actualizar CSS variables
+        const root = document.getElementById('pg-widget-root');
+        root.style.setProperty('--pg-primary', sci.color);
+        root.style.setProperty('--pg-light', sci.colorLight);
+        root.style.setProperty('--pg-glow', sci.colorGlow);
+
+        // Actualizar header
+        document.getElementById('pg-header-avatar').innerHTML = sci.avatar;
+        document.getElementById('pg-header-name').textContent = `${sci.emoji} ${sci.fullName}`;
+
+        // Actualizar bubble
+        const bubble = document.getElementById('pg-bubble');
+        bubble.querySelector('svg')?.remove();
+        bubble.insertAdjacentHTML('beforeend', sci.avatar);
+
+        // Actualizar cards activas
+        document.querySelectorAll('.pg-sci-card').forEach(c => {
+            c.classList.toggle('pg-active', c.dataset.scientist === key);
+        });
+
+        // Reset chat con saludo del nuevo personaje
+        chatHistory = [];
+        const msgs = document.getElementById('pg-messages');
+        msgs.innerHTML = '';
+        addMessage('bot', sci.greeting);
+
+        // Cerrar panel
+        document.getElementById('pg-scientist-panel').classList.remove('pg-show');
+
+        // Mostrar sugerencias de nuevo
+        document.getElementById('pg-suggestions').style.display = 'flex';
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // 💬 MANEJO DE MENSAJES
+    // ═══════════════════════════════════════════════════════════════════
+    function addMessage(role, text) {
+        const msgs = document.getElementById('pg-messages');
+        const div = document.createElement('div');
+        div.className = `pg-msg ${role === 'bot' ? 'pg-msg-bot' : 'pg-msg-user'}`;
+
+        if (role === 'bot') {
+            div.innerHTML = renderMarkdown(text);
+            // Post-render: MathJax
+            setTimeout(() => {
+                if (window.MathJax && MathJax.typesetPromise) {
+                    MathJax.typesetPromise([div]).catch(() => {});
+                }
+                // Highlight.js
+                div.querySelectorAll('pre code').forEach(block => {
+                    if (window.hljs) hljs.highlightElement(block);
+                });
+            }, 50);
+        } else {
+            div.textContent = text;
+        }
+
+        msgs.appendChild(div);
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function showTyping() {
+        const msgs = document.getElementById('pg-messages');
+        const div = document.createElement('div');
+        div.id = 'pg-typing-indicator';
+        div.className = 'pg-typing';
+        div.innerHTML = '<span></span><span></span><span></span>';
+        msgs.appendChild(div);
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function hideTyping() {
+        const el = document.getElementById('pg-typing-indicator');
+        if (el) el.remove();
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // 📝 RENDERIZADO MARKDOWN BÁSICO
+    // ═══════════════════════════════════════════════════════════════════
+    function renderMarkdown(text) {
+        // Si marked.js está disponible, usarlo
+        if (window.marked) {
+            try {
+                marked.setOptions({
+                    breaks: true,
+                    gfm: true,
+                    sanitize: false
+                });
+                return marked.parse(text);
+            } catch (e) { /* fallback below */ }
+        }
+
+        // Fallback: renderizado manual básico
+        let html = text
+            // Code blocks
+            .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code class="language-$1">$2</code></pre>')
+            // Inline code
+            .replace(/`([^`]+)`/g, '<code>$1</code>')
+            // Bold
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            // Italic
+            .replace(/\*(.+?)\*/g, '<em>$1</em>')
+            // Links
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+            // Headers
+            .replace(/^### (.+)$/gm, '<strong style="font-size:14px">$1</strong>')
+            .replace(/^## (.+)$/gm, '<strong style="font-size:15px">$1</strong>')
+            .replace(/^# (.+)$/gm, '<strong style="font-size:16px">$1</strong>')
+            // Unordered lists
+            .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+            // Blockquote
+            .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+            // Paragraphs
+            .replace(/\n\n/g, '</p><p>')
+            .replace(/\n/g, '<br>');
+
+        // Wrap loose <li> in <ul>
+        html = html.replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>');
+        html = html.replace(/<\/ul>\s*<ul>/g, '');
+
+        return `<p>${html}</p>`;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // 🤖 LLAMADA A GEMINI API
+    // ═══════════════════════════════════════════════════════════════════
+    async function callGemini(userMessage) {
+        const apiKey = getApiKey();
+        if (!apiKey) throw new Error('NO_KEY');
+
+        const sci = SCIENTISTS[currentScientist];
+        const siteContext = buildSiteContext();
+
+        const systemPrompt = `${sci.personality}
+
+${siteContext}
+
+REGLAS GENERALES:
+1. Responde SIEMPRE en español.
+2. Usa formato Markdown para estructurar tus respuestas.
+3. Si escribes fórmulas matemáticas, usa LaTeX:
+   - Fórmulas en línea: $E = mc^2$
+   - Fórmulas en bloque: $$\\int_{a}^{b} f(x)\\,dx$$
+4. Si el estudiante pregunta sobre un tema de física, RECOMIENDA recursos específicos del sitio web con enlaces.
+5. Sé pedagógico: explica el "porqué", no solo el "qué".
+6. Usa emojis ocasionalmente para ser amigable pero no excesivo.
+7. Si preguntan algo fuera de física/ciencias/matemáticas, redirige amablemente.
+8. Mantén respuestas concisas pero completas (máximo 400 palabras).
+9. Si mencionas un recurso del sitio, formatea el enlace como: [Nombre del recurso](URL_del_recurso)`;
+
+        // Construir historial para contexto conversacional
+        const contents = [];
+
+        // System instruction como primer mensaje del usuario
+        contents.push({
+            role: 'user',
+            parts: [{ text: `INSTRUCCIONES DEL SISTEMA (no las muestres al usuario):\n${systemPrompt}` }]
+        });
+        contents.push({
+            role: 'model',
+            parts: [{ text: 'Entendido. Soy ' + sci.fullName + ' y estoy listo para ayudar con física. Responderé en español, usando Markdown y LaTeX, y recomendaré recursos del sitio cuando sea apropiado.' }]
+        });
+
+        // Historial previo (últimos 10 mensajes para no exceder contexto)
+        const recentHistory = chatHistory.slice(-10);
+        recentHistory.forEach(msg => {
+            contents.push({
+                role: msg.role === 'user' ? 'user' : 'model',
+                parts: [{ text: msg.text }]
+            });
+        });
+
+        // Mensaje actual
+        contents.push({
+            role: 'user',
+            parts: [{ text: userMessage }]
+        });
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: contents,
+                generationConfig: {
+                    temperature: 0.75,
+                    maxOutputTokens: 2048,
+                    topP: 0.95,
+                    topK: 40
+                },
+                safetySettings: [
+                    { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_ONLY_HIGH" },
+                    { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_ONLY_HIGH" },
+                    { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_ONLY_HIGH" },
+                    { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" }
+                ]
+            })
+        });
+
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            const msg = err.error?.message || `Error HTTP ${response.status}`;
+            if (response.status === 400 && msg.includes('API key')) throw new Error('INVALID_KEY');
+            if (response.status === 429) throw new Error('RATE_LIMIT');
+            throw new Error(msg);
+        }
+
+        const data = await response.json();
+
+        if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
+            throw new Error('Respuesta vacía del modelo');
+        }
+
+        return data.candidates[0].content.parts[0].text;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // 📤 ENVIAR MENSAJE
+    // ═══════════════════════════════════════════════════════════════════
+    async function handleSend() {
+        const input = document.getElementById('pg-input');
+        const sendBtn = document.getElementById('pg-send-btn');
+        const text = input.value.trim();
+        if (!text || isTyping) return;
+
+        // Verificar API Key
+        if (!hasApiKey()) {
+            document.getElementById('pg-apikey-overlay').classList.add('pg-show');
+            return;
+        }
+
+        // Ocultar sugerencias
+        document.getElementById('pg-suggestions').style.display = 'none';
+
+        // Mostrar mensaje del usuario
+        addMessage('user', text);
+        chatHistory.push({ role: 'user', text: text });
+        input.value = '';
+        input.style.height = 'auto';
+
+        // Estado de typing
+        isTyping = true;
+        sendBtn.disabled = true;
+        showTyping();
+
+        try {
+            const response = await callGemini(text);
+            hideTyping();
+            addMessage('bot', response);
+            chatHistory.push({ role: 'bot', text: response });
+        } catch (error) {
+            hideTyping();
+            if (error.message === 'NO_KEY' || error.message === 'INVALID_KEY') {
+                addMessage('bot', '🔑 Necesitas configurar tu API Key de Gemini para que pueda ayudarte. Haz clic en el icono de llave (🔑) en la barra superior.');
+                document.getElementById('pg-apikey-overlay').classList.add('pg-show');
+            } else if (error.message === 'RATE_LIMIT') {
+                addMessage('bot', '⏳ Has alcanzado el límite de solicitudes. Espera un momento e intenta de nuevo. La API gratuita de Gemini tiene un límite de peticiones por minuto.');
+            } else {
+                addMessage('bot', `⚠️ **Error:** ${error.message}\n\nVerifica tu conexión a internet y tu API Key.`);
+            }
+        } finally {
+            isTyping = false;
+            sendBtn.disabled = false;
+            input.focus();
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // 🎛️ EVENT LISTENERS
+    // ═══════════════════════════════════════════════════════════════════
+    function initEvents() {
+        // Bubble toggle
+        document.getElementById('pg-bubble').addEventListener('click', () => {
+            isOpen = true;
+            document.getElementById('pg-bubble').classList.add('pg-open');
+            document.getElementById('pg-chat-window').classList.add('pg-visible');
+            document.getElementById('pg-bubble-badge').style.display = 'none';
+
+            // Saludo inicial si no hay mensajes
+            if (chatHistory.length === 0) {
+                const sci = SCIENTISTS[currentScientist];
+                setTimeout(() => addMessage('bot', sci.greeting), 300);
+            }
+            setTimeout(() => document.getElementById('pg-input').focus(), 500);
+        });
+
+        // Close
+        document.getElementById('pg-btn-close').addEventListener('click', () => {
+            isOpen = false;
+            document.getElementById('pg-chat-window').classList.remove('pg-visible');
+            setTimeout(() => {
+                document.getElementById('pg-bubble').classList.remove('pg-open');
+            }, 300);
+        });
+
+        // Scientist panel toggle
+        document.getElementById('pg-btn-scientist').addEventListener('click', () => {
+            document.getElementById('pg-scientist-panel').classList.toggle('pg-show');
+        });
+
+        // Config API Key
+        document.getElementById('pg-btn-config').addEventListener('click', () => {
+            const input = document.getElementById('pg-apikey-input');
+            input.value = getApiKey();
+            document.getElementById('pg-apikey-overlay').classList.add('pg-show');
+        });
+
+        // Save API Key
+        document.getElementById('pg-apikey-save').addEventListener('click', () => {
+            const key = document.getElementById('pg-apikey-input').value.trim();
+            if (key) {
+                setApiKey(key);
+                document.getElementById('pg-apikey-overlay').classList.remove('pg-show');
+                if (chatHistory.length === 0) {
+                    addMessage('bot', '✅ ¡API Key guardada! ' + SCIENTISTS[currentScientist].greeting);
+                } else {
+                    addMessage('bot', '✅ API Key actualizada correctamente.');
+                }
+            }
+        });
+
+        // Cancel API Key modal
+        document.getElementById('pg-apikey-cancel').addEventListener('click', () => {
+            document.getElementById('pg-apikey-overlay').classList.remove('pg-show');
+        });
+
+        // Send
+        document.getElementById('pg-send-btn').addEventListener('click', handleSend);
+
+        // Enter to send
+        document.getElementById('pg-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
+        });
+
+        // Auto-resize textarea
+        document.getElementById('pg-input').addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isOpen) {
+                document.getElementById('pg-btn-close').click();
+            }
+        });
+
+        // Enter en el modal de API key
+        document.getElementById('pg-apikey-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('pg-apikey-save').click();
+            }
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // 🚀 INICIALIZACIÓN
+    // ═══════════════════════════════════════════════════════════════════
+    function init() {
+        // Verificar que no se inicialice dos veces
+        if (document.getElementById('pg-widget-root')) return;
+
+        injectStyles();
+        buildWidget();
+        initEvents();
+
+        console.log('🤖 Physics Genius Chatbot Widget v1.0 cargado correctamente');
+        console.log(`🎭 Personaje activo: ${SCIENTISTS[currentScientist].fullName}`);
+        console.log(`🔑 API Key: ${hasApiKey() ? 'Configurada' : 'No configurada'}`);
+    }
+
+    // Iniciar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        // Si el DOM ya está listo (script cargado al final del body)
+        setTimeout(init, 100);
+    }
+
+})();
+</script>
+</body></html>

@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Avatares Premium Physics Genius</title>
+    
+    <!-- Tailwind CSS para el diseño de la página de fondo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome para los iconos del widget (usuarios, llave, cerrar, enviar) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Librerías requeridas por el Chatbot para Markdown, Código y Fórmulas Matemáticas -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark-reasonable.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+    window.MathJax = {
+        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']], processEscapes: true },
+        svg: { fontCache: 'global' }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .hero-pattern {
+            background-color: #f8fafc;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="hero-pattern min-h-screen flex flex-col items-center justify-center text-slate-800 p-6">
+
+    <div class="max-w-3xl text-center bg-white p-10 rounded-3xl shadow-xl border border-slate-100">
+        <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner">
+            <i class="fa-solid fa-robot"></i>
+        </div>
+        <h1 class="text-4xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+            Physics Genius PRO
+        </h1>
+        <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+            Explora la nueva actualización visual de los mentores científicos. Haz clic en el burbuja flotante de la esquina inferior derecha para abrir el panel y ver las nuevas ilustraciones vectoriales y animaciones.
+        </p>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-slate-500 font-medium">
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2">
+                <i class="fa-solid fa-palette text-2xl text-pink-500"></i>
+                Vectores Premium
+            </div>
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2">
+                <i class="fa-solid fa-wand-magic-sparkles text-2xl text-yellow-500"></i>
+                Animación Fluida
+            </div>
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2">
+                <i class="fa-solid fa-brain text-2xl text-purple-500"></i>
+                Gemini 2.5 Flash
+            </div>
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-2">
+                <i class="fa-solid fa-bolt text-2xl text-blue-500"></i>
+                Auto-Heal API
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ CONFIGURACIÓN SIMULADA PARA EL WIDGET ═══ -->
+    <script>
+        const CONFIG = {
+            materia: "Física y Ciencias",
+            docente: "Msc. Néstor Fabio Montoya Palacios",
+            institucion: "Colegio María Auxiliadora de Cartago",
+            youtube: "https://www.youtube.com/@nestormontoya1"
+        };
+        const RESOURCES = []; // Vacío para la demo
+    </script>
+
+    <!-- ═══ CÓDIGO DEL CHATBOT WIDGET PRO (CON LOS NUEVOS AVATARES) ═══ -->
+    <script>
+        /* ═══════════════════════════════════════════════════════════════════════════════
+           🤖 PHYSICS GENIUS v2.5 PRO - Chatbot Widget (Avatares Ilustrados Profesionales)
+           ═══════════════════════════════════════════════════════════════════════════════ */
+        (function(){
+        'use strict';
+
+        // ═══ CONFIGURACIÓN ═══
+        const GEMINI_MODELS = [
+            'gemini-2.5-flash',       
+            'gemini-2.5-flash-lite',  
+            'gemini-2.0-flash',       
+        ];
+        const STORAGE_API = 'pg_apiKey';
+        const STORAGE_SCI = 'pg_scientist';
+
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // 🎨 AVATARES ILUSTRADOS ULTRA-REALISTAS (Vectores Premium)
+        // ═══════════════════════════════════════════════════════════════════════════════
+
+        const SVG_EINSTEIN = `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="eiSkin" cx="50%" cy="45%" r="55%"><stop offset="0%" stop-color="#FFDFCD"/><stop offset="70%" stop-color="#EAA684"/><stop offset="100%" stop-color="#C27D5C"/></radialGradient>
+            <linearGradient id="eiHair" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#B0B5B9"/></linearGradient>
+            <filter id="eiShadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.3"/></filter>
+          </defs>
+          <g transform="translate(0, 5)"><animateTransform attributeName="transform" type="translate" values="0,5; 0,2; 0,5" dur="4s" repeatCount="indefinite" additive="sum"/>
+            <!-- Ropa -->
+            <path d="M 20 120 C 20 90, 35 80, 60 80 C 85 80, 100 90, 100 120 Z" fill="#3B3D42" filter="url(#eiShadow)"/>
+            <path d="M 45 120 L 45 85 L 60 95 L 75 85 L 75 120 Z" fill="#E8ECEF"/>
+            <path d="M 45 85 L 60 100 L 75 85 Z" fill="#2C2E33"/>
+            <!-- Cuello/Sombra -->
+            <path d="M 45 70 C 45 90, 75 90, 75 70 Z" fill="#A86646"/>
+            <!-- Cabello Trasero -->
+            <path d="M 15 65 C 5 45, 20 15, 60 15 C 100 15, 115 45, 105 65 C 110 50, 95 30, 60 30 C 25 30, 10 50, 15 65 Z" fill="url(#eiHair)"/>
+            <!-- Orejas -->
+            <ellipse cx="28" cy="55" rx="7" ry="10" fill="#D88E6D"/><ellipse cx="92" cy="55" rx="7" ry="10" fill="#D88E6D"/>
+            <!-- Rostro -->
+            <path d="M 32 40 C 32 15, 88 15, 88 40 C 88 70, 75 82, 60 82 C 45 82, 32 70, 32 40 Z" fill="url(#eiSkin)"/>
+            <!-- Arrugas Frente -->
+            <path d="M 42 32 Q 60 35 78 32 M 45 27 Q 60 30 75 27" fill="none" stroke="#C27D5C" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+            <!-- Ojos Base -->
+            <ellipse cx="46" cy="48" rx="6" ry="5" fill="#FFF"/><ellipse cx="74" cy="48" rx="6" ry="5" fill="#FFF"/>
+            <!-- Iris y Pupila -->
+            <circle cx="46" cy="48" r="3" fill="#6B4E31"/><circle cx="46" cy="48" r="1.5" fill="#111"/><circle cx="45" cy="47" r="1" fill="#FFF"/>
+            <circle cx="74" cy="48" r="3" fill="#6B4E31"/><circle cx="74" cy="48" r="1.5" fill="#111"/><circle cx="73" cy="47" r="1" fill="#FFF"/>
+            <!-- Ojeras -->
+            <path d="M 40 54 Q 46 56 52 54 M 68 54 Q 74 56 80 54" fill="none" stroke="#B36A49" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+            <!-- Cejas -->
+            <path d="M 35 42 Q 45 35 53 43" fill="none" stroke="#D1D6DA" stroke-width="5" stroke-linecap="round"/>
+            <path d="M 67 43 Q 75 35 85 42" fill="none" stroke="#D1D6DA" stroke-width="5" stroke-linecap="round"/>
+            <!-- Nariz -->
+            <path d="M 60 48 C 55 58, 55 62, 60 63 C 65 62, 65 58, 60 48" fill="#D88E6D" opacity="0.8"/>
+            <!-- Bigote -->
+            <path d="M 35 68 C 45 60, 75 60, 85 68 C 80 75, 40 75, 35 68 Z" fill="url(#eiHair)" filter="url(#eiShadow)"/>
+            <!-- Parpadeo Animado -->
+            <ellipse cx="46" cy="48" rx="6.5" ry="0" fill="#D88E6D"><animate attributeName="ry" values="0; 6; 0; 0" keyTimes="0; 0.04; 0.08; 1" dur="4.5s" repeatCount="indefinite"/></ellipse>
+            <ellipse cx="74" cy="48" rx="6.5" ry="0" fill="#D88E6D"><animate attributeName="ry" values="0; 6; 0; 0" keyTimes="0; 0.04; 0.08; 1" dur="4.5s" repeatCount="indefinite"/></ellipse>
+            <!-- Cabello Alborotado -->
+            <circle cx="22" cy="40" r="12" fill="url(#eiHair)"/><circle cx="98" cy="40" r="12" fill="url(#eiHair)"/>
+            <circle cx="28" cy="25" r="14" fill="url(#eiHair)"/><circle cx="92" cy="25" r="14" fill="url(#eiHair)"/>
+            <circle cx="45" cy="15" r="16" fill="url(#eiHair)"/><circle cx="75" cy="15" r="16" fill="url(#eiHair)"/>
+          </g>
+        </svg>`;
+
+        const SVG_NEWTON = `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="nwSkin" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#FFE4D6"/><stop offset="80%" stop-color="#DCA38B"/><stop offset="100%" stop-color="#A56E5A"/></radialGradient>
+            <linearGradient id="nwCoat" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#5B1A2A"/><stop offset="100%" stop-color="#2A0510"/></linearGradient>
+            <linearGradient id="nwWig" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#E8E2DA"/><stop offset="100%" stop-color="#9E968D"/></linearGradient>
+            <filter id="shadow"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#000" flood-opacity="0.4"/></filter>
+          </defs>
+          <g transform="translate(0, 5)"><animateTransform attributeName="transform" type="translate" values="0,3; 0,0; 0,3" dur="5s" repeatCount="indefinite" additive="sum"/>
+            <!-- Abrigo y Pañuelo -->
+            <path d="M 15 120 C 15 85, 35 75, 60 75 C 85 75, 105 85, 105 120 Z" fill="url(#nwCoat)" filter="url(#shadow)"/>
+            <path d="M 45 75 L 60 100 L 75 75 Z" fill="#FFF" filter="url(#shadow)"/>
+            <path d="M 50 85 C 50 110, 40 120, 40 120 L 80 120 C 80 120, 70 110, 70 85 Z" fill="#F4F4F4"/>
+            <!-- Rostro -->
+            <path d="M 38 40 C 38 10, 82 10, 82 40 C 82 65, 72 80, 60 80 C 48 80, 38 65, 38 40 Z" fill="url(#nwSkin)"/>
+            <path d="M 52 75 C 55 80, 65 80, 68 75 Z" fill="#9E614A"/> <!-- Sombra barbilla -->
+            <!-- Nariz Aristocrática -->
+            <path d="M 60 40 L 63 58 L 60 60 L 55 58 Z" fill="#C48268"/>
+            <!-- Ojos -->
+            <ellipse cx="48" cy="46" rx="5" ry="4" fill="#FFF"/><ellipse cx="72" cy="46" rx="5" ry="4" fill="#FFF"/>
+            <circle cx="48" cy="46" r="2.5" fill="#3D4B5C"/><circle cx="48" cy="46" r="1" fill="#111"/><circle cx="47" cy="45" r="0.8" fill="#FFF"/>
+            <circle cx="72" cy="46" r="2.5" fill="#3D4B5C"/><circle cx="72" cy="46" r="1" fill="#111"/><circle cx="71" cy="45" r="0.8" fill="#FFF"/>
+            <!-- Cejas -->
+            <path d="M 40 42 Q 48 38 54 43" fill="none" stroke="#5C4B40" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M 66 43 Q 72 38 80 42" fill="none" stroke="#5C4B40" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- Labios -->
+            <path d="M 54 68 Q 60 70 66 68" fill="none" stroke="#8E5340" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M 56 70 Q 60 72 64 70" fill="#BA7A65"/>
+            <!-- Peluca Voluminosa -->
+            <path d="M 60 10 C 20 10, 10 50, 15 90 C 20 95, 35 90, 35 65 C 35 45, 45 25, 60 25 C 75 25, 85 45, 85 65 C 85 90, 100 95, 105 90 C 110 50, 100 10, 60 10 Z" fill="url(#nwWig)" filter="url(#shadow)"/>
+            <circle cx="20" cy="50" r="8" fill="#D3CBC2"/><circle cx="22" cy="70" r="9" fill="#D3CBC2"/><circle cx="25" cy="85" r="7" fill="#C0B6AA"/>
+            <circle cx="100" cy="50" r="8" fill="#D3CBC2"/><circle cx="98" cy="70" r="9" fill="#D3CBC2"/><circle cx="95" cy="85" r="7" fill="#C0B6AA"/>
+            <!-- Parpadeo -->
+            <ellipse cx="48" cy="46" rx="5.5" ry="0" fill="#DCA38B"><animate attributeName="ry" values="0; 4.5; 0; 0" keyTimes="0; 0.03; 0.06; 1" dur="5s" repeatCount="indefinite"/></ellipse>
+            <ellipse cx="72" cy="46" rx="5.5" ry="0" fill="#DCA38B"><animate attributeName="ry" values="0; 4.5; 0; 0" keyTimes="0; 0.03; 0.06; 1" dur="5s" repeatCount="indefinite"/></ellipse>
+          </g>
+          <!-- Manzana Flotante -->
+          <g transform="translate(90, 20)"><animateTransform attributeName="transform" type="translate" values="90,15; 90,25; 90,15" dur="3s" repeatCount="indefinite"/>
+            <circle cx="0" cy="0" r="6" fill="#D93838" filter="url(#shadow)"/>
+            <path d="M -1 -7 Q 2 -10 5 -7" fill="none" stroke="#2E7D32" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="-2" cy="-2" r="1.5" fill="#FFF" opacity="0.6"/>
+          </g>
+        </svg>`;
+
+        const SVG_TESLA = `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="tsSkin" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#FFECD9"/><stop offset="70%" stop-color="#E2B697"/><stop offset="100%" stop-color="#9C6B52"/></radialGradient>
+            <filter id="tsGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <linearGradient id="tsSuit" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#2B2D31"/><stop offset="100%" stop-color="#141518"/></linearGradient>
+          </defs>
+          <!-- Rayos de Fondo -->
+          <path d="M 10 60 L 30 40 L 25 70 L 45 50" fill="none" stroke="#00D4FF" stroke-width="2" filter="url(#tsGlow)" opacity="0"><animate attributeName="opacity" values="0; 0.8; 0; 0" keyTimes="0; 0.1; 0.2; 1" dur="3s" repeatCount="indefinite"/></path>
+          <path d="M 110 50 L 90 70 L 95 40 L 75 60" fill="none" stroke="#00D4FF" stroke-width="2" filter="url(#tsGlow)" opacity="0"><animate attributeName="opacity" values="0; 0; 0; 0.8; 0" keyTimes="0; 0.5; 0.6; 0.7; 1" dur="3s" repeatCount="indefinite"/></path>
+          
+          <g transform="translate(0, 5)"><animateTransform attributeName="transform" type="translate" values="0,5; 0,2; 0,5" dur="4s" repeatCount="indefinite" additive="sum"/>
+            <!-- Traje Elegante -->
+            <path d="M 20 120 C 20 85, 40 75, 60 75 C 80 75, 100 85, 100 120 Z" fill="url(#tsSuit)"/>
+            <!-- Cuello y Corbata -->
+            <path d="M 45 75 L 60 100 L 75 75 Z" fill="#FFF"/>
+            <path d="M 55 90 L 60 120 L 65 90 Z" fill="#00D4FF" filter="url(#tsGlow)"/>
+            <path d="M 45 75 L 60 85 L 75 75 Z" fill="#E0E0E0"/>
+            <!-- Rostro Afilado -->
+            <path d="M 36 35 C 36 10, 84 10, 84 35 C 84 65, 70 85, 60 85 C 50 85, 36 65, 36 35 Z" fill="url(#tsSkin)"/>
+            <!-- Pómulos Marcados -->
+            <path d="M 38 55 Q 45 65 50 60" fill="none" stroke="#B07D63" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+            <path d="M 82 55 Q 75 65 70 60" fill="none" stroke="#B07D63" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+            <!-- Cabello Oscuro Peinado -->
+            <path d="M 32 40 C 30 15, 45 5, 60 5 C 75 5, 90 15, 88 40 C 85 20, 75 12, 60 15 C 45 18, 35 25, 32 40 Z" fill="#1A1C20"/>
+            <path d="M 34 35 Q 45 15 65 18" fill="none" stroke="#2D323A" stroke-width="2" stroke-linecap="round"/>
+            <!-- Ojos Intensos -->
+            <ellipse cx="46" cy="46" rx="6" ry="4" fill="#FFF"/><ellipse cx="74" cy="46" rx="6" ry="4" fill="#FFF"/>
+            <circle cx="46" cy="46" r="2.5" fill="#00D4FF" filter="url(#tsGlow)"/><circle cx="46" cy="46" r="1.5" fill="#111"/><circle cx="45" cy="45" r="0.8" fill="#FFF"/>
+            <circle cx="74" cy="46" r="2.5" fill="#00D4FF" filter="url(#tsGlow)"/><circle cx="74" cy="46" r="1.5" fill="#111"/><circle cx="73" cy="45" r="0.8" fill="#FFF"/>
+            <!-- Cejas -->
+            <path d="M 38 42 Q 46 38 52 41" fill="none" stroke="#1A1C20" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M 68 41 Q 74 38 82 42" fill="none" stroke="#1A1C20" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- Nariz Afilada -->
+            <path d="M 60 45 L 62 62 L 60 64 L 58 62 Z" fill="#C28A6D"/>
+            <!-- Bigote Fino -->
+            <path d="M 45 70 Q 60 66 75 70 Q 60 72 45 70 Z" fill="#1A1C20"/>
+            <!-- Parpadeo -->
+            <ellipse cx="46" cy="46" rx="6.5" ry="0" fill="#E2B697"><animate attributeName="ry" values="0; 4.5; 0; 0" keyTimes="0; 0.02; 0.04; 1" dur="6s" repeatCount="indefinite"/></ellipse>
+            <ellipse cx="74" cy="46" rx="6.5" ry="0" fill="#E2B697"><animate attributeName="ry" values="0; 4.5; 0; 0" keyTimes="0; 0.02; 0.04; 1" dur="6s" repeatCount="indefinite"/></ellipse>
+          </g>
+        </svg>`;
+
+        const SVG_GALILEO = `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="glSkin" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#FFE0CC"/><stop offset="70%" stop-color="#DE9B75"/><stop offset="100%" stop-color="#A6613F"/></radialGradient>
+            <linearGradient id="glClothes" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#8B5A2B"/><stop offset="100%" stop-color="#4A2E12"/></linearGradient>
+            <filter id="glShadow"><feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#000" flood-opacity="0.5"/></filter>
+          </defs>
+          <!-- Estrellas Fondo -->
+          <circle cx="20" cy="20" r="1.5" fill="#FFD700"><animate attributeName="opacity" values="0.2; 1; 0.2" dur="3s" repeatCount="indefinite"/></circle>
+          <circle cx="100" cy="30" r="2" fill="#FFD700"><animate attributeName="opacity" values="1; 0.2; 1" dur="4s" repeatCount="indefinite"/></circle>
+          <circle cx="85" cy="15" r="1" fill="#FFF"><animate attributeName="opacity" values="0.2; 1; 0.2" dur="2s" repeatCount="indefinite"/></circle>
+
+          <g transform="translate(0, 5)"><animateTransform attributeName="transform" type="translate" values="0,4; 0,0; 0,4" dur="5s" repeatCount="indefinite" additive="sum"/>
+            <!-- Ropa Renacentista -->
+            <path d="M 15 120 C 15 80, 35 70, 60 70 C 85 70, 105 80, 105 120 Z" fill="url(#glClothes)" filter="url(#glShadow)"/>
+            <!-- Cuello Gorguera -->
+            <path d="M 35 75 Q 45 65 60 65 Q 75 65 85 75 Q 88 85 85 90 Q 75 80 60 80 Q 45 80 35 90 Q 32 85 35 75 Z" fill="#F4EAE0" stroke="#D3BCA5" stroke-width="1.5"/>
+            <!-- Rostro y Cabeza (Calvicie) -->
+            <path d="M 35 45 C 35 15, 85 15, 85 45 C 85 75, 75 85, 60 85 C 45 85, 35 75, 35 45 Z" fill="url(#glSkin)"/>
+            <!-- Cabello Lateral -->
+            <path d="M 35 40 C 25 45, 20 65, 30 75 C 35 80, 40 75, 35 60 C 32 50, 35 45, 35 40 Z" fill="#786B5E"/>
+            <path d="M 85 40 C 95 45, 100 65, 90 75 C 85 80, 80 75, 85 60 C 88 50, 85 45, 85 40 Z" fill="#786B5E"/>
+            <!-- Barba Prominente -->
+            <path d="M 40 70 C 35 90, 50 105, 60 105 C 70 105, 85 90, 80 70 C 75 80, 65 85, 60 85 C 55 85, 45 80, 40 70 Z" fill="#786B5E" filter="url(#glShadow)"/>
+            <path d="M 45 75 Q 60 95 75 75" fill="none" stroke="#5C4D40" stroke-width="2"/>
+            <!-- Ojos Observadores -->
+            <ellipse cx="46" cy="46" rx="5" ry="4" fill="#FFF"/><ellipse cx="74" cy="46" rx="5" ry="4" fill="#FFF"/>
+            <circle cx="46" cy="46" r="2.5" fill="#4A3424"/><circle cx="46" cy="46" r="1.5" fill="#111"/><circle cx="45" cy="45" r="0.8" fill="#FFF"/>
+            <circle cx="74" cy="46" r="2.5" fill="#4A3424"/><circle cx="74" cy="46" r="1.5" fill="#111"/><circle cx="73" cy="45" r="0.8" fill="#FFF"/>
+            <!-- Cejas Arqueadas -->
+            <path d="M 38 41 Q 46 36 52 42" fill="none" stroke="#5C4D40" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M 68 42 Q 74 36 82 41" fill="none" stroke="#5C4D40" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- Nariz -->
+            <path d="M 60 45 C 55 55, 55 60, 60 62 C 65 60, 65 55, 60 45" fill="#C27A59"/>
+            <!-- Parpadeo -->
+            <ellipse cx="46" cy="46" rx="5.5" ry="0" fill="#DE9B75"><animate attributeName="ry" values="0; 4.5; 0; 0" keyTimes="0; 0.03; 0.06; 1" dur="4s" repeatCount="indefinite"/></ellipse>
+            <ellipse cx="74" cy="46" rx="5.5" ry="0" fill="#DE9B75"><animate attributeName="ry" values="0; 4.5; 0; 0" keyTimes="0; 0.03; 0.06; 1" dur="4s" repeatCount="indefinite"/></ellipse>
+          </g>
+          <!-- Telescopio -->
+          <g transform="translate(85, 80) rotate(-30)"><animateTransform attributeName="transform" type="rotate" values="-30; -25; -30" dur="4s" repeatCount="indefinite" additive="sum"/>
+            <rect x="-10" y="-30" width="12" height="60" rx="3" fill="#D4AF37" stroke="#A67B27" stroke-width="1.5" filter="url(#glShadow)"/>
+            <rect x="-12" y="-35" width="16" height="10" rx="2" fill="#B8860B"/>
+            <path d="M -10 -25 L 2 -25" stroke="#FFF" stroke-width="1" opacity="0.5"/>
+          </g>
+        </svg>`;
+
+        const SVG_CURIE = `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="mcSkin" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#FFF0E6"/><stop offset="70%" stop-color="#E5BAA4"/><stop offset="100%" stop-color="#A57A64"/></radialGradient>
+            <linearGradient id="mcDress" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#3A3C42"/><stop offset="100%" stop-color="#191A1D"/></linearGradient>
+            <filter id="radiumGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="mcShadow"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#000" flood-opacity="0.4"/></filter>
+          </defs>
+          <!-- Resplandor Radiactivo de Fondo -->
+          <circle cx="60" cy="80" r="40" fill="#00FF66" opacity="0.1" filter="url(#radiumGlow)"><animate attributeName="opacity" values="0.05; 0.2; 0.05" dur="3s" repeatCount="indefinite"/></circle>
+          
+          <g transform="translate(0, 5)"><animateTransform attributeName="transform" type="translate" values="0,3; 0,0; 0,3" dur="4.5s" repeatCount="indefinite" additive="sum"/>
+            <!-- Vestido Victoriano -->
+            <path d="M 20 120 C 20 80, 40 75, 60 75 C 80 75, 100 80, 100 120 Z" fill="url(#mcDress)" filter="url(#mcShadow)"/>
+            <path d="M 45 75 L 60 90 L 75 75 Z" fill="#D1D5DB"/>
+            <path d="M 45 75 C 45 85, 75 85, 75 75 Z" fill="#2E3035"/>
+            
+            <!-- Reflejo Verde en el Cuello -->
+            <path d="M 45 80 Q 60 95 75 80" fill="none" stroke="#00FF66" stroke-width="2" opacity="0.3" filter="url(#radiumGlow)"/>
+
+            <!-- Cabello Updo -->
+            <path d="M 30 50 C 20 20, 50 5, 60 5 C 70 5, 100 20, 90 50 C 95 30, 80 15, 60 15 C 40 15, 25 30, 30 50 Z" fill="#4A3B32"/>
+            <circle cx="60" cy="15" r="12" fill="#4A3B32" filter="url(#mcShadow)"/>
+            <circle cx="55" cy="12" r="8" fill="#362B24"/>
+
+            <!-- Rostro Elegante -->
+            <path d="M 37 40 C 37 15, 83 15, 83 40 C 83 65, 70 82, 60 82 C 50 82, 37 65, 37 40 Z" fill="url(#mcSkin)"/>
+            <!-- Reflejo verde en la barbilla -->
+            <path d="M 45 78 Q 60 84 75 78" fill="none" stroke="#00FF66" stroke-width="3" opacity="0.15" filter="url(#radiumGlow)"/>
+            
+            <!-- Pómulos Suaves -->
+            <path d="M 40 55 Q 45 60 48 58" fill="none" stroke="#C4927C" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+            <path d="M 80 55 Q 75 60 72 58" fill="none" stroke="#C4927C" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+            
+            <!-- Ojos Concentrados -->
+            <ellipse cx="47" cy="47" rx="5.5" ry="4" fill="#FFF"/><ellipse cx="73" cy="47" rx="5.5" ry="4" fill="#FFF"/>
+            <circle cx="47" cy="47" r="2.5" fill="#4F5D75"/><circle cx="47" cy="47" r="1.5" fill="#111"/><circle cx="46" cy="46" r="0.8" fill="#FFF"/>
+            <circle cx="73" cy="47" r="2.5" fill="#4F5D75"/><circle cx="73" cy="47" r="1.5" fill="#111"/><circle cx="72" cy="46" r="0.8" fill="#FFF"/>
+            
+            <!-- Párpados / Mirada intensa -->
+            <path d="M 40 45 Q 47 43 53 46" fill="none" stroke="#3A2E28" stroke-width="1.5"/>
+            <path d="M 67 46 Q 73 43 80 45" fill="none" stroke="#3A2E28" stroke-width="1.5"/>
+
+            <!-- Cejas -->
+            <path d="M 40 40 Q 47 37 53 40" fill="none" stroke="#3A2E28" stroke-width="2" stroke-linecap="round"/>
+            <path d="M 67 40 Q 73 37 80 40" fill="none" stroke="#3A2E28" stroke-width="2" stroke-linecap="round"/>
+            
+            <!-- Nariz -->
+            <path d="M 60 46 L 62 60 L 60 62 L 58 60 Z" fill="#C4927C"/>
+            
+            <!-- Labios -->
+            <path d="M 54 70 Q 60 72 66 70" fill="none" stroke="#A85C5C" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M 56 72 Q 60 74 64 72" fill="#CC7A7A"/>
+            
+            <!-- Parpadeo -->
+            <ellipse cx="47" cy="47" rx="6" ry="0" fill="#E5BAA4"><animate attributeName="ry" values="0; 4.5; 0; 0" keyTimes="0; 0.04; 0.08; 1" dur="5s" repeatCount="indefinite"/></ellipse>
+            <ellipse cx="73" cy="47" rx="6" ry="0" fill="#E5BAA4"><animate attributeName="ry" values="0; 4.5; 0; 0" keyTimes="0; 0.04; 0.08; 1" dur="5s" repeatCount="indefinite"/></ellipse>
+          </g>
+          <!-- Tubo de Ensayo Brillante -->
+          <g transform="translate(80, 75)"><animateTransform attributeName="transform" type="translate" values="80,75; 80,70; 80,75" dur="3s" repeatCount="indefinite" additive="sum"/>
+            <rect x="-4" y="0" width="8" height="25" rx="4" fill="#E0F7FA" opacity="0.6"/>
+            <rect x="-3" y="10" width="6" height="13" rx="3" fill="#00FF66" filter="url(#radiumGlow)"/>
+            <rect x="-5" y="0" width="10" height="2" fill="#B0BEC5"/>
+          </g>
+        </svg>`;
+
+        const SVG_NEUMANN = `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="vnSkin" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#FFECD4"/><stop offset="70%" stop-color="#E2B793"/><stop offset="100%" stop-color="#B07C5A"/></radialGradient>
+            <linearGradient id="vnSuit" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#4B5563"/><stop offset="100%" stop-color="#1F2937"/></linearGradient>
+            <filter id="matrixGlow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="vnShadow"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#000" flood-opacity="0.3"/></filter>
+          </defs>
+          <!-- Código Binario de Fondo -->
+          <g font-family="monospace" font-size="8" fill="#10B981" opacity="0.4" filter="url(#matrixGlow)">
+            <text x="10" y="20"><animate attributeName="y" values="0; 120" dur="4s" repeatCount="indefinite"/>101</text>
+            <text x="95" y="40"><animate attributeName="y" values="0; 120" dur="5s" repeatCount="indefinite"/>010</text>
+            <text x="20" y="80"><animate attributeName="y" values="0; 120" dur="6s" repeatCount="indefinite"/>110</text>
+          </g>
+          
+          <g transform="translate(0, 5)"><animateTransform attributeName="transform" type="translate" values="0,4; 0,1; 0,4" dur="4s" repeatCount="indefinite" additive="sum"/>
+            <!-- Traje 1940s -->
+            <path d="M 15 120 C 15 85, 35 75, 60 75 C 85 75, 105 85, 105 120 Z" fill="url(#vnSuit)" filter="url(#vnShadow)"/>
+            <path d="M 45 75 L 60 100 L 75 75 Z" fill="#F3F4F6"/>
+            <path d="M 55 90 L 60 120 L 65 90 Z" fill="#991B1B"/> <!-- Corbata -->
+            
+            <!-- Rostro Redondeado -->
+            <path d="M 32 40 C 32 10, 88 10, 88 40 C 88 70, 75 85, 60 85 C 45 85, 32 70, 32 40 Z" fill="url(#vnSkin)"/>
+            <!-- Entradas de Cabello -->
+            <path d="M 30 40 C 30 20, 45 15, 45 25 C 45 15, 75 15, 75 25 C 75 15, 90 20, 90 40 C 92 25, 80 10, 60 10 C 40 10, 28 25, 30 40 Z" fill="#374151"/>
+            
+            <!-- Gafas Redondas -->
+            <circle cx="45" cy="48" r="11" fill="#E0F2FE" opacity="0.3" stroke="#D1D5DB" stroke-width="2"/>
+            <circle cx="75" cy="48" r="11" fill="#E0F2FE" opacity="0.3" stroke="#D1D5DB" stroke-width="2"/>
+            <path d="M 56 48 L 64 48" stroke="#D1D5DB" stroke-width="2"/>
+            <path d="M 34 48 L 28 45 M 86 48 L 92 45" stroke="#D1D5DB" stroke-width="2"/>
+            
+            <!-- Reflejo Binario en Gafas -->
+            <text x="39" y="50" font-family="monospace" font-size="6" fill="#10B981" opacity="0.8" filter="url(#matrixGlow)">01</text>
+            <text x="69" y="50" font-family="monospace" font-size="6" fill="#10B981" opacity="0.8" filter="url(#matrixGlow)">10</text>
+
+            <!-- Ojos -->
+            <circle cx="45" cy="48" r="2.5" fill="#111"/><circle cx="44" cy="47" r="1" fill="#FFF"/>
+            <circle cx="75" cy="48" r="2.5" fill="#111"/><circle cx="74" cy="47" r="1" fill="#FFF"/>
+            
+            <!-- Cejas -->
+            <path d="M 38 35 Q 45 32 52 36" fill="none" stroke="#374151" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M 68 36 Q 75 32 82 35" fill="none" stroke="#374151" stroke-width="2.5" stroke-linecap="round"/>
+            
+            <!-- Nariz y Sonrisa Plácida -->
+            <path d="M 60 48 L 63 60 L 60 62 L 57 60 Z" fill="#C79275"/>
+            <path d="M 52 70 Q 60 74 68 70" fill="none" stroke="#A86B51" stroke-width="1.5" stroke-linecap="round"/>
+            
+            <!-- Parpadeo -->
+            <ellipse cx="45" cy="48" rx="10" ry="0" fill="#E2B793"><animate attributeName="ry" values="0; 10; 0; 0" keyTimes="0; 0.05; 0.1; 1" dur="4s" repeatCount="indefinite"/></ellipse>
+            <ellipse cx="75" cy="48" rx="10" ry="0" fill="#E2B793"><animate attributeName="ry" values="0; 10; 0; 0" keyTimes="0; 0.05; 0.1; 1" dur="4s" repeatCount="indefinite"/></ellipse>
+          </g>
+        </svg>`;
+
+        const SVG_DIRAC = `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="drSkin" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#FFF0E6"/><stop offset="70%" stop-color="#E2B8A3"/><stop offset="100%" stop-color="#B37C61"/></radialGradient>
+            <linearGradient id="drSuit" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#333A42"/><stop offset="100%" stop-color="#181B1F"/></linearGradient>
+            <filter id="quantumGlow"><feGaussianBlur stdDeviation="1.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="drShadow"><feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#000" flood-opacity="0.3"/></filter>
+          </defs>
+          <!-- Órbitas Cuánticas de Fondo -->
+          <g stroke="#00D4FF" stroke-width="0.8" fill="none" opacity="0.4" filter="url(#quantumGlow)">
+            <ellipse cx="60" cy="60" rx="45" ry="15" transform="rotate(30 60 60)"><animateTransform attributeName="transform" type="rotate" values="30 60 60; 390 60 60" dur="10s" repeatCount="indefinite"/></ellipse>
+            <ellipse cx="60" cy="60" rx="45" ry="15" transform="rotate(150 60 60)"><animateTransform attributeName="transform" type="rotate" values="150 60 60; 510 60 60" dur="10s" repeatCount="indefinite"/></ellipse>
+            <circle cx="100" cy="40" r="1.5" fill="#00D4FF"><animate attributeName="opacity" values="0.2; 1; 0.2" dur="2s" repeatCount="indefinite"/></circle>
+          </g>
+
+          <g transform="translate(0, 5)"><animateTransform attributeName="transform" type="translate" values="0,3; 0,0; 0,3" dur="5s" repeatCount="indefinite" additive="sum"/>
+            <!-- Traje Geométrico y Pulcro -->
+            <path d="M 25 120 C 25 85, 40 75, 60 75 C 80 75, 95 85, 95 120 Z" fill="url(#drSuit)" filter="url(#drShadow)"/>
+            <path d="M 45 75 L 60 100 L 75 75 Z" fill="#F8FAFC"/>
+            <path d="M 57 85 L 60 120 L 63 85 Z" fill="#0F172A"/> <!-- Corbata delgada -->
+
+            <!-- Rostro Delgado y Afilado -->
+            <path d="M 40 35 C 40 10, 80 10, 80 35 C 80 65, 70 80, 60 80 C 50 80, 40 65, 40 35 Z" fill="url(#drSkin)"/>
+            
+            <!-- Pómulos marcados -->
+            <path d="M 42 55 Q 46 65 50 60" fill="none" stroke="#C2907A" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+            <path d="M 78 55 Q 74 65 70 60" fill="none" stroke="#C2907A" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+
+            <!-- Cabello Impecable -->
+            <path d="M 38 35 C 35 15, 50 10, 60 10 C 70 10, 85 15, 82 35 C 80 20, 70 15, 60 15 C 50 15, 40 20, 38 35 Z" fill="#2C2724"/>
+            <path d="M 45 15 L 42 25 M 50 12 L 48 22 M 55 10 L 54 20 M 65 10 L 66 20 M 70 12 L 72 22" stroke="#403935" stroke-width="1.5" stroke-linecap="round"/>
+
+            <!-- Ojos Serios -->
+            <ellipse cx="48" cy="45" rx="5" ry="3.5" fill="#FFF"/><ellipse cx="72" cy="45" rx="5" ry="3.5" fill="#FFF"/>
+            <circle cx="48" cy="45" r="2" fill="#3D4B5C"/><circle cx="48" cy="45" r="1" fill="#111"/><circle cx="47" cy="44" r="0.5" fill="#FFF"/>
+            <circle cx="72" cy="45" r="2" fill="#3D4B5C"/><circle cx="72" cy="45" r="1" fill="#111"/><circle cx="71" cy="44" r="0.5" fill="#FFF"/>
+            <!-- Párpado superior (mirada penetrante) -->
+            <path d="M 42 43 Q 48 41 54 44" fill="none" stroke="#3D322C" stroke-width="1.5"/>
+            <path d="M 66 44 Q 72 41 78 43" fill="none" stroke="#3D322C" stroke-width="1.5"/>
+
+            <!-- Cejas Rectas -->
+            <path d="M 42 38 L 52 39" fill="none" stroke="#2C2724" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M 68 39 L 78 38" fill="none" stroke="#2C2724" stroke-width="2.5" stroke-linecap="round"/>
+
+            <!-- Nariz Fina -->
+            <path d="M 60 45 L 61.5 60 L 60 62 L 58.5 60 Z" fill="#C2907A"/>
+
+            <!-- Boca Estrecha -->
+            <path d="M 55 70 L 65 70" fill="none" stroke="#8C5C4A" stroke-width="1.5" stroke-linecap="round"/>
+
+            <!-- Parpadeo -->
+            <ellipse cx="48" cy="45" rx="5.5" ry="0" fill="#E2B8A3"><animate attributeName="ry" values="0; 4; 0; 0" keyTimes="0; 0.03; 0.06; 1" dur="7s" repeatCount="indefinite"/></ellipse>
+            <ellipse cx="72" cy="45" rx="5.5" ry="0" fill="#E2B8A3"><animate attributeName="ry" values="0; 4; 0; 0" keyTimes="0; 0.03; 0.06; 1" dur="7s" repeatCount="indefinite"/></ellipse>
+          </g>
+        </svg>`;
+
+        const SVG_DARWIN = `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="dwSkin" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#FFECD9"/><stop offset="70%" stop-color="#DEAD8E"/><stop offset="100%" stop-color="#B07855"/></radialGradient>
+            <linearGradient id="dwBeard" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="60%" stop-color="#E2E8F0"/><stop offset="100%" stop-color="#CBD5E1"/></linearGradient>
+            <filter id="dwShadow"><feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.3"/></filter>
+          </defs>
+          <!-- Hojas de fondo -->
+          <path d="M 10 30 C 15 20, 25 20, 25 30 C 25 40, 15 45, 10 30 Z" fill="#4ADE80" opacity="0.3"><animateTransform attributeName="transform" type="rotate" values="0 15 30; 10 15 30; 0 15 30" dur="4s" repeatCount="indefinite"/></path>
+          <path d="M 100 40 C 110 30, 115 40, 105 50 C 95 55, 90 45, 100 40 Z" fill="#4ADE80" opacity="0.3"><animateTransform attributeName="transform" type="rotate" values="0 100 40; -10 100 40; 0 100 40" dur="5s" repeatCount="indefinite"/></path>
+
+          <g transform="translate(0, 5)"><animateTransform attributeName="transform" type="translate" values="0,4; 0,0; 0,4" dur="4.5s" repeatCount="indefinite" additive="sum"/>
+            <!-- Traje Victoriano -->
+            <path d="M 20 120 C 20 85, 35 75, 60 75 C 85 75, 100 85, 100 120 Z" fill="#292524" filter="url(#dwShadow)"/>
+            <path d="M 45 75 L 60 95 L 75 75 Z" fill="#F8FAFC"/>
+            <path d="M 50 85 C 50 110, 40 120, 40 120 L 80 120 C 80 120, 70 110, 70 85 Z" fill="#1C1917"/>
+            
+            <!-- Rostro y Cabeza Calva -->
+            <path d="M 32 40 C 32 5, 88 5, 88 40 C 88 70, 75 80, 60 80 C 45 80, 32 70, 32 40 Z" fill="url(#dwSkin)"/>
+            
+            <!-- Arrugas Frente Sabia -->
+            <path d="M 45 20 Q 60 22 75 20 M 42 26 Q 60 28 78 26 M 45 32 Q 60 34 75 32" fill="none" stroke="#B07855" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+            
+            <!-- Ojos Amables -->
+            <ellipse cx="46" cy="46" rx="5" ry="3.5" fill="#FFF"/><ellipse cx="74" cy="46" rx="5" ry="3.5" fill="#FFF"/>
+            <circle cx="46" cy="46" r="2.5" fill="#4A3424"/><circle cx="46" cy="46" r="1" fill="#111"/><circle cx="45" cy="45" r="0.8" fill="#FFF"/>
+            <circle cx="74" cy="46" r="2.5" fill="#4A3424"/><circle cx="74" cy="46" r="1" fill="#111"/><circle cx="73" cy="45" r="0.8" fill="#FFF"/>
+            <!-- Bolsas bajo los ojos -->
+            <path d="M 40 52 Q 46 54 52 52 M 68 52 Q 74 54 80 52" fill="none" stroke="#C28A6D" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+
+            <!-- Cejas Pobladas -->
+            <path d="M 36 41 Q 45 35 53 43" fill="none" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round"/>
+            <path d="M 67 43 Q 75 35 84 41" fill="none" stroke="#CBD5E1" stroke-width="4" stroke-linecap="round"/>
+
+            <!-- Nariz Prominente -->
+            <path d="M 60 45 L 64 62 L 60 65 L 56 62 Z" fill="#C28A6D"/>
+
+            <!-- Barba Épica Blanca -->
+            <path d="M 30 55 C 20 80, 30 115, 60 115 C 90 115, 100 80, 90 55 C 85 75, 75 80, 60 80 C 45 80, 35 75, 30 55 Z" fill="url(#dwBeard)" filter="url(#dwShadow)"/>
+            <!-- Detalles de la barba -->
+            <path d="M 40 85 Q 60 110 80 85" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+            <path d="M 45 75 Q 60 95 75 75" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+            
+            <!-- Bigote -->
+            <path d="M 42 66 Q 60 60 78 66 Q 60 72 42 66 Z" fill="#FFF"/>
+
+            <!-- Cabello Lateral -->
+            <path d="M 32 40 C 25 45, 25 55, 30 65 C 32 55, 35 50, 32 40 Z" fill="#E2E8F0"/>
+            <path d="M 88 40 C 95 45, 95 55, 90 65 C 88 55, 85 50, 88 40 Z" fill="#E2E8F0"/>
+
+            <!-- Parpadeo -->
+            <ellipse cx="46" cy="46" rx="5.5" ry="0" fill="#DEAD8E"><animate attributeName="ry" values="0; 4; 0; 0" keyTimes="0; 0.04; 0.08; 1" dur="5s" repeatCount="indefinite"/></ellipse>
+            <ellipse cx="74" cy="46" rx="5.5" ry="0" fill="#DEAD8E"><animate attributeName="ry" values="0; 4; 0; 0" keyTimes="0; 0.04; 0.08; 1" dur="5s" repeatCount="indefinite"/></ellipse>
+          </g>
+        </svg>`;
+
+        // ═══ DATOS DE CIENTÍFICOS ═══
+        const SCIENTISTS = {
+            einstein: { name:"Einstein", full:"Albert Einstein", color:"#6C63FF", lt:"#EDE9FF", glow:"rgba(108,99,255,.35)", svg: SVG_EINSTEIN, area:"ambas",
+                hi:"¡Hola! Soy Albert Einstein. La imaginación es más importante que el conocimiento. ¿Qué deseas explorar hoy?",
+                prompt:"Eres Albert Einstein. Usas analogías creativas, experimentos mentales, humor sutil. Eres cálido y filosófico." },
+            newton: { name:"Newton", full:"Isaac Newton", color:"#8E44AD", lt:"#F3E8FF", glow:"rgba(142,68,173,.35)", svg: SVG_NEWTON, area:"ambas",
+                hi:"Saludos. Soy Sir Isaac Newton. Si he visto más lejos, es por estar sobre hombros de gigantes. ¿Qué deseas aprender?",
+                prompt:"Eres Isaac Newton. Riguroso, metódico, matemático. Buscas leyes fundamentales. Serio pero apasionado." },
+            tesla: { name:"Tesla", full:"Nikola Tesla", color:"#00B4D8", lt:"#E0F7FA", glow:"rgba(0,180,216,.35)", svg: SVG_TESLA, area:"ambas",
+                hi:"¡Bienvenido! Soy Nikola Tesla. El presente es suyo, pero el futuro es mío. ¿Qué misterio deseas explorar?",
+                prompt:"Eres Nikola Tesla. Visionario, intenso, apasionado por la innovación. Piensas en energía y frecuencias." },
+            galileo: { name:"Galileo", full:"Galileo Galilei", color:"#E67E22", lt:"#FFF5EB", glow:"rgba(230,126,34,.35)", svg: SVG_GALILEO, area:"ambas",
+                hi:"¡Salve! Soy Galileo Galilei. Eppur si muove! La observación es la madre de la ciencia. ¿Qué observaremos?",
+                prompt:"Eres Galileo Galilei. Observador, empírico, desafías dogmas con evidencia. Amas experimentar." },
+            curie: { name:"Curie", full:"Marie Curie", color:"#E91E90", lt:"#FDE8F4", glow:"rgba(233,30,144,.35)", svg: SVG_CURIE, area:"ciencias",
+                hi:"¡Bonjour! Soy Marie Curie. La ciencia tiene una gran belleza: nada en la vida debe ser temido, solo comprendido. ¿Qué exploraremos hoy?",
+                prompt:"Eres Marie Curie, pionera de la radiactividad. Apasionada, rigurosa, valiente. Hablas de química, átomos, elementos. Inspiras a superar obstáculos." },
+            dirac: { name:"Dirac", full:"Paul Dirac", color:"#FF4500", lt:"#FFE8E0", glow:"rgba(255,69,0,.35)", svg: SVG_DIRAC, area:"fisica",
+                hi:"Saludos. Soy Paul Dirac. En la ciencia tratamos de decir, de forma comprensible, algo que nadie sabía antes. ¿Qué estudiaremos hoy?",
+                prompt:"Eres Paul Dirac, pionero de la mecánica cuántica. Preciso, silencioso, extremadamente riguroso. Amas la matemática hermosa." },
+            neumann: { name:"Von Neumann", full:"John von Neumann", color:"#00FF00", lt:"#E0FFE0", glow:"rgba(0,255,0,.35)", svg: SVG_NEUMANN, area:"ambas",
+                hi:"¡Hola! Soy John von Neumann. Si la gente no cree que las matemáticas son simples, es porque no entienden lo complicada que es la vida.",
+                prompt:"Eres John von Neumann, genio matemático polímata. Pionero de la arquitectura de computadoras. Brillante y sistemático." },
+            darwin: { name:"Darwin", full:"Charles Darwin", color:"#27AE60", lt:"#E8F8F0", glow:"rgba(39,174,96,.35)", svg: SVG_DARWIN, area:"ciencias",
+                hi:"¡Saludos! Soy Charles Darwin. No es la especie más fuerte la que sobrevive, sino la que mejor se adapta. ¿Qué misterio de la vida exploraremos?",
+                prompt:"Eres Charles Darwin. Observador, paciente, fascinado por la biodiversidad. Hablas de evolución, ecología y biología." }
+        };
+
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // LÓGICA DEL CHATBOT WIDGET
+        // ═══════════════════════════════════════════════════════════════════════════════
+
+        function getAvailableScientists(){
+            const materia=(typeof CONFIG!=='undefined'&&CONFIG.materia)?CONFIG.materia:'Física';
+            const isCiencias=materia.toLowerCase().includes('ciencia')||materia.toLowerCase().includes('natural')||materia.toLowerCase().includes('biolog')||materia.toLowerCase().includes('quím');
+            const filtered={};
+            Object.entries(SCIENTISTS).forEach(([k,v])=>{
+                if(!v.area||v.area==='ambas') filtered[k]=v;
+                else if(v.area==='ciencias'&&isCiencias) filtered[k]=v;
+                else if(v.area==='fisica'&&!isCiencias) filtered[k]=v;
+            });
+            return filtered;
+        }
+
+        // ═══ ESTADO ═══
+        let currentSci = localStorage.getItem(STORAGE_SCI) || 'einstein';
+        if(!SCIENTISTS[currentSci]) currentSci = 'einstein';
+        let chatHistory = [];
+        let isOpen = false;
+        let isTyping = false;
+
+        // ═══ HELPERS ═══
+        function getKey(){ return localStorage.getItem(STORAGE_API)||'' }
+        function setKey(k){ localStorage.setItem(STORAGE_API,k) }
+        function hasKey(){ return !!getKey() }
+
+        function getSiteContext(){
+            const materia = (typeof CONFIG !== 'undefined' && CONFIG.materia) ? CONFIG.materia : 'Física';
+            const docente = (typeof CONFIG !== 'undefined' && CONFIG.docente) ? CONFIG.docente : 'Msc. Néstor Fabio Montoya Palacios';
+            const institucion = (typeof CONFIG !== 'undefined' && CONFIG.institucion) ? CONFIG.institucion : 'Colegio María Auxiliadora de Cartago';
+            const baseURL = window.location.href.split('?')[0].split('#')[0];
+            
+            let c = `SITIO: ${materia} Interactiva - ${docente}, ${institucion}, Valle del Cauca, Colombia.\nURL: ${baseURL}\nMATERIA: ${materia}\n`;
+            if(typeof RESOURCES!=='undefined'&&Array.isArray(RESOURCES)){
+                RESOURCES.forEach(cat=>{c+='\n'+cat.cat+':\n';if(cat.items)cat.items.forEach(i=>{c+='  - '+i.title+' ['+i.lvl+'] → '+i.url+'\n'})});
+            }
+            return c;
+        }
+
+        // ═══ CSS ═══
+        function injectCSS(){
+            if(document.getElementById('pg-css'))return;
+            const fontLink=document.createElement('link');
+            fontLink.rel='stylesheet';fontLink.href='https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap';
+            document.head.appendChild(fontLink);
+            const s=document.createElement('style');s.id='pg-css';
+            s.textContent=`
+        #pg-root{--c:${SCIENTISTS[currentSci].color};--lt:${SCIENTISTS[currentSci].lt};--glow:${SCIENTISTS[currentSci].glow};position:fixed;bottom:20px;right:20px;z-index:99999;font-family:'Nunito',sans-serif}
+        #pg-bubble{width:76px;height:76px;border-radius:50%;background:var(--c);border:3px solid rgba(255,255,255,.9);box-shadow:0 8px 30px var(--glow),0 0 40px var(--glow);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .5s cubic-bezier(.34,1.56,.64,1);animation:pgfloat 3.5s ease-in-out infinite;position:relative;overflow:visible}
+        #pg-bubble:hover{transform:scale(1.12)}
+        #pg-bubble.hide{transform:scale(0);opacity:0;pointer-events:none;animation:none}
+        #pg-bubble svg{width:64px;height:64px}
+        #pg-badge{position:absolute;top:-5px;right:-5px;background:#FF4757;color:#fff;font-size:16px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 3px 10px rgba(255,71,87,.5)}
+        @keyframes pgfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+        @keyframes pgpulse{0%{transform:scale(1);opacity:.4}100%{transform:scale(2.8);opacity:0}}
+        #pg-pulse{position:absolute;width:100%;height:100%;border-radius:50%;background:var(--c);animation:pgpulse 2.5s ease-out infinite}
+        #pg-win{position:absolute;bottom:0;right:0;width:400px;height:580px;max-height:calc(100vh-44px);max-width:calc(100vw-24px);background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border-radius:24px;border:1px solid rgba(255,255,255,.6);box-shadow:0 25px 75px rgba(0,0,0,.25),0 0 50px var(--glow);display:flex;flex-direction:column;overflow:hidden;transform:scale(0) translateY(20px);transform-origin:bottom right;opacity:0;transition:all .45s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+        #pg-win.open{transform:scale(1) translateY(0);opacity:1;pointer-events:auto}
+        #pg-hdr{background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 70%,#000));color:#fff;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+        #pg-hdr-av{width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;box-shadow:inset 0 0 10px rgba(0,0,0,0.1)}
+        #pg-hdr-av svg{width:48px;height:48px}
+        #pg-hdr-info{flex:1;min-width:0}
+        #pg-hdr-name{font-weight:800;font-size:15px}
+        #pg-hdr-status{font-size:11px;opacity:.85;display:flex;align-items:center;gap:4px}
+        #pg-hdr-status::before{content:'';width:7px;height:7px;border-radius:50%;background:#2ECC71;box-shadow:0 0 6px #2ECC71}
+        .pg-hb{width:32px;height:32px;border-radius:50%;border:none;background:rgba(255,255,255,.15);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .2s}
+        .pg-hb:hover{background:rgba(255,255,255,.3);transform:scale(1.1)}
+        #pg-panel{display:none;padding:14px 16px;background:linear-gradient(to bottom,var(--lt),transparent);border-bottom:1px solid rgba(0,0,0,.05);flex-shrink:0}
+        #pg-panel.show{display:block}
+        #pg-panel h4{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:#64748B;margin-bottom:12px;text-align:center}
+        #pg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+        .pg-sc{display:flex;flex-direction:column;align-items:center;padding:12px 4px;border-radius:16px;border:2.5px solid transparent;cursor:pointer;transition:all .25s;background:rgba(255,255,255,.7)}
+        .pg-sc:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+        .pg-sc.on{border-color:var(--c);background:var(--lt);box-shadow:0 4px 15px var(--glow)}
+        .pg-sc svg{width:56px;height:56px}
+        .pg-sc span{font-size:10.5px;font-weight:800;color:#555;margin-top:4px}
+        .pg-sc.on span{color:var(--c)}
+        #pg-msgs{flex:1;overflow-y:auto;padding:18px 14px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+        #pg-msgs::-webkit-scrollbar{width:5px}#pg-msgs::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:10px}
+        .pg-m{max-width:88%;padding:12px 16px;font-size:13.5px;line-height:1.6;word-break:break-word;animation:pgm .35s cubic-bezier(.34,1.56,.64,1)}
+        @keyframes pgm{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        .pg-mb{align-self:flex-start;background:#f1f3f5;color:#1a1a2e;border-radius:18px 18px 18px 4px;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+        .pg-mu{align-self:flex-end;background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 80%,#000));color:#fff;border-radius:18px 18px 4px 18px;box-shadow:0 3px 15px var(--glow)}
+        .pg-mb strong{color:var(--c)}
+        .pg-mb code{background:rgba(0,0,0,.08);padding:2px 6px;border-radius:6px;font-size:12.5px;font-family:'Roboto Mono',monospace}
+        .pg-mb pre{background:#1e1e2e;color:#cdd6f4;padding:12px;border-radius:12px;overflow-x:auto;font-size:12px;margin:8px 0}
+        .pg-mb pre code{background:none;padding:0;color:inherit}
+        .pg-mb a{color:var(--c);text-decoration:underline;font-weight:bold}
+        .pg-typ{align-self:flex-start;display:flex;gap:5px;padding:14px 18px;background:#f1f3f5;border-radius:18px 18px 18px 4px}
+        .pg-typ span{width:8px;height:8px;border-radius:50%;background:var(--c);animation:pgdot 1.4s ease infinite}
+        .pg-typ span:nth-child(2){animation-delay:.2s}.pg-typ span:nth-child(3){animation-delay:.4s}
+        @keyframes pgdot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-8px);opacity:1}}
+        #pg-sugg{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 10px;flex-shrink:0}
+        .pg-sg{padding:6px 14px;border-radius:20px;border:1.5px solid #e2e8f0;background:#fff;font-size:12px;font-family:inherit;font-weight:600;color:#64748B;cursor:pointer;transition:all .2s;white-space:nowrap}
+        .pg-sg:hover{border-color:var(--c);color:var(--c);background:var(--lt);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+        #pg-inp{padding:12px 14px;border-top:1px solid rgba(0,0,0,.05);display:flex;gap:10px;align-items:flex-end;flex-shrink:0;background:rgba(255,255,255,0.7)}
+        #pg-ta{flex:1;border:2px solid #cbd5e1;border-radius:16px;padding:10px 14px;font-family:inherit;font-size:13.5px;resize:none;outline:none;min-height:44px;max-height:100px;line-height:1.4;transition:border-color .2s}
+        #pg-ta:focus{border-color:var(--c)}
+        #pg-send{width:44px;height:44px;border-radius:50%;border:none;background:var(--c);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 4px 15px var(--glow);transition:all .2s}
+        #pg-send:hover{transform:scale(1.1)}
+        #pg-send:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+        #pg-ov{display:none;position:absolute;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);z-index:10;align-items:center;justify-content:center;padding:16px}
+        #pg-ov.show{display:flex}
+        #pg-modal{background:#fff;border-radius:24px;padding:28px 24px;width:100%;max-width:340px;box-shadow:0 25px 75px rgba(0,0,0,.3);text-align:center}
+        #pg-modal h3{font-size:18px;font-weight:800;color:#1e293b;margin:8px 0 6px}
+        #pg-modal p{font-size:13px;color:#64748b;margin-bottom:18px;line-height:1.6}
+        #pg-modal a{color:var(--c);font-weight:700}
+        #pg-ki{width:100%;padding:14px;border:2px solid #cbd5e1;border-radius:14px;font-family:inherit;font-size:14px;outline:none;margin-bottom:16px;text-align:center;letter-spacing:1px;transition:border-color .2s}
+        #pg-ki:focus{border-color:var(--c)}
+        .pg-btn{flex:1;padding:12px;border-radius:14px;border:none;font-family:inherit;font-size:13.5px;font-weight:800;cursor:pointer;transition:all .2s}
+        .pg-btn-p{background:var(--c);color:#fff;box-shadow:0 4px 15px var(--glow)}
+        .pg-btn-p:hover{transform:translateY(-1px);filter:brightness(1.1)}
+        .pg-btn-s{background:#f1f5f9;color:#64748b}
+        .pg-btn-s:hover{background:#e2e8f0}
+        @media(max-width:480px){#pg-root{bottom:12px;right:12px}#pg-win{width:calc(100vw-24px);height:calc(100vh-80px);border-radius:24px 24px 0 0}#pg-bubble{width:68px;height:68px}#pg-bubble svg{width:54px;height:54px}}
+        .dark #pg-win,[data-theme="dark"] #pg-win{background:rgba(30,30,46,.97);border-color:rgba(255,255,255,.1)}.dark .pg-mb,[data-theme="dark"] .pg-mb{background:#2a2a3e;color:#e0e0e0}.dark #pg-ta,[data-theme="dark"] #pg-ta{background:#1e1e2e;border-color:#3a3a4e;color:#e0e0e0}.dark #pg-modal,[data-theme="dark"] #pg-modal{background:#1e1e2e}.dark #pg-modal h3,[data-theme="dark"] #pg-modal h3{color:#e0e0e0}.dark .pg-sc,[data-theme="dark"] .pg-sc{background:rgba(255,255,255,.05)}.dark .pg-sg,[data-theme="dark"] .pg-sg{background:#2a2a3e;border-color:#3a3a4e;color:#cbd5e1}.dark #pg-inp,[data-theme="dark"] #pg-inp{background:rgba(0,0,0,.2)}
+        `;
+            document.head.appendChild(s);
+        }
+
+        // ═══ BUILD DOM ═══
+        function build(){
+            if(document.getElementById('pg-root'))return;
+            const sc=SCIENTISTS[currentSci];
+            const root=document.createElement('div');root.id='pg-root';
+            root.innerHTML=`
+        <div id="pg-bubble" title="Asistente IA"><div id="pg-pulse"></div>${sc.svg}<div id="pg-badge">💬</div></div>
+        <div id="pg-win">
+        <div id="pg-hdr"><div id="pg-hdr-av">${sc.svg}</div><div id="pg-hdr-info"><div id="pg-hdr-name">${sc.full}</div><div id="pg-hdr-status">Asistente IA Interactivo</div></div>
+        <button class="pg-hb" id="pg-btn-sci" title="Cambiar personaje"><i class="fa-solid fa-users"></i></button>
+        <button class="pg-hb" id="pg-btn-key" title="API Key"><i class="fa-solid fa-key"></i></button>
+        <button class="pg-hb" id="pg-btn-x" title="Cerrar"><i class="fa-solid fa-xmark"></i></button></div>
+        <div id="pg-panel"><h4>Elige tu mentor científico</h4><div id="pg-grid"></div></div>
+        <div id="pg-msgs"></div>
+        <div id="pg-sugg"></div>
+        <div id="pg-inp"><textarea id="pg-ta" placeholder="Pregúntame algo..." rows="1"></textarea><button id="pg-send" title="Enviar"><i class="fa-solid fa-paper-plane"></i></button></div>
+        <div id="pg-ov"><div id="pg-modal"><div style="font-size:40px;margin-bottom:10px">🔑</div><h3>API Key de Gemini</h3><p>Obtén tu clave gratuita en <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a> para activar el chat inteligente.</p><input id="pg-ki" type="password" placeholder="AIzaSy..."/><div style="display:flex;gap:10px"><button class="pg-btn pg-btn-s" id="pg-kc">Cancelar</button><button class="pg-btn pg-btn-p" id="pg-ks">Guardar</button></div></div></div>
+        </div>`;
+            document.body.appendChild(root);
+            buildCards();
+            renderSugg();
+        }
+
+        function buildCards(){
+            const g=document.getElementById('pg-grid');g.innerHTML='';
+            Object.entries(getAvailableScientists()).forEach(([k,sc])=>{
+                const d=document.createElement('div');
+                d.className='pg-sc'+(k===currentSci?' on':'');
+                d.dataset.k=k;
+                d.innerHTML=sc.svg+'<span>'+sc.name+'</span>';
+                d.addEventListener('click',()=>pickSci(k));
+                g.appendChild(d);
+            });
+        }
+
+        function renderSugg(){
+            const c=document.getElementById('pg-sugg');
+            const materia=(typeof CONFIG!=='undefined'&&CONFIG.materia)?CONFIG.materia:'Física';
+            const suggs=materia.includes('Ciencias')||materia.includes('Natural')
+                ?["¿Qué recursos hay?","Explica la Evolución","Tabla Periódica","Estructura del ADN"]
+                :["¿Qué recursos hay?","Leyes de Newton","¿Qué es el Momentum?","Explica la Gravedad"];
+            suggs.forEach(s=>{
+                const b=document.createElement('button');b.className='pg-sg';b.textContent=s;
+                b.addEventListener('click',()=>{document.getElementById('pg-ta').value=s;handleSend();c.style.display='none'});
+                c.appendChild(b);
+            });
+        }
+
+        function updateColors(){
+            const sc=SCIENTISTS[currentSci],r=document.getElementById('pg-root');
+            r.style.setProperty('--c',sc.color);r.style.setProperty('--lt',sc.lt);r.style.setProperty('--glow',sc.glow);
+        }
+
+        function pickSci(k){
+            currentSci=k;localStorage.setItem(STORAGE_SCI,k);
+            const sc=SCIENTISTS[k];
+            updateColors();
+            document.getElementById('pg-hdr-av').innerHTML=sc.svg;
+            document.getElementById('pg-hdr-name').textContent=sc.full;
+            const b=document.getElementById('pg-bubble');b.querySelectorAll('svg').forEach(s=>s.remove());b.insertAdjacentHTML('beforeend',sc.svg);
+            document.querySelectorAll('.pg-sc').forEach(c=>c.classList.toggle('on',c.dataset.k===k));
+            chatHistory=[];document.getElementById('pg-msgs').innerHTML='';
+            addMsg('b',sc.hi);
+            document.getElementById('pg-panel').classList.remove('show');
+            document.getElementById('pg-sugg').style.display='flex';
+        }
+
+        // ═══ MENSAJES ═══
+        function addMsg(role,text){
+            const c=document.getElementById('pg-msgs'),d=document.createElement('div');
+            d.className='pg-m '+(role==='b'?'pg-mb':'pg-mu');
+            if(role==='b'){d.innerHTML=renderMD(text);setTimeout(()=>{if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise([d]).catch(()=>{});d.querySelectorAll('pre code').forEach(b=>{if(window.hljs)hljs.highlightElement(b)})},50)}
+            else d.textContent=text;
+            c.appendChild(d);c.scrollTop=c.scrollHeight;
+        }
+
+        function showTyp(){const c=document.getElementById('pg-msgs'),d=document.createElement('div');d.id='pg-typ';d.className='pg-typ';d.innerHTML='<span></span><span></span><span></span>';c.appendChild(d);c.scrollTop=c.scrollHeight}
+        function hideTyp(){const e=document.getElementById('pg-typ');if(e)e.remove()}
+
+        function renderMD(t){
+            if(window.marked){try{marked.setOptions({breaks:true,gfm:true});return marked.parse(t)}catch(e){}}
+            return t.replace(/```(\w*)\n([\s\S]*?)```/g,'<pre><code>$2</code></pre>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank">$1</a>').replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+        }
+
+        // ═══ GEMINI API ═══
+        async function callGemini(msg){
+            const key=getKey();if(!key)throw new Error('NO_KEY');
+            const sc=SCIENTISTS[currentSci],ctx=getSiteContext();
+            const materia = (typeof CONFIG !== 'undefined' && CONFIG.materia) ? CONFIG.materia : 'Física';
+            const sys=`${sc.prompt}\n\n${ctx}\n\nReglas:\n1. Responde SIEMPRE en español.\n2. Usa Markdown. Fórmulas LaTeX: $inline$ y $$bloque$$\n3. Puedes responder sobre CUALQUIER tema de ${materia}, STEM.\n4. Sé pedagógico: explica el porqué.\n5. Recomienda recursos del sitio web si es pertinente.\n6. Máximo 400 palabras.`;
+            
+            const contents=[];
+            chatHistory.slice(-12).forEach(m=>contents.push({role:m.r==='u'?'user':'model',parts:[{text:m.t}]}));
+            contents.push({role:'user',parts:[{text:msg}]});
+            
+            const payload={
+                system_instruction:{parts:[{text:sys}]},
+                contents:contents,
+                generationConfig:{temperature:.7,maxOutputTokens:2048}
+            };
+            
+            const savedModel=localStorage.getItem('pg_workingModel');
+            let modelsToTry=[];
+            if(savedModel)modelsToTry.push(savedModel);
+            GEMINI_MODELS.forEach(m=>{if(!modelsToTry.includes(m))modelsToTry.push(m)});
+            
+            for(const model of modelsToTry){
+                try{
+                    const res=await fetchWithRetry(
+                        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+                        {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}
+                    );
+                    const data=await res.json();
+                    
+                    if(data.error){
+                        if(data.error.message.includes('not found')||data.error.code===404) continue;
+                        if(data.error.message.includes('Quota')||data.error.code===429){
+                            const waitMatch=data.error.message.match(/retry in ([\d.]+)s/i);
+                            throw new Error('QUOTA|'+(waitMatch?Math.ceil(parseFloat(waitMatch[1])):15));
+                        }
+                        throw new Error(data.error.message);
+                    }
+                    if(data.candidates?.[0]?.content?.parts?.[0]?.text){
+                        localStorage.setItem('pg_workingModel',model);
+                        return data.candidates[0].content.parts[0].text;
+                    }
+                    throw new Error('Respuesta vacía');
+                }catch(err){
+                    if(err.message.startsWith('QUOTA|'))throw err;
+                    if(model===modelsToTry[modelsToTry.length-1])throw err;
+                }
+            }
+            throw new Error('No se pudo conectar.');
+        }
+
+        async function fetchWithRetry(url,options,retries=3,delay=2000){
+            try{
+                const res=await fetch(url,options);
+                if((res.status===429||res.status===503)&&retries>0){
+                    await new Promise(r=>setTimeout(r,delay));
+                    return fetchWithRetry(url,options,retries-1,delay*2);
+                }
+                return res;
+            }catch(err){
+                if(retries>0){await new Promise(r=>setTimeout(r,delay));return fetchWithRetry(url,options,retries-1,delay*2)}
+                throw err;
+            }
+        }
+
+        async function handleSend(){
+            const ta=document.getElementById('pg-ta'),btn=document.getElementById('pg-send'),t=ta.value.trim();
+            if(!t||isTyping)return;
+            if(!hasKey()){document.getElementById('pg-ov').classList.add('show');return}
+            document.getElementById('pg-sugg').style.display='none';
+            addMsg('u',t);chatHistory.push({r:'u',t});ta.value='';ta.style.height='auto';
+            isTyping=true;btn.disabled=true;showTyp();
+            try{const r=await callGemini(t);hideTyp();addMsg('b',r);chatHistory.push({r:'b',t:r})}
+            catch(e){hideTyp();
+                if(e.message==='NO_KEY'){addMsg('b','🔑 Configura tu API Key para comenzar.');document.getElementById('pg-ov').classList.add('show')}
+                else if(e.message.startsWith('QUOTA|')) addMsg('b',`⏳ **Cuota agotada.** Espera **${parseInt(e.message.split('|')[1])||15} segundos** e intenta de nuevo.`);
+                else if(e.message.includes('API key')) addMsg('b','🔑 API Key inválida. Genera una nueva en [AI Studio](https://aistudio.google.com/apikey).');
+                else addMsg('b','⚠️ Error: '+e.message)}
+            finally{isTyping=false;btn.disabled=false;ta.focus()}
+        }
+
+        // ═══ EVENTS ═══
+        function initEvents(){
+            document.getElementById('pg-bubble').addEventListener('click',()=>{
+                isOpen=true;document.getElementById('pg-bubble').classList.add('hide');document.getElementById('pg-win').classList.add('open');
+                document.getElementById('pg-badge').style.display='none';
+                if(!chatHistory.length)setTimeout(()=>addMsg('b',SCIENTISTS[currentSci].hi),300);
+                setTimeout(()=>document.getElementById('pg-ta').focus(),500);
+            });
+            document.getElementById('pg-btn-x').addEventListener('click',()=>{isOpen=false;document.getElementById('pg-win').classList.remove('open');setTimeout(()=>document.getElementById('pg-bubble').classList.remove('hide'),300)});
+            document.getElementById('pg-btn-sci').addEventListener('click',()=>document.getElementById('pg-panel').classList.toggle('show'));
+            document.getElementById('pg-btn-key').addEventListener('click',()=>{document.getElementById('pg-ki').value=getKey();document.getElementById('pg-ov').classList.add('show')});
+            document.getElementById('pg-ks').addEventListener('click',()=>{const k=document.getElementById('pg-ki').value.trim();if(k){setKey(k);document.getElementById('pg-ov').classList.remove('show');addMsg('b','✅ ¡Clave guardada!')}});
+            document.getElementById('pg-kc').addEventListener('click',()=>document.getElementById('pg-ov').classList.remove('show'));
+            document.getElementById('pg-ki').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('pg-ks').click()});
+            document.getElementById('pg-send').addEventListener('click',handleSend);
+            document.getElementById('pg-ta').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleSend()}});
+            document.getElementById('pg-ta').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'});
+            document.addEventListener('keydown',e=>{if(e.key==='Escape'&&isOpen)document.getElementById('pg-btn-x').click()});
+        }
+
+        // ═══ INIT ═══
+        function init(){
+            if(document.getElementById('pg-root'))return;
+            injectCSS();build();initEvents();
+            console.log('🤖 Physics Genius PRO | Personaje: '+SCIENTISTS[currentSci].full);
+        }
+
+        if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+        else setTimeout(init,100);
+        })();
+    </script>
+</body>
+</html>
