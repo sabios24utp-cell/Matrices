@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuaderno Interactivo de Teoría de Conjuntos</title>
+<meta name="description" content="Cuaderno interactivo sobre Teoría de Conjuntos: definición, pertenencia, operaciones, conjuntos numéricos, leyes, conteo y diagramas de Venn.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Cinzel:wght@600;800&display=swap" rel="stylesheet">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+    svg: { fontCache: 'global' },
+    startup: { typeset: false }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-svg.js"></script>
+<style>
+:root{
+  --bg-body:#eef2f6; --paper-color:#ffffff; --paper-line:#d4e5f7;
+  --primary:#0d9488; --primary-dark:#134e4a; --secondary:#14b8a6;
+  --accent:#f59e0b; --success:#22c55e; --warning:#ef4444;
+  --text-main:#0f172a; --text-muted:#64748b;
+  --shadow-dark:6px 6px 16px rgba(13,148,136,.18);
+  --clay-shadow:8px 8px 16px rgba(13,148,136,.2),-8px -8px 16px rgba(255,255,255,.9);
+  --glass-bg:rgba(255,255,255,.7); --glass-border:1px solid rgba(255,255,255,.6);
+}
+body.dark-mode{
+  --bg-body:#0b1120; --paper-color:#111827; --paper-line:#1e3a4a;
+  --text-main:#e2e8f0; --text-muted:#94a3b8;
+  --shadow-dark:4px 4px 10px rgba(0,0,0,.6);
+  --clay-shadow:6px 6px 12px rgba(0,0,0,.5),-6px -6px 12px rgba(30,50,60,.3);
+  --glass-bg:rgba(20,30,50,.6);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Nunito',sans-serif;background:var(--bg-body);color:var(--text-main);height:100vh;display:flex;flex-direction:column;overflow:hidden;transition:background .4s}
+#app-container{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;perspective:2000px;padding:10px;gap:15px}
+.book-wrapper{width:96%;max-width:1400px;height:85vh;position:relative;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.book{width:100%;height:100%;display:flex;background:transparent;position:relative}
+.page{flex:1;background:var(--paper-color);position:relative;display:flex;flex-direction:column;overflow:hidden;background-image:linear-gradient(var(--paper-line) 1px,transparent 1px),linear-gradient(90deg,var(--paper-line) 1px,transparent 1px);background-size:20px 20px}
+.page-left{border-radius:12px 0 0 12px;box-shadow:inset -15px 0 25px -10px rgba(0,0,0,.1),var(--shadow-dark);border-right:1px solid rgba(0,0,0,.05)}
+.page-right{border-radius:0 12px 12px 0;box-shadow:inset 15px 0 25px -10px rgba(0,0,0,.1),var(--shadow-dark);border-left:1px solid rgba(0,0,0,.05)}
+.page-content{padding:30px 45px;overflow-y:auto;height:100%;scrollbar-width:thin;scrollbar-color:var(--primary) transparent}
+.page-content::-webkit-scrollbar{width:6px}
+.page-content::-webkit-scrollbar-thumb{background:var(--primary);border-radius:3px}
+.binding-spine{position:absolute;left:50%;top:30px;bottom:30px;width:40px;transform:translateX(-50%);z-index:20;pointer-events:none;display:flex;flex-direction:column;justify-content:space-evenly}
+.metal-ring{width:100%;height:12px;background:linear-gradient(90deg,#888 0%,#eee 40%,#ddd 60%,#555 100%);border-radius:6px;box-shadow:0 4px 6px rgba(0,0,0,.2);position:relative}
+.metal-ring::before,.metal-ring::after{content:'';position:absolute;top:2px;bottom:2px;width:5px;background:#2c3e50;border-radius:50%;opacity:.9}
+.metal-ring::before{left:-3px}.metal-ring::after{right:-3px}
+.holes-strip{position:absolute;top:30px;bottom:30px;width:15px;display:flex;flex-direction:column;justify-content:space-evenly;z-index:15;pointer-events:none}
+.page-left .holes-strip{right:6px;align-items:flex-end}
+.page-right .holes-strip{left:6px;align-items:flex-start}
+.paper-hole{width:10px;height:10px;background:#2c3e50;border-radius:50%;box-shadow:inset 1px 1px 2px rgba(0,0,0,.6)}
+h1,h2,h3,h4{color:var(--text-main);margin-bottom:.8rem}
+h2{position:relative;display:inline-block;color:var(--primary);font-weight:800;font-size:1.6rem;margin-top:0}
+h2::after{content:'';position:absolute;bottom:-5px;left:0;width:60%;height:4px;background:var(--accent);border-radius:2px}
+h3{color:var(--primary-dark);font-size:1.15rem;margin-top:16px}
+h4{color:var(--secondary);font-size:1.02rem;margin-top:12px}
+p,li{line-height:1.65;font-size:.95rem;margin-bottom:8px;text-align:justify}
+strong{color:var(--primary-dark)} em{color:var(--secondary)}
+.clay-card{background:var(--paper-color);border-radius:16px;padding:16px;margin:10px 0;box-shadow:var(--clay-shadow);border:1px solid rgba(255,255,255,.2);transition:transform .2s}
+.clay-card:hover{transform:translateY(-2px)}
+.glass-panel{background:var(--glass-bg);backdrop-filter:blur(10px);border:var(--glass-border);border-radius:12px;padding:14px;margin:10px 0}
+.def-box{border-left:5px solid var(--secondary);background:rgba(20,184,166,.08);padding:14px;border-radius:0 12px 12px 0;margin:12px 0}
+.def-title{font-weight:800;color:var(--secondary);display:block;margin-bottom:6px;text-transform:uppercase;font-size:.82rem;letter-spacing:1px}
+.concept-box{border-left:5px solid var(--primary);background:rgba(13,148,136,.08);padding:14px;border-radius:0 12px 12px 0;margin:12px 0}
+.example-box{border-left:5px solid var(--success);background:rgba(34,197,94,.08);padding:14px;border-radius:0 12px 12px 0;margin:12px 0}
+.example-title{font-weight:800;color:var(--success);display:block;margin-bottom:6px;font-size:.88rem}
+.warning-box{border-left:5px solid var(--warning);background:rgba(239,68,68,.08);padding:14px;border-radius:0 12px 12px 0;margin:12px 0}
+.formula-box{background:linear-gradient(135deg,rgba(20,184,166,.12),rgba(13,148,136,.12));border:2px solid var(--secondary);border-radius:12px;padding:13px;margin:12px 0;text-align:center}
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin:12px 0}
+th{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);color:#fff;padding:10px;text-align:center;font-weight:700}
+td{padding:8px;border-bottom:1px solid rgba(0,0,0,.08);text-align:center}
+tr:nth-child(even){background:rgba(0,0,0,.02)}
+tr:hover{background:rgba(13,148,136,.05)}
+body.dark-mode td{border-bottom-color:rgba(255,255,255,.08)}
+.nav-dock{display:flex;gap:12px;align-items:center;background:var(--glass-bg);backdrop-filter:blur(15px);padding:8px 22px;border-radius:50px;box-shadow:0 10px 30px rgba(0,0,0,.1);z-index:100;border:var(--glass-border);flex-shrink:0}
+.btn-circle{width:46px;height:46px;border-radius:50%;border:none;background:var(--bg-body);color:var(--primary);font-size:1.05rem;box-shadow:var(--clay-shadow);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.btn-circle:hover:not(:disabled){transform:scale(1.1);color:var(--accent)}
+.btn-circle:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+.page-badge{font-family:'Courier New',monospace;font-weight:bold;background:var(--primary);color:#fff;padding:6px 16px;border-radius:20px;box-shadow:inset 0 2px 5px rgba(0,0,0,.2);font-size:.85rem}
+/* ===== COVER ===== */
+.cover-page{height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:linear-gradient(135deg,#0a1628 0%,#0b2e2e 25%,#0d9488 50%,#14b8a6 75%,#5eead4 100%);color:#fff;margin:-30px -45px;width:calc(100% + 90px);height:calc(100% + 60px);position:relative;overflow:hidden}
+.cover-page::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg at 50% 50%,transparent 0deg,rgba(94,234,212,.1) 60deg,transparent 120deg,rgba(20,184,166,.08) 180deg,transparent 240deg,rgba(13,148,136,.08) 300deg,transparent 360deg);animation:coverRotate 20s linear infinite;pointer-events:none}
+.cover-page::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(245,158,11,.18) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(94,234,212,.15) 0%,transparent 50%);pointer-events:none}
+@keyframes coverRotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes float{0%,100%{transform:translateY(0) scale(1);opacity:.6}50%{transform:translateY(-20px) scale(1.1);opacity:1}}
+@keyframes pulse-ring{0%{transform:translate(-50%,-50%) scale(.8);opacity:.4}50%{transform:translate(-50%,-50%) scale(1.1);opacity:.15}100%{transform:translate(-50%,-50%) scale(.8);opacity:.4}}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(13,148,136,.4)}50%{box-shadow:0 0 40px rgba(13,148,136,.8)}}
+.cover-particles{position:absolute;inset:0;pointer-events:none;z-index:1}
+.cover-particle{position:absolute;border-radius:50%;background:rgba(94,234,212,.6);animation:float 6s ease-in-out infinite}
+.cover-particle:nth-child(1){width:4px;height:4px;top:15%;left:10%;animation-delay:0s}
+.cover-particle:nth-child(2){width:6px;height:6px;top:25%;left:80%;animation-delay:1s}
+.cover-particle:nth-child(3){width:3px;height:3px;top:60%;left:15%;animation-delay:2s}
+.cover-particle:nth-child(4){width:5px;height:5px;top:70%;left:75%;animation-delay:.5s}
+.cover-particle:nth-child(5){width:3px;height:3px;top:40%;left:90%;animation-delay:3s}
+.cover-particle:nth-child(6){width:4px;height:4px;top:85%;left:45%;animation-delay:1.5s}
+.cover-particle:nth-child(7){width:5px;height:5px;top:10%;left:50%;animation-delay:2.5s}
+.cover-particle:nth-child(8){width:3px;height:3px;top:50%;left:30%;animation-delay:4s}
+.cover-orbit{position:absolute;top:50%;left:50%;border-radius:50%;border:1px solid rgba(94,234,212,.15);animation:pulse-ring 8s ease-in-out infinite;pointer-events:none;z-index:1}
+.cover-orbit:nth-child(1){width:200px;height:200px;animation-delay:0s}
+.cover-orbit:nth-child(2){width:340px;height:340px;animation-delay:1.5s}
+.cover-orbit:nth-child(3){width:480px;height:480px;animation-delay:3s}
+.cover-symbol{position:absolute;color:rgba(94,234,212,.25);font-family:'Cinzel',serif;font-weight:800;font-size:3rem;animation:float 8s ease-in-out infinite;z-index:2}
+.cover-symbol:nth-of-type(1){top:18%;left:12%;animation-delay:0s}
+.cover-symbol:nth-of-type(2){top:22%;right:14%;animation-delay:1s;font-size:3.5rem}
+.cover-symbol:nth-of-type(3){bottom:24%;left:16%;animation-delay:2s;font-size:2.8rem}
+.cover-symbol:nth-of-type(4){bottom:18%;right:18%;animation-delay:3s;font-size:3.2rem}
+.cover-symbol:nth-of-type(5){top:50%;right:8%;animation-delay:4s;font-size:2.5rem}
+.cover-symbol:nth-of-type(6){top:50%;left:6%;animation-delay:1.5s;font-size:2.5rem}
+.cover-content{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:8px;animation:fadeInUp 1s ease-out}
+.cover-page h1{font-family:'Cinzel',serif;font-size:3rem;font-weight:800;margin:10px 0 5px;letter-spacing:5px;text-shadow:0 4px 20px rgba(0,0,0,.4),0 0 60px rgba(13,148,136,.3);background:linear-gradient(135deg,#fff 0%,#5eead4 50%,#fff 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 4s ease-in-out infinite}
+.cover-page h2{font-size:1.2rem;font-weight:600;margin:4px 0;letter-spacing:2px;color:#fff}
+.cover-page h2::after{display:none}
+.cover-icon-wrapper{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,rgba(94,234,212,.25),rgba(13,148,136,.08));backdrop-filter:blur(10px);border:1px solid rgba(94,234,212,.3);display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 8px 32px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.15);animation:glow 3s ease-in-out infinite}
+.cover-icon{font-size:2.5rem;opacity:.95;filter:drop-shadow(0 2px 8px rgba(0,0,0,.3));color:#5eead4}
+.cover-subtitle{font-size:.85rem;letter-spacing:6px;text-transform:uppercase;opacity:.75;font-weight:600;margin-top:5px}
+.cover-badge{background:linear-gradient(135deg,rgba(94,234,212,.3),rgba(13,148,136,.1));backdrop-filter:blur(10px);padding:12px 30px;border-radius:50px;margin-top:18px;font-weight:700;font-size:.98rem;letter-spacing:1px;border:1px solid rgba(94,234,212,.3);box-shadow:0 4px 20px rgba(0,0,0,.15)}
+.cover-separator{width:80px;height:3px;background:linear-gradient(90deg,transparent,rgba(94,234,212,.8),transparent);border-radius:2px;margin:8px 0}
+.cover-footer{margin-top:22px;font-size:.78rem;opacity:.55;letter-spacing:1px}
+.footer{font-size:.72rem;color:var(--text-muted);text-align:center;font-weight:600;flex-shrink:0;padding:2px 0}
+.num-page{position:absolute;bottom:8px;font-size:.75rem;color:var(--text-muted);font-weight:bold}
+.page-left .num-page{left:20px}.page-right .num-page{right:20px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:300}
+.modal-overlay.active{display:flex}
+.modal-content{background:var(--paper-color);border-radius:16px;padding:22px;max-width:640px;max-height:80vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3);color:var(--text-main)}
+.modal-close{position:absolute;top:12px;right:12px;background:none;border:none;font-size:1.5rem;color:var(--text-muted);cursor:pointer}
+.index-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.index-item{padding:10px 12px;background:rgba(13,148,136,.06);border-radius:8px;cursor:pointer;transition:all .2s;border-left:3px solid transparent;font-size:.88rem}
+.index-item:hover{background:rgba(13,148,136,.15);border-left-color:var(--primary);transform:translateX(5px)}
+#mobile-fab{display:none}
+@media (max-width:900px){
+  .book-wrapper{width:100%;height:78vh}
+  .page-right{display:none}
+  .page-left{width:100%;border-radius:12px;border:none;box-shadow:var(--clay-shadow)}
+  .binding-spine{display:none}
+  .cover-page{margin:-20px -20px;width:calc(100% + 40px);height:calc(100% + 40px)}
+  .cover-page h1{font-size:2rem;letter-spacing:3px}
+  .cover-icon-wrapper{width:70px;height:70px}
+  .cover-icon{font-size:1.8rem}
+  .nav-dock{padding:6px 14px;width:95%;justify-content:space-between;gap:6px}
+  .btn-circle{width:38px;height:38px;font-size:.95rem}
+  .page-badge{font-size:.75rem;padding:5px 10px}
+  .page-content{padding:18px}
+  h2{font-size:1.3rem}
+  #mobile-fab{display:flex;position:fixed;top:15px;right:15px;z-index:200;background:var(--accent);color:#fff;border:none;padding:9px 16px;border-radius:30px;font-weight:bold;box-shadow:0 5px 15px rgba(0,0,0,.3);align-items:center;gap:8px;cursor:pointer}
+}
+.interactive-controls{background:rgba(13,148,136,.05);border-radius:12px;padding:12px;margin:10px 0}
+.control-row{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.control-label{font-weight:600;font-size:.85rem;min-width:80px;color:var(--primary-dark)}
+.control-slider{flex:1;min-width:100px;height:6px;-webkit-appearance:none;appearance:none;background:linear-gradient(90deg,var(--primary),var(--secondary));border-radius:3px;outline:none;cursor:pointer}
+.control-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:#fff;border:3px solid var(--primary);border-radius:50%;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.control-value{background:var(--primary);color:#fff;padding:4px 10px;border-radius:15px;font-weight:bold;font-size:.85rem;min-width:46px;text-align:center}
+.result-display{background:linear-gradient(135deg,var(--success),var(--primary));color:#fff;padding:12px 15px;border-radius:12px;margin:10px 0;text-align:center}
+.result-display .result-title{font-size:.72rem;opacity:.9;text-transform:uppercase;letter-spacing:1px}
+.result-display .result-value{font-size:1.3rem;font-weight:800;margin-top:4px;font-family:'Courier New',monospace}
+/* ===== TIMELINE ===== */
+.timeline{position:relative;padding:20px 0}
+.timeline::before{content:'';position:absolute;left:28px;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--primary),var(--accent),var(--secondary));border-radius:2px}
+.tl-item{position:relative;padding-left:70px;margin-bottom:20px;opacity:0;animation:fadeInUp .7s ease forwards}
+.tl-item:nth-child(1){animation-delay:0s}.tl-item:nth-child(2){animation-delay:.1s}.tl-item:nth-child(3){animation-delay:.2s}.tl-item:nth-child(4){animation-delay:.3s}.tl-item:nth-child(5){animation-delay:.4s}.tl-item:nth-child(6){animation-delay:.5s}.tl-item:nth-child(7){animation-delay:.6s}.tl-item:nth-child(8){animation-delay:.7s}
+.tl-dot{position:absolute;left:14px;top:10px;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));box-shadow:0 0 18px rgba(13,148,136,.6),0 4px 10px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.75rem;border:3px solid var(--paper-color);z-index:2}
+.tl-year{font-size:.75rem;color:var(--accent);font-weight:800;letter-spacing:1px}
+.tl-title{font-size:1rem;font-weight:800;color:var(--primary-dark);margin:4px 0}
+.tl-desc{font-size:.85rem;color:var(--text-muted);line-height:1.5}
+/* ===== CONCEPT MAP ===== */
+.concept-map{position:relative;width:100%;height:420px;background:linear-gradient(135deg,rgba(13,148,136,.04),rgba(20,184,166,.04));border-radius:12px;overflow:hidden}
+.cm-node{position:absolute;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;padding:10px 14px;border-radius:12px;font-weight:700;font-size:.85rem;box-shadow:0 6px 16px rgba(13,148,136,.4);transform:translate(-50%,-50%);text-align:center;cursor:pointer;transition:transform .2s;white-space:nowrap;z-index:3}
+.cm-node.root{background:linear-gradient(135deg,var(--accent),#d97706);font-size:1rem;box-shadow:0 8px 20px rgba(245,158,11,.5);padding:14px 20px;animation:glow 3s ease-in-out infinite}
+.cm-node.child{background:linear-gradient(135deg,var(--success),#059669);font-size:.78rem;padding:8px 12px}
+.cm-node:hover{transform:translate(-50%,-50%) scale(1.12);z-index:4}
+.cm-svg{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+/* ===== QUIZ ===== */
+.quiz-option{display:block;width:100%;padding:10px 14px;margin:6px 0;background:var(--paper-color);border:2px solid var(--paper-line);border-radius:10px;cursor:pointer;text-align:left;font-size:.92rem;font-weight:600;color:var(--text-main);transition:all .2s}
+.quiz-option:hover{border-color:var(--primary);background:rgba(13,148,136,.05);transform:translateX(4px)}
+.quiz-option.correct{background:linear-gradient(135deg,#22c55e,#059669);color:#fff;border-color:#22c55e}
+.quiz-option.wrong{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border-color:#ef4444}
+/* ===== LAW CARDS ===== */
+.law-grid{display:grid;grid-template-columns:1fr;gap:8px}
+.law-card{background:linear-gradient(135deg,rgba(13,148,136,.08),rgba(20,184,166,.05));border-left:4px solid var(--primary);border-radius:8px;padding:10px 14px;display:flex;gap:12px;align-items:center;transition:all .2s}
+.law-card:hover{transform:translateX(4px);box-shadow:0 4px 12px rgba(13,148,136,.2)}
+.law-num{background:var(--primary);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;flex-shrink:0}
+.law-body{flex:1}
+.law-name{font-weight:800;color:var(--primary-dark);font-size:.82rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.law-formula{font-size:.95rem}
+/* ===== SWITCHES ===== */
+.logic-switch{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:10px;background:var(--bg-body);box-shadow:var(--clay-shadow);margin:4px;cursor:pointer;transition:all .2s;font-weight:700;user-select:none}
+.logic-switch.on{background:linear-gradient(135deg,#22c55e,#059669);color:#fff}
+.logic-switch.off{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
+.logic-switch:hover{transform:scale(1.05)}
+/* ===== INPUT/SELECT ===== */
+.lg-input,.lg-select{padding:8px 14px;border-radius:10px;border:2px solid var(--paper-line);background:var(--paper-color);color:var(--text-main);font-family:'Courier New',monospace;font-size:1rem;font-weight:700;margin:4px}
+.lg-input:focus,.lg-select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(13,148,136,.2)}
+.lg-btn{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;border:none;padding:9px 18px;border-radius:10px;font-weight:700;cursor:pointer;box-shadow:0 4px 10px rgba(13,148,136,.3);transition:all .2s;font-size:.9rem;margin:4px}
+.lg-btn:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(13,148,136,.4)}
+.op-chip{display:inline-block;padding:4px 10px;margin:3px;background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff;border-radius:8px;font-weight:700;font-family:'Courier New',monospace;cursor:pointer;transition:all .2s;font-size:.9rem}
+.op-chip:hover{transform:scale(1.1)}
+.historic-img{width:100%;max-width:480px;border-radius:14px;box-shadow:0 10px 30px rgba(13,148,136,.25);margin:10px auto;display:block;border:3px solid rgba(94,234,212,.3)}
+/* ===== VENN DIAGRAMS ===== */
+.venn-canvas{border-radius:12px;display:block;margin:10px auto;max-width:100%}
+/* ===== NUMERIC SETS DIAGRAM ===== */
+.num-sets-svg{width:100%;max-height:360px}
+/* ===== TV-TABLE (Truth Table style) ===== */
+.tv-table th,.tv-table td{padding:8px 12px;font-family:'Courier New',monospace;font-weight:bold;font-size:.95rem}
+.tv-table .tv-V{background:rgba(34,197,94,.18);color:#047857}
+.tv-table .tv-F{background:rgba(239,68,68,.18);color:#b91c1c}
+body.dark-mode .tv-table .tv-V{background:rgba(34,197,94,.25);color:#6ee7b7}
+body.dark-mode .tv-table .tv-F{background:rgba(239,68,68,.25);color:#fca5a5}
+/* ===== VENN INTERACTIVE ===== */
+.venn-interactive{position:relative;border-radius:12px;overflow:hidden;margin:10px auto;cursor:pointer;background:linear-gradient(135deg,rgba(13,148,136,.03),rgba(20,184,166,.03));border:1px solid rgba(13,148,136,.15)}
+.venn-interactive canvas{display:block;margin:0 auto}
+.venn-info-bar{font-size:.82rem;text-align:center;padding:8px;font-weight:700;color:var(--primary);min-height:40px}
+/* ===== CARTESIAN PRODUCT ===== */
+.cart-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px 0}
+.cart-pair{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;padding:6px 12px;border-radius:20px;font-weight:700;font-size:.85rem;font-family:'Courier New',monospace;box-shadow:0 3px 8px rgba(13,148,136,.3);opacity:0;animation:fadeInUp .4s ease forwards}
+.cart-pair:nth-child(1){animation-delay:.05s}.cart-pair:nth-child(2){animation-delay:.1s}.cart-pair:nth-child(3){animation-delay:.15s}.cart-pair:nth-child(4){animation-delay:.2s}.cart-pair:nth-child(5){animation-delay:.25s}.cart-pair:nth-child(6){animation-delay:.3s}.cart-pair:nth-child(7){animation-delay:.35s}.cart-pair:nth-child(8){animation-delay:.4s}.cart-pair:nth-child(9){animation-delay:.45s}.cart-pair:nth-child(10){animation-delay:.5s}.cart-pair:nth-child(11){animation-delay:.55s}.cart-pair:nth-child(12){animation-delay:.6s}
+.cart-pair.reverse{background:linear-gradient(135deg,#f59e0b,#d97706)}
+/* ===== CHALLENGE GAME ===== */
+.challenge-card{background:linear-gradient(135deg,rgba(13,148,136,.06),rgba(94,234,212,.04));border:2px solid var(--primary);border-radius:14px;padding:16px;margin:10px 0;text-align:center;position:relative;overflow:hidden}
+.challenge-card::before{content:'';position:absolute;top:-40%;right:-30%;width:120px;height:120px;border-radius:50%;background:rgba(94,234,212,.08);pointer-events:none}
+.challenge-card .q-num{background:var(--accent);color:#fff;display:inline-block;padding:4px 14px;border-radius:20px;font-weight:800;font-size:.82rem;margin-bottom:8px}
+@keyframes correctPulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 15px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+@keyframes wrongShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.answer-correct{animation:correctPulse .6s ease}.answer-wrong{animation:wrongShake .4s ease}
+.streak-badge{display:inline-block;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:4px 12px;border-radius:20px;font-weight:800;font-size:.78rem;margin:4px;animation:glow 1.5s ease-in-out infinite}
+.history-item{display:flex;align-items:center;gap:8px;padding:6px 10px;margin:3px 0;border-radius:8px;font-size:.82rem;font-weight:600}
+.history-item.ok{background:rgba(34,197,94,.1);color:#047857}
+.history-item.fail{background:rgba(239,68,68,.1);color:#b91c1c}
+</style>
+</head>
+<body>
+<button class="btn-circle" onclick="toggleTheme()" style="position:fixed;top:20px;left:20px;z-index:200;width:40px;height:40px"><i class="fas fa-moon" id="theme-icon"></i></button>
+<button class="btn-circle" onclick="showIndex()" style="position:fixed;top:20px;left:70px;z-index:200;width:40px;height:40px" title="Índice"><i class="fas fa-list"></i></button>
+<button id="mobile-fab" onclick="toggleMobileSide()"><i class="fas fa-columns"></i> <span id="fab-text">Ver Der.</span></button>
+<div id="app-container">
+<div class="book-wrapper"><div class="book" id="book-el">
+<div class="binding-spine" id="spine"></div>
+<div class="page page-left" id="p-left"><div class="holes-strip" id="holes-l"></div><div class="page-content" id="c-left"></div><span class="num-page" id="num-left"></span></div>
+<div class="page page-right" id="p-right"><div class="holes-strip" id="holes-r"></div><div class="page-content" id="c-right"></div><span class="num-page" id="num-right"></span></div>
+</div></div>
+<div class="nav-dock">
+<button class="btn-circle" onclick="goToPage(0)" title="Inicio"><i class="fas fa-home"></i></button>
+<button class="btn-circle" onclick="prevPage()" id="btn-prev"><i class="fas fa-chevron-left"></i></button>
+<div class="page-badge" id="page-num">PORTADA</div>
+<button class="btn-circle" onclick="nextPage()" id="btn-next"><i class="fas fa-chevron-right"></i></button>
+<button class="btn-circle" onclick="showIndex()" title="Índice"><i class="fas fa-th-list"></i></button>
+</div>
+<div class="footer">Creado por Msc. Néstor Fabio Montoya Palacios · Cuaderno de Teoría de Conjuntos</div>
+</div>
+<div id="index-modal" class="modal-overlay"><div class="modal-content">
+<button class="modal-close" onclick="hideIndex()"><i class="fas fa-times"></i></button>
+<h2 style="margin-bottom:18px"><i class="fas fa-book-open"></i> Índice del Cuaderno</h2>
+<div id="index-list" class="index-grid"></div>
+</div></div>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// 📘 CUADERNO INTERACTIVO — TEORÍA DE CONJUNTOS
+// ═══════════════════════════════════════════════════════════════
+const BOOK_DATA = [
+/* ═══ PÁG 0 · PORTADA ═══ */
+{ title:"Portada", left:{ type:'cover', html:`
+<div class="cover-page">
+<div class="cover-particles"><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div></div>
+<div class="cover-orbit"></div><div class="cover-orbit"></div><div class="cover-orbit"></div>
+<div class="cover-symbol">∈</div><div class="cover-symbol">∪</div><div class="cover-symbol">∩</div>
+<div class="cover-symbol">⊂</div><div class="cover-symbol">∅</div><div class="cover-symbol">ℕ</div>
+<div class="cover-content">
+<div class="cover-icon-wrapper"><div class="cover-icon"><i class="fa-solid fa-object-group"></i></div></div>
+<div class="cover-subtitle">Cuaderno Interactivo de</div>
+<h1>CONJUNTOS</h1>
+<h2>Teoría · Operaciones · Aplicaciones</h2>
+<div class="cover-separator"></div>
+<div class="cover-badge"><i class="fas fa-layer-group" style="margin-right:8px"></i>A ∪ B ∩ C</div>
+<p class="cover-footer">Definiciones · Diagramas de Venn · Leyes · Conteo</p>
+</div></div>`}, right:{ html:`
+<h2 style="text-align:center"><i class="fas fa-list-ol"></i> Contenidos</h2>
+<div class="concept-box" style="font-size:.85rem">
+<p><strong>1.</strong> Reseña histórica</p>
+<p><strong>2.</strong> Línea de tiempo</p>
+<p><strong>3.</strong> Mapa conceptual</p>
+<p><strong>4.</strong> Definición y notación</p>
+<p><strong>5.</strong> Pertenencia y subconjuntos</p>
+<p><strong>6.</strong> Conjunto vacío y universal</p>
+<p><strong>7.</strong> Unión e intersección</p>
+<p><strong>8.</strong> Diferencia, complemento y Δ simétrica</p>
+<p><strong>9.</strong> Conjuntos numéricos</p>
+<p><strong>10.</strong> Leyes de las operaciones (I)</p>
+<p><strong>11.</strong> Leyes de las operaciones (II)</p>
+<p><strong>12.</strong> Conteo: inclusión-exclusión</p>
+<p><strong>13.</strong> Producto cartesiano</p>
+<p><strong>14.</strong> Diagramas de Venn interactivos</p>
+<p><strong>15.</strong> Desafío: Maestro de conjuntos</p>
+<p><strong>16.</strong> Evaluador + Quiz</p>
+<p><strong>17.</strong> Créditos</p>
+</div>
+<div class="glass-panel" style="text-align:center;margin-top:8px">
+<p style="font-style:italic;font-size:.88rem">"Del paraíso que Cantor ha creado para nosotros, nadie podrá expulsarnos."</p>
+<p style="font-size:.78rem">— David Hilbert</p>
+</div>
+<div class="warning-box" style="margin-top:8px">
+<strong><i class="fa-solid fa-lightbulb"></i> ¿Cómo usar este cuaderno?</strong>
+<p>Navega con <i class="fas fa-chevron-left"></i> <i class="fas fa-chevron-right"></i> o flechas del teclado. Pulsa <i class="fas fa-list"></i> para el índice. Activa el <strong>modo oscuro</strong> <i class="fas fa-moon"></i>. ¡Interactúa con los diagramas, generadores y desafíos!</p>
+</div>`} },
+
+/* ═══ PÁG 1 · RESEÑA HISTÓRICA ═══ */
+{ title:"1. Reseña histórica", left:{ html:`
+<h2>1. Reseña histórica</h2>
+<div class="def-box">
+<span class="def-title"><i class="fa-solid fa-scroll"></i> ¿Qué es la teoría de conjuntos?</span>
+<p>La <strong>teoría de conjuntos</strong> es la rama de las matemáticas que estudia las <em>colecciones de objetos</em> llamados conjuntos. Es la base sobre la cual se construyen prácticamente todas las demás áreas de la matemática moderna.</p>
+</div>
+<h3>Orígenes y precursores</h3>
+<p>Desde la antigüedad, los matemáticos agruparon objetos: <em>Euclides</em> clasificó los números, <em>Aristóteles</em> creó categorías lógicas. Sin embargo, la idea formal de "conjunto" no apareció hasta el siglo XIX.</p>
+<p><strong>Bernard Bolzano</strong> (1781–1848) fue uno de los primeros en estudiar propiedades de conjuntos infinitos en su obra <em>Paradoxien des Unendlichen</em> (1851), publicada póstumamente.</p>
+<div class="concept-box">
+<h4><i class="fas fa-crown"></i> El padre de la teoría de conjuntos</h4>
+<p><strong>Georg Cantor</strong> (1845–1918) desarrolló la teoría de conjuntos moderna entre 1874 y 1884. Demostró que existen <em>infinitos de diferentes tamaños</em> y creó los <strong>números transfinitos</strong> ($\\aleph_0, \\aleph_1, \\ldots$), cambiando para siempre nuestra comprensión del infinito.</p>
+</div>
+<div class="warning-box">
+<strong><i class="fas fa-quote-left"></i> Frase célebre</strong>
+<p><em>"La esencia de las matemáticas reside en su libertad."</em> — Georg Cantor</p>
+</div>`}, right:{ html:`
+<div style="text-align:center">
+<img src="../imagenes/conjuntos/GeorgCantor.png" alt="Georg Cantor" class="historic-img">
+<p style="font-size:.78rem;font-style:italic;color:var(--text-muted);margin-top:-4px"><strong>Georg Cantor</strong> (1845–1918), padre de la teoría de conjuntos.</p>
+</div>
+<h3>La crisis y la axiomatización</h3>
+<p>En 1901, <em>Bertrand Russell</em> descubrió una paradoja en la teoría ingenua de conjuntos: el conjunto de todos los conjuntos que no se contienen a sí mismos. Esto provocó una <strong>crisis en los fundamentos</strong>.</p>
+<p>La respuesta vino de <strong>Ernst Zermelo</strong> (1908) y <strong>Abraham Fraenkel</strong> (1922), quienes crearon el sistema axiomático <strong>ZFC</strong> (Zermelo-Fraenkel con axioma de elección), que se usa hasta hoy como fundamento de las matemáticas.</p>
+<div class="example-box">
+<span class="example-title"><i class="fas fa-landmark"></i> Dato curioso</span>
+<p>El grupo <strong>Bourbaki</strong> (desde 1935) popularizó la notación moderna de conjuntos ($\\in, \\subset, \\cup, \\cap$). Muchos de los símbolos que usamos hoy fueron estandarizados por ellos.</p>
+</div>`} },
+
+/* ═══ PÁG 2 · LÍNEA DE TIEMPO ═══ */
+{ title:"2. Línea de tiempo", left:{ html:`
+<h2>2. Línea de tiempo</h2>
+<p>Un recorrido por los momentos clave en la historia de la teoría de conjuntos.</p>
+<div class="timeline">
+<div class="tl-item"><div class="tl-dot">I</div>
+<div class="tl-year">c. 300 a.C.</div>
+<div class="tl-title">Euclides</div>
+<div class="tl-desc">En los <em>Elementos</em>, clasifica tipos de números (pares, impares, primos). Primeras agrupaciones matemáticas.</div></div>
+
+<div class="tl-item"><div class="tl-dot">II</div>
+<div class="tl-year">1638</div>
+<div class="tl-title">Galileo Galilei</div>
+<div class="tl-desc">Observa la paradoja de que hay "tantos" cuadrados perfectos como números naturales, pese a ser un "subconjunto".</div></div>
+
+<div class="tl-item"><div class="tl-dot">III</div>
+<div class="tl-year">1851</div>
+<div class="tl-title">Bernard Bolzano</div>
+<div class="tl-desc">Publica <em>Paradoxien des Unendlichen</em>: primer estudio riguroso de conjuntos infinitos y correspondencias.</div></div>
+
+<div class="tl-item"><div class="tl-dot">IV</div>
+<div class="tl-year">1874</div>
+<div class="tl-title">Georg Cantor — Artículo fundacional</div>
+<div class="tl-desc">Demuestra que los reales son <strong>no numerables</strong>: existen infinitos más grandes que otros. Nace la <strong>teoría de conjuntos</strong>.</div></div>
+</div>`}, right:{ html:`
+<div class="timeline">
+<div class="tl-item"><div class="tl-dot">V</div>
+<div class="tl-year">1880–1884</div>
+<div class="tl-title">Cantor — Números transfinitos</div>
+<div class="tl-desc">Desarrolla la aritmética de los <strong>cardinales transfinitos</strong> $\\aleph_0, \\aleph_1, \\ldots$ y los ordinales.</div></div>
+
+<div class="tl-item"><div class="tl-dot">VI</div>
+<div class="tl-year">1888</div>
+<div class="tl-title">Richard Dedekind</div>
+<div class="tl-desc">Define los números reales mediante <strong>cortaduras de Dedekind</strong>. Publica <em>Was sind und was sollen die Zahlen?</em>.</div></div>
+
+<div class="tl-item"><div class="tl-dot">VII</div>
+<div class="tl-year">1901</div>
+<div class="tl-title">Paradoja de Russell</div>
+<div class="tl-desc">Russell demuestra que la "teoría ingenua" de conjuntos lleva a contradicciones: $R = \\{x \\mid x \\notin x\\}$.</div></div>
+
+<div class="tl-item"><div class="tl-dot">VIII</div>
+<div class="tl-year">1908</div>
+<div class="tl-title">Zermelo — Axiomatización</div>
+<div class="tl-desc">Publica el primer sistema axiomático para conjuntos. Fraenkel (1922) lo completa: nace <strong>ZFC</strong>.</div></div>
+
+<div class="tl-item"><div class="tl-dot">IX</div>
+<div class="tl-year">1935</div>
+<div class="tl-title">Nicolas Bourbaki</div>
+<div class="tl-desc">El grupo Bourbaki estandariza la notación moderna ($\\in, \\cup, \\cap, \\subset$) y la enseñanza basada en conjuntos.</div></div>
+
+<div class="tl-item"><div class="tl-dot">X</div>
+<div class="tl-year">1963</div>
+<div class="tl-title">Paul Cohen</div>
+<div class="tl-desc">Demuestra la <strong>independencia de la hipótesis del continuo</strong> respecto a ZFC. Premio Fields 1966.</div></div>
+</div>`} },
+
+/* ═══ PÁG 3 · MAPA CONCEPTUAL ═══ */
+{ title:"3. Mapa conceptual", left:{ html:`
+<h2>3. Mapa conceptual</h2>
+<p>Visualización jerárquica de los <strong>conceptos fundamentales</strong> de la teoría de conjuntos:</p>
+<div class="concept-map" id="concept-map">
+<svg class="cm-svg" id="cm-svg" viewBox="0 0 600 420"></svg>
+<div class="cm-node root" style="top:12%;left:50%">CONJUNTOS</div>
+<div class="cm-node" style="top:36%;left:18%">Definición</div>
+<div class="cm-node" style="top:36%;left:50%">Operaciones</div>
+<div class="cm-node" style="top:36%;left:82%">Tipos</div>
+<div class="cm-node child" style="top:62%;left:8%">Extensión</div>
+<div class="cm-node child" style="top:62%;left:26%">Comprensión</div>
+<div class="cm-node child" style="top:62%;left:38%">∪ Unión</div>
+<div class="cm-node child" style="top:62%;left:52%">∩ Intersección</div>
+<div class="cm-node child" style="top:62%;left:66%">− Diferencia</div>
+<div class="cm-node child" style="top:85%;left:50%">Complemento</div>
+<div class="cm-node child" style="top:62%;left:80%">ℕ ℤ ℚ</div>
+<div class="cm-node child" style="top:85%;left:82%">ℝ ℂ</div>
+</div>`}, right:{ html:`
+<h3>Glosario rápido</h3>
+<div class="law-grid">
+<div class="law-card"><div class="law-num">1</div><div class="law-body"><div class="law-name">Conjunto</div><div class="law-formula" style="font-size:.85rem;font-family:Nunito">Colección bien definida de objetos.</div></div></div>
+<div class="law-card"><div class="law-num">2</div><div class="law-body"><div class="law-name">Elemento</div><div class="law-formula" style="font-size:.85rem;font-family:Nunito">Cada objeto que pertenece a un conjunto.</div></div></div>
+<div class="law-card"><div class="law-num">3</div><div class="law-body"><div class="law-name">Subconjunto</div><div class="law-formula" style="font-size:.85rem;font-family:Nunito">$A \\subseteq B$ si todo elemento de $A$ está en $B$.</div></div></div>
+<div class="law-card"><div class="law-num">4</div><div class="law-body"><div class="law-name">Conjunto vacío</div><div class="law-formula" style="font-size:.85rem;font-family:Nunito">$\\emptyset = \\{\\}$, el conjunto sin elementos.</div></div></div>
+<div class="law-card"><div class="law-num">5</div><div class="law-body"><div class="law-name">Conjunto universal</div><div class="law-formula" style="font-size:.85rem;font-family:Nunito">$U$: contiene todos los elementos del contexto.</div></div></div>
+<div class="law-card"><div class="law-num">6</div><div class="law-body"><div class="law-name">Cardinal</div><div class="law-formula" style="font-size:.85rem;font-family:Nunito">$|A|$: número de elementos de $A$.</div></div></div>
+<div class="law-card"><div class="law-num">7</div><div class="law-body"><div class="law-name">Diagrama de Venn</div><div class="law-formula" style="font-size:.85rem;font-family:Nunito">Representación gráfica de conjuntos con círculos.</div></div></div>
+</div>
+<div class="example-box" style="margin-top:10px">
+<span class="example-title"><i class="fas fa-puzzle-piece"></i> ¿Qué es un conjunto?</span>
+<ul style="margin-top:6px">
+<li>✅ $A = \\{1, 2, 3\\}$ → conjunto de números</li>
+<li>✅ <em>"El conjunto de vocales"</em> = $\\{a, e, i, o, u\\}$</li>
+<li>❌ <em>"Los números grandes"</em> → no está bien definido</li>
+</ul>
+</div>`} },
+
+/* ═══ PÁG 4 · DEFINICIÓN Y NOTACIÓN ═══ */
+{ title:"4. Definición y notación", left:{ html:`
+<h2>4. Definición y notación</h2>
+<div class="def-box">
+<span class="def-title"><i class="fa-solid fa-pen-nib"></i> Definición</span>
+<p>Un <strong>conjunto</strong> es una colección <em>bien definida</em> de objetos distintos, llamados <strong>elementos</strong> o <strong>miembros</strong> del conjunto. Se denota con letras mayúsculas: $A, B, C, \\ldots$</p>
+</div>
+<h3>Formas de describir un conjunto</h3>
+<div class="concept-box">
+<h4>Por extensión (enumeración)</h4>
+<p>Se listan todos los elementos entre llaves:</p>
+<div class="formula-box">$A = \\{1, 2, 3, 4, 5\\}$</div>
+</div>
+<div class="concept-box">
+<h4>Por comprensión (propiedad)</h4>
+<p>Se indica una propiedad que deben cumplir los elementos:</p>
+<div class="formula-box">$B = \\{x \\in \\mathbb{N} \\mid x < 6\\}$</div>
+<p>Se lee: "$B$ es el conjunto de los $x$ naturales tales que $x$ es menor que 6".</p>
+</div>
+<h3>Tabla de símbolos fundamentales</h3>
+<table>
+<thead><tr><th>Símbolo</th><th>Significado</th><th>Ejemplo</th></tr></thead>
+<tbody>
+<tr><td><strong>$\\in$</strong></td><td>Pertenece a</td><td>$3 \\in A$</td></tr>
+<tr><td><strong>$\\notin$</strong></td><td>No pertenece a</td><td>$7 \\notin A$</td></tr>
+<tr><td><strong>$\\subset$</strong></td><td>Subconjunto propio</td><td>$\\{1,2\\} \\subset A$</td></tr>
+<tr><td><strong>$\\subseteq$</strong></td><td>Subconjunto</td><td>$A \\subseteq A$</td></tr>
+<tr><td><strong>$|A|$</strong></td><td>Cardinal (tamaño)</td><td>$|A| = 5$</td></tr>
+</tbody></table>`}, right:{ html:`
+<h3>Ejemplos de conjuntos</h3>
+<div class="example-box">
+<span class="example-title"><i class="fa-solid fa-star"></i> Ejemplo 4.1 — Por extensión</span>
+<p>Sea $V$ el conjunto de vocales del alfabeto español:</p>
+<div class="formula-box">$V = \\{a, e, i, o, u\\}$</div>
+<p>Entonces $|V| = 5$, $a \\in V$, pero $b \\notin V$.</p>
+</div>
+<div class="example-box">
+<span class="example-title"><i class="fa-solid fa-star"></i> Ejemplo 4.2 — Por comprensión</span>
+<p>Sea $P$ el conjunto de números primos menores que 20:</p>
+<div class="formula-box">$P = \\{x \\in \\mathbb{N} \\mid x \\text{ es primo} \\land x < 20\\}$</div>
+<p>Por extensión: $P = \\{2, 3, 5, 7, 11, 13, 17, 19\\}$, $|P| = 8$.</p>
+</div>
+<div class="warning-box">
+<strong><i class="fa-solid fa-triangle-exclamation"></i> Errores comunes:</strong>
+<ul>
+<li>Confundir <strong>elemento</strong> con <strong>subconjunto</strong>: $3 \\in A$ pero $\\{3\\} \\subseteq A$.</li>
+<li>Olvidar que el <strong>orden no importa</strong>: $\\{1,2,3\\} = \\{3,1,2\\}$.</li>
+<li>Elementos <strong>repetidos no se cuentan</strong>: $\\{1,1,2\\} = \\{1,2\\}$.</li>
+</ul>
+</div>
+<div class="concept-box">
+<h4><i class="fas fa-equals"></i> Igualdad de conjuntos</h4>
+<p>Dos conjuntos son iguales ($A = B$) si y solo si tienen <strong>exactamente los mismos elementos</strong>:</p>
+<div class="formula-box">$A = B \\iff (\\forall x)(x \\in A \\leftrightarrow x \\in B)$</div>
+</div>`} },
+
+/* ═══ PÁG 5 · PERTENENCIA Y SUBCONJUNTOS ═══ */
+{ title:"5. Pertenencia y subconjuntos", left:{ html:`
+<h2>5. Pertenencia y subconjuntos</h2>
+<div class="def-box">
+<span class="def-title"><i class="fa-solid fa-right-to-bracket"></i> Pertenencia</span>
+<p>Si $x$ es elemento de $A$, escribimos $x \\in A$. Si no, $x \\notin A$.</p>
+</div>
+<div class="def-box">
+<span class="def-title"><i class="fa-solid fa-layer-group"></i> Subconjunto</span>
+<p>$A \\subseteq B$ si todo elemento de $A$ está también en $B$:</p>
+<div class="formula-box">$A \\subseteq B \\iff (\\forall x)(x \\in A \\implies x \\in B)$</div>
+</div>
+<div class="concept-box">
+<h4>Subconjunto propio</h4>
+<p>$A \\subset B$ si $A \\subseteq B$ y $A \\neq B$ (hay al menos un elemento de $B$ que no está en $A$).</p>
+</div>
+<h3>Propiedades</h3>
+<div class="law-grid">
+<div class="law-card"><div class="law-num">1</div><div class="law-body"><div class="law-name">Reflexiva</div><div class="law-formula">$A \\subseteq A$ para todo conjunto $A$</div></div></div>
+<div class="law-card"><div class="law-num">2</div><div class="law-body"><div class="law-name">Antisimétrica</div><div class="law-formula">$A \\subseteq B \\land B \\subseteq A \\implies A = B$</div></div></div>
+<div class="law-card"><div class="law-num">3</div><div class="law-body"><div class="law-name">Transitiva</div><div class="law-formula">$A \\subseteq B \\land B \\subseteq C \\implies A \\subseteq C$</div></div></div>
+<div class="law-card"><div class="law-num">4</div><div class="law-body"><div class="law-name">Vacío</div><div class="law-formula">$\\emptyset \\subseteq A$ para todo conjunto $A$</div></div></div>
+</div>`}, right:{ html:`
+<h3>Laboratorio de pertenencia <i class="fas fa-flask"></i></h3>
+<div class="interactive-controls">
+<p style="text-align:center;font-size:.9rem;margin-bottom:10px">Sea $A = \\{2, 4, 6, 8, 10\\}$. ¿Pertenecen estos elementos?</p>
+<div style="text-align:center;margin:12px 0" id="membership-lab">
+<span class="logic-switch" id="mem-1" onclick="checkMembership(1)">1 ∈ A ?</span>
+<span class="logic-switch" id="mem-2" onclick="checkMembership(2)">2 ∈ A ?</span>
+<span class="logic-switch" id="mem-4" onclick="checkMembership(4)">4 ∈ A ?</span>
+<span class="logic-switch" id="mem-5" onclick="checkMembership(5)">5 ∈ A ?</span>
+<span class="logic-switch" id="mem-8" onclick="checkMembership(8)">8 ∈ A ?</span>
+<span class="logic-switch" id="mem-9" onclick="checkMembership(9)">9 ∈ A ?</span>
+</div>
+<div id="membership-result" class="result-display" style="display:none">
+<div class="result-title">Resultado</div>
+<div class="result-value" id="mem-result-text">—</div>
+</div>
+</div>
+<h3>Conjunto potencia</h3>
+<div class="def-box">
+<span class="def-title"><i class="fas fa-superscript"></i> Partes de A</span>
+<p>El <strong>conjunto potencia</strong> $\\mathcal{P}(A)$ es el conjunto de <em>todos</em> los subconjuntos de $A$.</p>
+<div class="formula-box">$|\\mathcal{P}(A)| = 2^{|A|}$</div>
+</div>
+<div class="example-box">
+<span class="example-title"><i class="fas fa-star"></i> Ejemplo</span>
+<p>Si $A = \\{1, 2\\}$, entonces:</p>
+<p>$\\mathcal{P}(A) = \\{\\emptyset, \\{1\\}, \\{2\\}, \\{1,2\\}\\}$</p>
+<p>$|\\mathcal{P}(A)| = 2^2 = 4$ ✓</p>
+</div>`} },
+
+/* ═══ PÁG 6 · VACÍO Y UNIVERSAL ═══ */
+{ title:"6. Conjunto vacío y universal", left:{ html:`
+<h2>6. Conjunto vacío y universal</h2>
+<div class="def-box">
+<span class="def-title"><i class="fa-solid fa-circle-notch"></i> Conjunto vacío</span>
+<p>El <strong>conjunto vacío</strong> es el conjunto que no tiene ningún elemento. Se denota $\\emptyset$ o $\\{\\}$.</p>
+<div class="formula-box">$\\emptyset = \\{x \\mid x \\neq x\\}$</div>
+</div>
+<div class="concept-box">
+<h4>Propiedades del vacío</h4>
+<ul>
+<li>$|\\emptyset| = 0$</li>
+<li>$\\emptyset \\subseteq A$ para <strong>todo</strong> conjunto $A$</li>
+<li>$\\emptyset$ es <strong>único</strong></li>
+<li>$\\mathcal{P}(\\emptyset) = \\{\\emptyset\\}$, por lo tanto $|\\mathcal{P}(\\emptyset)| = 1$</li>
+</ul>
+</div>
+<div class="def-box">
+<span class="def-title"><i class="fa-solid fa-globe"></i> Conjunto universal</span>
+<p>El <strong>conjunto universal</strong> $U$ contiene todos los elementos bajo consideración en un contexto dado.</p>
+</div>
+<div class="example-box">
+<span class="example-title"><i class="fas fa-star"></i> Ejemplo</span>
+<p>Si estudiamos números del 1 al 10:</p>
+<p>$U = \\{1, 2, 3, 4, 5, 6, 7, 8, 9, 10\\}$</p>
+<p>$A = \\{2, 4, 6, 8, 10\\}$ (pares)</p>
+<p>$B = \\{1, 3, 5, 7, 9\\}$ (impares)</p>
+</div>`}, right:{ html:`
+<h3>Propiedades con vacío y universal</h3>
+<div class="law-grid">
+<div class="law-card"><div class="law-num">1</div><div class="law-body"><div class="law-name">Identidad unión</div><div class="law-formula">$A \\cup \\emptyset = A$</div></div></div>
+<div class="law-card"><div class="law-num">2</div><div class="law-body"><div class="law-name">Identidad intersección</div><div class="law-formula">$A \\cap U = A$</div></div></div>
+<div class="law-card"><div class="law-num">3</div><div class="law-body"><div class="law-name">Dominación unión</div><div class="law-formula">$A \\cup U = U$</div></div></div>
+<div class="law-card"><div class="law-num">4</div><div class="law-body"><div class="law-name">Dominación intersección</div><div class="law-formula">$A \\cap \\emptyset = \\emptyset$</div></div></div>
+<div class="law-card"><div class="law-num">5</div><div class="law-body"><div class="law-name">Complemento unión</div><div class="law-formula">$A \\cup A' = U$</div></div></div>
+<div class="law-card"><div class="law-num">6</div><div class="law-body"><div class="law-name">Complemento intersección</div><div class="law-formula">$A \\cap A' = \\emptyset$</div></div></div>
+<div class="law-card"><div class="law-num">7</div><div class="law-body"><div class="law-name">Doble complemento</div><div class="law-formula">$(A')' = A$</div></div></div>
+<div class="law-card"><div class="law-num">8</div><div class="law-body"><div class="law-name">Complemento de U y ∅</div><div class="law-formula">$U' = \\emptyset \\quad$ y $\\quad \\emptyset' = U$</div></div></div>
+</div>
+<div class="warning-box" style="margin-top:10px">
+<strong><i class="fas fa-brain"></i> Pregúntate:</strong>
+<p>¿Por qué $\\emptyset \\subseteq A$ es verdadero? Porque la afirmación "todo elemento de $\\emptyset$ está en $A$" es <strong>vacuamente verdadera</strong>: no hay elementos en $\\emptyset$ que puedan violarla.</p>
+</div>`} },
+
+/* ═══ PÁG 7 · UNIÓN E INTERSECCIÓN ═══ */
+{ title:"7. Unión e intersección", left:{ html:`
+<h2>7. Unión e intersección</h2>
+<div class="def-box">
+<span class="def-title"><i class="fa-solid fa-circle-plus"></i> Unión</span>
+<p>La <strong>unión</strong> de $A$ y $B$ es el conjunto de elementos que están en $A$, en $B$, o en ambos:</p>
+<div class="formula-box">$A \\cup B = \\{x \\mid x \\in A \\lor x \\in B\\}$</div>
+</div>
+<div style="text-align:center">
+<img src="../imagenes/conjuntos/unionConjuntos.png" alt="Diagrama de Unión" style="max-width:100%;max-height:200px;border-radius:10px;margin:8px 0">
+</div>
+<div class="def-box">
+<span class="def-title"><i class="fa-solid fa-circle-nodes"></i> Intersección</span>
+<p>La <strong>intersección</strong> de $A$ y $B$ es el conjunto de elementos que están en <em>ambos</em>:</p>
+<div class="formula-box">$A \\cap B = \\{x \\mid x \\in A \\land x \\in B\\}$</div>
+</div>
+<div style="text-align:center">
+<img src="../imagenes/conjuntos/interseccionConjuntos.png" alt="Diagrama de Intersección" style="max-width:100%;max-height:200px;border-radius:10px;margin:8px 0">
+</div>`}, right:{ html:`
+<h3>Ejemplo resuelto</h3>
+<div class="example-box">
+<span class="example-title"><i class="fa-solid fa-star"></i> Ejemplo 7.1</span>
+<p>Sean $A = \\{1, 2, 3, 4, 5\\}$ y $B = \\{3, 4, 5, 6, 7\\}$</p>
+<p>$A \\cup B = \\{1, 2, 3, 4, 5, 6, 7\\}$</p>
+<p>$A \\cap B = \\{3, 4, 5\\}$</p>
+</div>
+<h3>Propiedades</h3>
+<div class="law-grid">
+<div class="law-card"><div class="law-num">1</div><div class="law-body"><div class="law-name">Conmutativa</div><div class="law-formula">$A \\cup B = B \\cup A$<br>$A \\cap B = B \\cap A$</div></div></div>
+<div class="law-card"><div class="law-num">2</div><div class="law-body"><div class="law-name">Asociativa</div><div class="law-formula">$(A \\cup B) \\cup C = A \\cup (B \\cup C)$<br>$(A \\cap B) \\cap C = A \\cap (B \\cap C)$</div></div></div>
+<div class="law-card"><div class="law-num">3</div><div class="law-body"><div class="law-name">Idempotencia</div><div class="law-formula">$A \\cup A = A \\quad$ · $\\quad A \\cap A = A$</div></div></div>
+<div class="law-card"><div class="law-num">4</div><div class="law-body"><div class="law-name">Distributiva</div><div class="law-formula">$A \\cup (B \\cap C) = (A \\cup B) \\cap (A \\cup C)$<br>$A \\cap (B \\cup C) = (A \\cap B) \\cup (A \\cap C)$</div></div></div>
+</div>
+<div class="warning-box" style="margin-top:8px">
+<strong><i class="fas fa-info-circle"></i> Conjuntos disjuntos</strong>
+<p>$A$ y $B$ son <strong>disjuntos</strong> si $A \\cap B = \\emptyset$.</p>
+</div>`} },
+
+/* ═══ PÁG 8 · DIFERENCIA, COMPLEMENTO, DIF. SIMÉTRICA ═══ */
+{ title:"8. Diferencia, complemento y Δ", left:{ html:`
+<h2>8. Diferencia, complemento y Δ</h2>
+<div class="def-box">
+<span class="def-title"><i class="fa-solid fa-minus"></i> Diferencia</span>
+<p>$A - B$ (o $A \\setminus B$) son los elementos de $A$ que <strong>no están</strong> en $B$:</p>
+<div class="formula-box">$A - B = \\{x \\mid x \\in A \\land x \\notin B\\}$</div>
+</div>
+<div style="text-align:center">
+<img src="../imagenes/conjuntos/diferenciaConjuntos.png" alt="Diferencia" style="max-width:100%;max-height:170px;border-radius:10px;margin:8px 0">
+</div>
+<div class="def-box">
+<span class="def-title"><i class="fa-solid fa-ban"></i> Complemento</span>
+<p>El <strong>complemento</strong> de $A$ respecto al universal $U$:</p>
+<div class="formula-box">$A' = A^c = U - A = \\{x \\in U \\mid x \\notin A\\}$</div>
+</div>
+<div style="text-align:center">
+<img src="../imagenes/conjuntos/complementoConjuntos.png" alt="Complemento" style="max-width:100%;max-height:170px;border-radius:10px;margin:8px 0">
+</div>`}, right:{ html:`
+<div class="def-box">
+<span class="def-title"><i class="fa-solid fa-shuffle"></i> Diferencia simétrica</span>
+<p>$A \\triangle B$: elementos que están en $A$ o en $B$ pero <strong>no en ambos</strong>:</p>
+<div class="formula-box">$A \\triangle B = (A - B) \\cup (B - A) = (A \\cup B) - (A \\cap B)$</div>
+</div>
+<div style="text-align:center">
+<img src="../imagenes/conjuntos/diferenciaSimetricaConjuntos.png" alt="Diferencia simétrica" style="max-width:100%;max-height:170px;border-radius:10px;margin:8px 0">
+</div>
+<h3>Ejemplo resuelto</h3>
+<div class="example-box">
+<span class="example-title"><i class="fa-solid fa-star"></i> Ejemplo 8.1</span>
+<p>$U = \\{1,2,3,4,5,6,7,8,9,10\\}$</p>
+<p>$A = \\{1,2,3,4,5\\}, \\quad B = \\{3,4,5,6,7\\}$</p>
+<p>$A - B = \\{1, 2\\}$</p>
+<p>$B - A = \\{6, 7\\}$</p>
+<p>$A' = \\{6,7,8,9,10\\}$</p>
+<p>$A \\triangle B = \\{1, 2, 6, 7\\}$</p>
+</div>
+<div class="concept-box">
+<h4><i class="fas fa-link"></i> Relación Lógica ↔ Conjuntos</h4>
+<table style="font-size:.85rem">
+<thead><tr><th>Lógica</th><th>Conjuntos</th></tr></thead>
+<tbody>
+<tr><td>$\\land$</td><td>$\\cap$</td></tr>
+<tr><td>$\\lor$</td><td>$\\cup$</td></tr>
+<tr><td>$\\neg$</td><td>Complemento $'$</td></tr>
+<tr><td>$\\to$</td><td>$A' \\cup B$</td></tr>
+</tbody></table>
+</div>`} },
+
+/* ═══ PÁG 9 · CONJUNTOS NUMÉRICOS ═══ */
+{ title:"9. Conjuntos numéricos", left:{ html:`
+<h2>9. Conjuntos numéricos</h2>
+<div class="concept-box">
+<h4><i class="fas fa-hashtag"></i> La gran familia de los números</h4>
+<p>Los conjuntos numéricos se organizan por <strong>inclusión</strong>:</p>
+<div class="formula-box">$\\mathbb{N} \\subset \\mathbb{Z} \\subset \\mathbb{Q} \\subset \\mathbb{R} \\subset \\mathbb{C}$</div>
+</div>
+<div class="law-grid">
+<div class="law-card"><div class="law-num">ℕ</div><div class="law-body"><div class="law-name">Naturales</div><div class="law-formula">$\\mathbb{N} = \\{0, 1, 2, 3, \\ldots\\}$</div></div></div>
+<div class="law-card"><div class="law-num">ℤ</div><div class="law-body"><div class="law-name">Enteros</div><div class="law-formula">$\\mathbb{Z} = \\{\\ldots, -2, -1, 0, 1, 2, \\ldots\\}$</div></div></div>
+<div class="law-card"><div class="law-num">ℚ</div><div class="law-body"><div class="law-name">Racionales</div><div class="law-formula">$\\mathbb{Q} = \\{\\frac{p}{q} \\mid p \\in \\mathbb{Z}, q \\in \\mathbb{Z}, q \\neq 0\\}$</div></div></div>
+<div class="law-card"><div class="law-num">𝕀</div><div class="law-body"><div class="law-name">Irracionales</div><div class="law-formula">$\\mathbb{I} = \\mathbb{R} - \\mathbb{Q}$. Ej: $\\sqrt{2}, \\pi, e$</div></div></div>
+<div class="law-card"><div class="law-num">ℝ</div><div class="law-body"><div class="law-name">Reales</div><div class="law-formula">$\\mathbb{R} = \\mathbb{Q} \\cup \\mathbb{I}$</div></div></div>
+<div class="law-card"><div class="law-num">ℂ</div><div class="law-body"><div class="law-name">Complejos</div><div class="law-formula">$\\mathbb{C} = \\{a + bi \\mid a,b \\in \\mathbb{R}, i^2 = -1\\}$</div></div></div>
+</div>`}, right:{ html:`
+<h3>Diagrama de inclusión</h3>
+<div style="text-align:center">
+<img src="../imagenes/conjuntos/conjuntosNumericos.png" alt="Diagrama de Conjuntos Numéricos" style="max-width:100%;max-height:360px;border-radius:10px;margin:8px auto;display:block;">
+</div>
+<div class="warning-box">
+<strong><i class="fas fa-infinity"></i> ¿Sabías que...?</strong>
+<p>Cantor demostró que $|\\mathbb{N}| = |\\mathbb{Z}| = |\\mathbb{Q}| = \\aleph_0$ (todos son <em>numerables</em>), pero $|\\mathbb{R}| = \\mathfrak{c} > \\aleph_0$ (los reales son <strong>no numerables</strong>).</p>
+</div>`} },
+
+/* ═══ PÁG 10 · LEYES (I) ═══ */
+{ title:"10. Leyes de las operaciones (I)", left:{ html:`
+<h2>10. Leyes de las operaciones <span style="font-size:.6em;color:var(--accent)">Parte I</span></h2>
+<div class="def-box">
+<span class="def-title"><i class="fa-solid fa-scale-balanced"></i> Leyes fundamentales</span>
+<p>Las operaciones entre conjuntos obedecen leyes análogas a las del álgebra booleana y la lógica proposicional.</p>
+</div>
+<div class="law-grid">
+<div class="law-card"><div class="law-num">1</div><div class="law-body"><div class="law-name">Conmutativa</div><div class="law-formula">$A \\cup B = B \\cup A$<br>$A \\cap B = B \\cap A$</div></div></div>
+<div class="law-card"><div class="law-num">2</div><div class="law-body"><div class="law-name">Asociativa</div><div class="law-formula">$(A \\cup B) \\cup C = A \\cup (B \\cup C)$<br>$(A \\cap B) \\cap C = A \\cap (B \\cap C)$</div></div></div>
+<div class="law-card"><div class="law-num">3</div><div class="law-body"><div class="law-name">Distributiva</div><div class="law-formula">$A \\cup (B \\cap C) = (A \\cup B) \\cap (A \\cup C)$<br>$A \\cap (B \\cup C) = (A \\cap B) \\cup (A \\cap C)$</div></div></div>
+<div class="law-card"><div class="law-num">4</div><div class="law-body"><div class="law-name">Idempotencia</div><div class="law-formula">$A \\cup A = A \\quad \\cdot \\quad A \\cap A = A$</div></div></div>
+<div class="law-card"><div class="law-num">5</div><div class="law-body"><div class="law-name">Identidad</div><div class="law-formula">$A \\cup \\emptyset = A \\quad \\cdot \\quad A \\cap U = A$</div></div></div>
+<div class="law-card"><div class="law-num">6</div><div class="law-body"><div class="law-name">Dominación</div><div class="law-formula">$A \\cup U = U \\quad \\cdot \\quad A \\cap \\emptyset = \\emptyset$</div></div></div>
+</div>`}, right:{ html:`
+<div class="law-grid">
+<div class="law-card"><div class="law-num">7</div><div class="law-body"><div class="law-name">Leyes de De Morgan</div><div class="law-formula">$(A \\cup B)' = A' \\cap B'$<br>$(A \\cap B)' = A' \\cup B'$</div></div></div>
+<div class="law-card"><div class="law-num">8</div><div class="law-body"><div class="law-name">Absorción</div><div class="law-formula">$A \\cup (A \\cap B) = A$<br>$A \\cap (A \\cup B) = A$</div></div></div>
+<div class="law-card"><div class="law-num">9</div><div class="law-body"><div class="law-name">Complemento</div><div class="law-formula">$A \\cup A' = U \\quad \\cdot \\quad A \\cap A' = \\emptyset$</div></div></div>
+<div class="law-card"><div class="law-num">10</div><div class="law-body"><div class="law-name">Doble complemento</div><div class="law-formula">$(A')' = A$</div></div></div>
+</div>
+<div class="example-box" style="margin-top:10px">
+<span class="example-title"><i class="fas fa-star"></i> Ejemplo: De Morgan</span>
+<p>Si $U = \\{1,2,3,4,5\\}$, $A = \\{1,2,3\\}$, $B = \\{3,4,5\\}$:</p>
+<p>$(A \\cup B)' = U' = \\emptyset' = \\ldots$</p>
+<p>$A \\cup B = \\{1,2,3,4,5\\} = U$, así $(A \\cup B)' = \\emptyset$</p>
+<p>$A' = \\{4,5\\}$, $B' = \\{1,2\\}$</p>
+<p>$A' \\cap B' = \\emptyset$ ✓ ¡Se cumple De Morgan!</p>
+</div>
+<div class="warning-box" style="margin-top:8px">
+<strong><i class="fas fa-brain"></i> Dualidad</strong>
+<p>Cada ley de conjuntos tiene un <strong>dual</strong>: se obtiene intercambiando $\\cup \\leftrightarrow \\cap$ y $\\emptyset \\leftrightarrow U$.</p>
+</div>`} },
+
+/* ═══ PÁG 11 · LEYES (II) — TABLA ANALOGÍA ═══ */
+{ title:"11. Leyes de las operaciones (II)", left:{ html:`
+<h2>11. Analogía Lógica ↔ Conjuntos</h2>
+<div class="concept-box">
+<p>Cada operación entre conjuntos tiene un <strong>análogo exacto</strong> en lógica proposicional. La <em>función característica</em> de un conjunto convierte una ley de conjuntos en una tautología.</p>
+</div>
+<table class="tv-table">
+<thead><tr><th>Lógica</th><th>Conjuntos</th><th>Nombre</th></tr></thead>
+<tbody>
+<tr><td>$p \\lor q \\Leftrightarrow q \\lor p$</td><td>$A \\cup B = B \\cup A$</td><td>Conmutativa</td></tr>
+<tr><td>$p \\land q \\Leftrightarrow q \\land p$</td><td>$A \\cap B = B \\cap A$</td><td>Conmutativa</td></tr>
+<tr><td>$\\neg(p \\lor q) \\Leftrightarrow \\neg p \\land \\neg q$</td><td>$(A \\cup B)' = A' \\cap B'$</td><td>De Morgan</td></tr>
+<tr><td>$\\neg(p \\land q) \\Leftrightarrow \\neg p \\lor \\neg q$</td><td>$(A \\cap B)' = A' \\cup B'$</td><td>De Morgan</td></tr>
+<tr><td>$p \\lor \\neg p \\Leftrightarrow V$</td><td>$A \\cup A' = U$</td><td>Complemento</td></tr>
+<tr><td>$p \\land \\neg p \\Leftrightarrow F$</td><td>$A \\cap A' = \\emptyset$</td><td>Complemento</td></tr>
+<tr><td>$p \\lor F \\Leftrightarrow p$</td><td>$A \\cup \\emptyset = A$</td><td>Identidad</td></tr>
+<tr><td>$p \\land V \\Leftrightarrow p$</td><td>$A \\cap U = A$</td><td>Identidad</td></tr>
+</tbody></table>`}, right:{ html:`
+<h3>Verificador interactivo de leyes</h3>
+<div class="interactive-controls">
+<p style="font-size:.88rem">Ingresa dos conjuntos y elige una ley para verificarla:</p>
+<div class="control-row">
+<span class="control-label">A =</span>
+<input type="text" id="law-set-a" class="lg-input" value="1,2,3,4" style="flex:1" placeholder="1,2,3">
+</div>
+<div class="control-row">
+<span class="control-label">B =</span>
+<input type="text" id="law-set-b" class="lg-input" value="3,4,5,6" style="flex:1" placeholder="3,4,5">
+</div>
+<div class="control-row">
+<span class="control-label">U =</span>
+<input type="text" id="law-set-u" class="lg-input" value="1,2,3,4,5,6,7,8" style="flex:1" placeholder="1,2,...,8">
+</div>
+<div style="text-align:center;margin-top:8px">
+<select id="law-select" class="lg-select" style="width:90%">
+<option value="demorgan1">De Morgan: (A∪B)' = A'∩B'</option>
+<option value="demorgan2">De Morgan: (A∩B)' = A'∪B'</option>
+<option value="distrib1">Distributiva: A∪(B∩C)…</option>
+<option value="absorb">Absorción: A∪(A∩B) = A</option>
+<option value="complement">Complemento: A∪A' = U</option>
+</select>
+</div>
+<div style="text-align:center;margin-top:8px">
+<button class="lg-btn" onclick="verifyLaw()"><i class="fas fa-check-double"></i> Verificar ley</button>
+</div>
+</div>
+<div id="law-result" class="result-display" style="display:none">
+<div class="result-title">Verificación</div>
+<div class="result-value" id="law-result-text">—</div>
+</div>`} },
+
+/* ═══ PÁG 12 · CONTEO ═══ */
+{ title:"12. Conteo: inclusión-exclusión", left:{ html:`
+<h2>12. Principio de inclusión-exclusión</h2>
+<div class="def-box">
+<span class="def-title"><i class="fa-solid fa-calculator"></i> Para dos conjuntos</span>
+<div class="formula-box" style="font-size:1.1rem">$|A \\cup B| = |A| + |B| - |A \\cap B|$</div>
+</div>
+<div class="def-box">
+<span class="def-title"><i class="fa-solid fa-calculator"></i> Para tres conjuntos</span>
+<div class="formula-box" style="font-size:.95rem">$|A \\cup B \\cup C| = |A| + |B| + |C|$<br>$- |A \\cap B| - |A \\cap C| - |B \\cap C|$<br>$+ |A \\cap B \\cap C|$</div>
+</div>
+<h3>Calculadora interactiva</h3>
+<div class="interactive-controls">
+<div class="control-row">
+<span class="control-label">|A| =</span>
+<input type="range" class="control-slider" id="cnt-a" min="0" max="50" value="20" oninput="calcCounting()">
+<span class="control-value" id="cnt-a-val">20</span>
+</div>
+<div class="control-row">
+<span class="control-label">|B| =</span>
+<input type="range" class="control-slider" id="cnt-b" min="0" max="50" value="15" oninput="calcCounting()">
+<span class="control-value" id="cnt-b-val">15</span>
+</div>
+<div class="control-row">
+<span class="control-label">|A∩B| =</span>
+<input type="range" class="control-slider" id="cnt-ab" min="0" max="50" value="5" oninput="calcCounting()">
+<span class="control-value" id="cnt-ab-val">5</span>
+</div>
+</div>
+<div class="result-display">
+<div class="result-title">|A ∪ B| =</div>
+<div class="result-value" id="cnt-result">30</div>
+</div>`}, right:{ html:`
+<h3>Ejemplo resuelto</h3>
+<div class="example-box">
+<span class="example-title"><i class="fa-solid fa-clipboard-list"></i> Problema</span>
+<p>En un curso de 40 estudiantes: 25 estudian matemáticas, 20 estudian física, y 10 estudian ambas materias. ¿Cuántos estudian al menos una?</p>
+</div>
+<h4>Solución</h4>
+<div class="concept-box">
+<p>$|M| = 25, \\quad |F| = 20, \\quad |M \\cap F| = 10$</p>
+<div class="formula-box">$|M \\cup F| = 25 + 20 - 10 = 35$</div>
+<p>Estudian al menos una: <strong>35 estudiantes</strong>.</p>
+<p>No estudian ninguna: $40 - 35 = \\mathbf{5}$ estudiantes.</p>
+</div>
+<div class="example-box">
+<span class="example-title"><i class="fa-solid fa-clipboard-list"></i> Problema (3 conjuntos)</span>
+<p>Una encuesta a 100 personas sobre deportes favoritos: 50 fútbol, 35 baloncesto, 30 tenis, 15 fútbol y baloncesto, 10 fútbol y tenis, 8 baloncesto y tenis, 5 los tres.</p>
+</div>
+<div class="concept-box">
+<div class="formula-box" style="font-size:.9rem">$|F \\cup B \\cup T| = 50+35+30-15-10-8+5 = \\mathbf{87}$</div>
+<p>No practican ningún deporte: $100 - 87 = \\mathbf{13}$ personas.</p>
+</div>`} },
+
+/* ═══ PÁG 13 · PRODUCTO CARTESIANO ═══ */
+{ title:"13. Producto cartesiano", left:{ html:`
+<h2>13. Producto cartesiano</h2>
+<div class="def-box">
+<span class="def-title"><i class="fa-solid fa-grip"></i> Definición</span>
+<p>El <strong>producto cartesiano</strong> de $A$ y $B$ es el conjunto de todos los <em>pares ordenados</em> $(a, b)$ donde $a \\in A$ y $b \\in B$:</p>
+<div class="formula-box" style="font-size:1.1rem">$A \\times B = \\{(a, b) \\mid a \\in A \\land b \\in B\\}$</div>
+</div>
+<div class="concept-box">
+<h4><i class="fas fa-ruler-combined"></i> Propiedades</h4>
+<ul>
+<li>$|A \\times B| = |A| \\cdot |B|$</li>
+<li>$A \\times B \\neq B \\times A$ en general (el <strong>orden importa</strong>)</li>
+<li>$A \\times \\emptyset = \\emptyset \\times A = \\emptyset$</li>
+<li>$A \\times (B \\cup C) = (A \\times B) \\cup (A \\times C)$</li>
+<li>$A \\times (B \\cap C) = (A \\times B) \\cap (A \\times C)$</li>
+</ul>
+</div>
+<div class="example-box">
+<span class="example-title"><i class="fas fa-star"></i> Ejemplo</span>
+<p>$A = \\{1, 2\\}$, $B = \\{a, b, c\\}$</p>
+<p>$A \\times B = \\{(1,a), (1,b), (1,c), (2,a), (2,b), (2,c)\\}$</p>
+<p>$|A \\times B| = 2 \\times 3 = 6$ pares ✓</p>
+</div>
+<div class="warning-box">
+<strong><i class="fas fa-info-circle"></i> ¿Por qué "cartesiano"?</strong>
+<p>El nombre honra a <em>René Descartes</em>, quien conectó la geometría con el álgebra: el plano cartesiano $\\mathbb{R}^2 = \\mathbb{R} \\times \\mathbb{R}$ es un producto cartesiano.</p>
+</div>`}, right:{ html:`
+<h3>Generador de A×B <i class="fas fa-wand-magic-sparkles"></i></h3>
+<div class="interactive-controls">
+<div class="control-row">
+<span class="control-label">A =</span>
+<input type="text" id="cart-a" class="lg-input" value="1,2,3" style="flex:1" placeholder="1,2,3">
+</div>
+<div class="control-row">
+<span class="control-label">B =</span>
+<input type="text" id="cart-b" class="lg-input" value="a,b" style="flex:1" placeholder="a,b">
+</div>
+<div style="text-align:center;margin-top:8px">
+<button class="lg-btn" onclick="generateCartesian(false)"><i class="fas fa-calculator"></i> Generar A×B</button>
+<button class="lg-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706)" onclick="generateCartesian(true)"><i class="fas fa-shuffle"></i> Generar B×A</button>
+</div>
+</div>
+<div id="cart-result" class="cart-grid"></div>
+<div id="cart-info" class="result-display" style="display:none">
+<div class="result-title">Cardinalidad</div>
+<div class="result-value" id="cart-count">—</div>
+</div>
+<div class="concept-box" style="margin-top:10px">
+<h4><i class="fas fa-link"></i> Conexión con funciones y relaciones</h4>
+<p style="font-size:.88rem">Una <strong>relación</strong> de $A$ a $B$ es un subconjunto de $A \\times B$. Una <strong>función</strong> $f: A \\to B$ es una relación donde cada $a \\in A$ se asocia con <em>exactamente un</em> $b \\in B$.</p>
+<p style="font-size:.85rem"><em>Ejemplo:</em> $f = \\{(1,a), (2,b), (3,a)\\} \\subseteq A \\times B$ ✓</p>
+</div>`} },
+
+/* ═══ PÁG 14 · DIAGRAMAS DE VENN INTERACTIVOS ═══ */
+{ title:"14. Venn interactivo", left:{ html:`
+<h2>14. Venn interactivo</h2>
+<div class="def-box">
+<span class="def-title"><i class="fa-solid fa-circle-nodes"></i> Diagramas de Venn</span>
+<p>Un <strong>diagrama de Venn</strong> usa figuras cerradas (usualmente círculos) para representar conjuntos y sus relaciones. Fue creado por <em>John Venn</em> en 1880.</p>
+</div>
+<h3>Explorador de 2 conjuntos <i class="fas fa-hand-pointer"></i></h3>
+<p style="font-size:.85rem">Haz clic en cada región para ver qué operación representa:</p>
+<div class="venn-interactive" id="venn2-wrap">
+<canvas id="venn2-canvas" width="380" height="260"></canvas>
+</div>
+<div id="venn2-info" class="result-display">
+<div class="result-title">Región seleccionada</div>
+<div class="result-value" id="venn2-text">Haz clic en una región</div>
+</div>
+<div class="concept-box" style="margin-top:8px">
+<h4><i class="fas fa-shapes"></i> Regiones con 2 conjuntos</h4>
+<p style="font-size:.85rem">Con 2 conjuntos hay $2^2 = 4$ regiones: solo A, solo B, ambos (A∩B), y ninguno (exterior).</p>
+</div>`}, right:{ html:`
+<h3>Explorador de 3 conjuntos <i class="fas fa-hand-pointer"></i></h3>
+<p style="font-size:.85rem">Haz clic en las regiones del diagrama con tres conjuntos:</p>
+<div class="venn-interactive" id="venn3-wrap">
+<canvas id="venn3-canvas" width="380" height="320"></canvas>
+</div>
+<div id="venn3-info" class="result-display">
+<div class="result-title">Región seleccionada</div>
+<div class="result-value" id="venn3-text">Haz clic en una región</div>
+</div>
+<div class="warning-box" style="margin-top:8px">
+<strong><i class="fas fa-infinity"></i> ¿Sabías que...?</strong>
+<p>Con 3 conjuntos hay <strong>8 regiones</strong> ($2^3$). Con $n$ conjuntos hay $2^n$ regiones. Para $n \\geq 4$ ya no se pueden usar solo círculos: se necesitan elipses o formas más complejas.</p>
+</div>
+<div class="example-box" style="margin-top:8px">
+<span class="example-title"><i class="fas fa-user-graduate"></i> John Venn (1834–1923)</span>
+<p style="font-size:.85rem">Lógico y filósofo inglés de la Universidad de Cambridge. Su diagrama apareció por primera vez en su artículo <em>"On the Diagrammatic and Mechanical Representation of Propositions and Reasonings"</em> (1880).</p>
+</div>`} },
+
+/* ═══ PÁG 15 · DESAFÍO ═══ */
+{ title:"15. Desafío: Maestro", left:{ html:`
+<h2>15. Desafío <i class="fas fa-trophy" style="color:var(--accent)"></i></h2>
+<div class="concept-box">
+<p>Pon a prueba tus conocimientos sobre operaciones de conjuntos. Calcula el resultado de cada operación.</p>
+</div>
+<h3>🎯 Reto de operaciones</h3>
+<div class="interactive-controls">
+<div id="ch-context" class="def-box" style="font-size:.88rem"></div>
+<div id="ch-question" class="challenge-card"></div>
+<div style="text-align:center;margin-top:10px">
+<input type="text" id="ch-answer" class="lg-input" style="width:80%" placeholder="Tu respuesta: 1,2,3" onkeydown="if(event.key==='Enter')checkChallenge()">
+<div style="margin-top:8px">
+<button class="lg-btn" onclick="checkChallenge()"><i class="fas fa-check"></i> Verificar</button>
+<button class="lg-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706)" onclick="nextChallenge()"><i class="fas fa-forward"></i> Siguiente</button>
+</div>
+</div>
+</div>
+<div id="ch-feedback" style="margin-top:8px"></div>`}, right:{ html:`
+<h3>📊 Marcador</h3>
+<div class="result-display" style="background:linear-gradient(135deg,var(--accent),#d97706)">
+<div class="result-title">Puntos</div>
+<div class="result-value" id="ch-score">0 / 0</div>
+</div>
+<div id="ch-streak" style="text-align:center;margin:8px 0"></div>
+<div id="ch-history" style="max-height:200px;overflow-y:auto"></div>
+<div class="warning-box" style="margin-top:10px">
+<strong><i class="fas fa-trophy"></i> Niveles</strong>
+<ul style="font-size:.85rem">
+<li>🥉 0–3 correctas: Principiante</li>
+<li>🥈 4–6 correctas: Intermedio</li>
+<li>🥇 7–8 correctas: Avanzado</li>
+<li>🏆 9–10 correctas: ¡Maestro de conjuntos!</li>
+</ul>
+</div>
+<div class="concept-box" style="margin-top:10px">
+<h4><i class="fas fa-lightbulb"></i> Consejos</h4>
+<ul style="font-size:.85rem">
+<li>Ordena los elementos: <code>1,2,3</code></li>
+<li>Para vacío escribe: <code>vacío</code> o <code>{}</code></li>
+<li>Presiona <strong>Enter</strong> para verificar rápido</li>
+</ul>
+</div>`} },
+
+/* ═══ PÁG 16 · QUIZ ═══ */
+{ title:"16. Evaluador + Quiz", left:{ html:`
+<h2>16. Evaluador de conjuntos</h2>
+<div class="concept-box">
+<p>Define conjuntos y evalúa operaciones:</p>
+</div>
+<div class="interactive-controls">
+<div class="control-row"><span class="control-label">U =</span><input type="text" id="eval-u" class="lg-input" value="1,2,3,4,5,6,7,8,9,10" style="flex:1"></div>
+<div class="control-row"><span class="control-label">A =</span><input type="text" id="eval-a" class="lg-input" value="1,2,3,4,5" style="flex:1"></div>
+<div class="control-row"><span class="control-label">B =</span><input type="text" id="eval-b" class="lg-input" value="3,4,5,6,7" style="flex:1"></div>
+<div style="text-align:center;margin-top:8px">
+<input type="text" id="eval-expr" class="lg-input" value="(A ∪ B) ∩ A'" style="width:90%;font-size:1.05rem" placeholder="(A ∪ B) ∩ A'">
+</div>
+<div style="text-align:center;margin-top:6px">
+<span class="op-chip" onclick="insertEval('∪')">∪</span>
+<span class="op-chip" onclick="insertEval('∩')">∩</span>
+<span class="op-chip" onclick="insertEval('-')">−</span>
+<span class="op-chip" onclick="insertEval('Δ')">Δ</span>
+<span class="op-chip" onclick="insertEval('\\'')">  '</span>
+<span class="op-chip" onclick="insertEval('(')"> (</span>
+<span class="op-chip" onclick="insertEval(')')"> )</span>
+</div>
+<div style="text-align:center;margin-top:8px">
+<button class="lg-btn" onclick="evaluateSetExpr()"><i class="fas fa-play"></i> Evaluar</button>
+</div>
+</div>
+<div id="eval-result" class="result-display" style="display:none">
+<div class="result-title">Resultado</div>
+<div class="result-value" id="eval-result-text">—</div>
+</div>`}, right:{ html:`
+<h2 style="margin-top:0">Quiz interactivo</h2>
+<div id="quiz-container"></div>
+<div id="quiz-score" style="display:none" class="result-display">
+<div class="result-title">Puntuación</div>
+<div class="result-value" id="quiz-score-text">0/5</div>
+</div>`} },
+
+/* ═══ PÁG 17 · CRÉDITOS ═══ */
+{ title:"17. Créditos", left:{ html:`
+<h2><i class="fa-solid fa-book"></i> Referencias</h2>
+<div class="clay-card">
+<ul>
+<li>Cantor, G. — <em>Beiträge zur Begründung der transfiniten Mengenlehre</em></li>
+<li>Halmos, P. — <em>Naive Set Theory</em></li>
+<li>Lipschutz, S. — <em>Teoría de Conjuntos (Schaum)</em></li>
+<li>Rosen, K. — <em>Discrete Mathematics and Its Applications</em></li>
+<li>Kolman, B. — <em>Estructuras de Matemáticas Discretas</em></li>
+<li>Johnsonbaugh, R. — <em>Matemáticas Discretas</em></li>
+<li>Grimaldi, R. — <em>Discrete and Combinatorial Mathematics</em></li>
+</ul>
+</div>
+<div class="glass-panel">
+<p><strong>Msc. Néstor Fabio Montoya Palacios</strong></p>
+<p style="font-size:.85rem;color:var(--text-muted)">Magíster en Enseñanza de la Física · Docente de Matemáticas y Física<br>Colegio María Auxiliadora · Cartago, Valle del Cauca, Colombia</p>
+</div>`}, right:{ html:`
+<div style="display:flex;flex-direction:column;justify-content:center;height:100%;text-align:center;">
+<div style="font-size:4rem;color:var(--primary)"><i class="fa-solid fa-infinity"></i></div>
+<h2 style="border:none;color:var(--primary)">¡Gracias por estudiar!</h2>
+<p style="font-style:italic;max-width:340px;margin:0 auto">"Del paraíso que Cantor ha creado para nosotros, nadie podrá expulsarnos."<br>— David Hilbert</p>
+<div class="glass-panel" style="margin-top:18px">
+<p style="font-size:.85rem"><strong>Símbolos de este cuaderno:</strong><br>
+∈ ∉ ⊂ ⊆ ∪ ∩ Δ ∅ ℕ ℤ ℚ ℝ ℂ</p>
+</div>
+<div class="warning-box" style="margin-top:14px;text-align:left">
+<strong><i class="fa-solid fa-heart"></i> Sigue aprendiendo</strong>
+<p>Las matemáticas son infinitas, como los conjuntos de Cantor. Cada concepto aprendido es un nuevo elemento en el conjunto de tu conocimiento: $|\\text{Tú}_{\\text{hoy}}| > |\\text{Tú}_{\\text{ayer}}|$</p>
+</div>
+</div>`} }
+];
+
+// ═══════════════════════════════════════
+// ENGINE — Navegación del cuaderno
+// ═══════════════════════════════════════
+window.currentPage = 0;
+let mobileView = 'left';
+
+document.addEventListener('DOMContentLoaded', () => {
+    initSpine();
+    render();
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowRight') nextPage();
+        if (e.key === 'ArrowLeft') prevPage();
+        if (e.key === 'Escape') hideIndex();
+    });
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('theme-icon').className = 'fas fa-sun';
+    }
+});
+
+function initSpine() {
+    const s = document.getElementById('spine');
+    const hL = document.getElementById('holes-l');
+    const hR = document.getElementById('holes-r');
+    if (!s) return;
+    s.innerHTML = ''; hL.innerHTML = ''; hR.innerHTML = '';
+    for (let i = 0; i < 15; i++) {
+        s.innerHTML += '<div class="metal-ring"></div>';
+        hL.innerHTML += '<div class="paper-hole"></div>';
+        hR.innerHTML += '<div class="paper-hole"></div>';
+    }
+}
+
+function render() {
+    const d = BOOK_DATA[window.currentPage];
+    document.getElementById('c-left').innerHTML = d.left.html;
+    document.getElementById('c-right').innerHTML = d.right.html;
+    document.getElementById('page-num').innerText = window.currentPage === 0 ? "PORTADA" : `HOJA ${window.currentPage} / ${BOOK_DATA.length - 1}`;
+    document.getElementById('btn-prev').disabled = window.currentPage === 0;
+    document.getElementById('btn-next').disabled = window.currentPage === BOOK_DATA.length - 1;
+    document.getElementById('num-left').innerText = window.currentPage > 0 ? window.currentPage * 2 : '';
+    document.getElementById('num-right').innerText = window.currentPage * 2 + 1;
+    if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise().catch(() => {});
+    handleResize();
+    setTimeout(() => initPageInteractivity(), 150);
+}
+
+window.nextPage = function() { if (window.currentPage < BOOK_DATA.length - 1) { window.currentPage++; animatePage(1); } };
+window.prevPage = function() { if (window.currentPage > 0) { window.currentPage--; animatePage(-1); } };
+window.goToPage = n => { window.currentPage = n; render(); };
+
+function animatePage(dir) {
+    const b = document.getElementById('book-el');
+    b.style.transform = `rotateY(${dir * -4}deg) scale(0.98)`;
+    setTimeout(() => { render(); b.style.transform = 'rotateY(0) scale(1)'; }, 250);
+}
+
+window.showIndex = () => {
+    const m = document.getElementById('index-modal');
+    const l = document.getElementById('index-list');
+    l.innerHTML = '';
+    BOOK_DATA.forEach((p, i) => {
+        const it = document.createElement('div');
+        it.className = 'index-item';
+        it.innerHTML = `<strong>${i}.</strong> ${p.title}`;
+        it.onclick = () => { goToPage(i); hideIndex(); };
+        l.appendChild(it);
+    });
+    m.classList.add('active');
+};
+window.hideIndex = () => document.getElementById('index-modal').classList.remove('active');
+
+window.toggleTheme = () => {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    document.getElementById('theme-icon').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+};
+
+function handleResize() {
+    const isMob = window.innerWidth <= 900;
+    const l = document.getElementById('p-left');
+    const r = document.getElementById('p-right');
+    if (isMob) {
+        if (mobileView === 'left') {
+            l.style.display = 'flex'; r.style.display = 'none';
+            document.getElementById('fab-text').textContent = 'Ver Der.';
+        } else {
+            l.style.display = 'none'; r.style.display = 'flex';
+            document.getElementById('fab-text').textContent = 'Ver Izq.';
+        }
+    } else { l.style.display = 'flex'; r.style.display = 'flex'; }
+}
+window.toggleMobileSide = () => { mobileView = mobileView === 'left' ? 'right' : 'left'; handleResize(); };
+
+// ═══════════════════════════════════════
+// INTERACTIVIDADES
+// ═══════════════════════════════════════
+function initPageInteractivity() {
+    if (window.currentPage === 16) initQuiz();
+    if (window.currentPage === 12) calcCounting();
+    if (window.currentPage === 3) drawConceptMapLines();
+    if (window.currentPage === 14) initVennInteractive();
+    if (window.currentPage === 15) initChallenge();
+}
+
+// ─── MEMBERSHIP LAB (Page 5) ───
+const membershipSet = new Set([2, 4, 6, 8, 10]);
+window.checkMembership = function(n) {
+    const el = document.getElementById('mem-' + n);
+    if (!el) return;
+    const belongs = membershipSet.has(n);
+    el.className = belongs ? 'logic-switch on' : 'logic-switch off';
+    el.textContent = `${n} ${belongs ? '∈' : '∉'} A`;
+    const res = document.getElementById('membership-result');
+    const txt = document.getElementById('mem-result-text');
+    if (res) res.style.display = 'block';
+    if (txt) txt.textContent = belongs ? `✓ ${n} pertenece a A` : `✗ ${n} NO pertenece a A`;
+};
+
+// ─── COUNTING CALCULATOR (Page 12) ───
+window.calcCounting = function() {
+    const a = parseInt(document.getElementById('cnt-a')?.value || 0);
+    const b = parseInt(document.getElementById('cnt-b')?.value || 0);
+    const ab = parseInt(document.getElementById('cnt-ab')?.value || 0);
+    if (document.getElementById('cnt-a-val')) document.getElementById('cnt-a-val').textContent = a;
+    if (document.getElementById('cnt-b-val')) document.getElementById('cnt-b-val').textContent = b;
+    if (document.getElementById('cnt-ab-val')) document.getElementById('cnt-ab-val').textContent = ab;
+    const result = a + b - ab;
+    if (document.getElementById('cnt-result')) document.getElementById('cnt-result').textContent = result;
+};
+
+// ─── LAW VERIFIER (Page 11) ───
+window.verifyLaw = function() {
+    const parseSet = s => new Set(s.split(',').map(x => x.trim()).filter(x => x));
+    const setA = parseSet(document.getElementById('law-set-a')?.value || '');
+    const setB = parseSet(document.getElementById('law-set-b')?.value || '');
+    const setU = parseSet(document.getElementById('law-set-u')?.value || '');
+    const law = document.getElementById('law-select')?.value;
+
+    const union = (a, b) => new Set([...a, ...b]);
+    const inter = (a, b) => new Set([...a].filter(x => b.has(x)));
+    const comp = (a, u) => new Set([...u].filter(x => !a.has(x)));
+    const setEq = (a, b) => a.size === b.size && [...a].every(x => b.has(x));
+    const fmt = s => `{${[...s].join(', ')}}`;
+
+    let left, right, lbl;
+    switch(law) {
+        case 'demorgan1':
+            left = comp(union(setA, setB), setU);
+            right = inter(comp(setA, setU), comp(setB, setU));
+            lbl = "(A∪B)' vs A'∩B'";
+            break;
+        case 'demorgan2':
+            left = comp(inter(setA, setB), setU);
+            right = union(comp(setA, setU), comp(setB, setU));
+            lbl = "(A∩B)' vs A'∪B'";
+            break;
+        case 'absorb':
+            left = union(setA, inter(setA, setB));
+            right = setA;
+            lbl = "A∪(A∩B) vs A";
+            break;
+        case 'complement':
+            left = union(setA, comp(setA, setU));
+            right = setU;
+            lbl = "A∪A' vs U";
+            break;
+        default:
+            left = union(setA, inter(setA, setB));
+            right = setA;
+            lbl = "A∪(A∩B) vs A";
+    }
+    const eq = setEq(left, right);
+    const resEl = document.getElementById('law-result');
+    const resTxt = document.getElementById('law-result-text');
+    if (resEl) resEl.style.display = 'block';
+    if (resTxt) resTxt.innerHTML = `${lbl}<br>Izquierda = ${fmt(left)}<br>Derecha = ${fmt(right)}<br>${eq ? '✅ ¡Se cumple!' : '❌ No se cumple'}`;
+};
+
+// ─── SET EVALUATOR (Page 13) ───
+window.insertEval = function(sym) {
+    const el = document.getElementById('eval-expr');
+    if (el) { el.value += sym; el.focus(); }
+};
+
+window.evaluateSetExpr = function() {
+    try {
+        const parseS = s => new Set(s.split(',').map(x => x.trim()).filter(x => x));
+        const sU = parseS(document.getElementById('eval-u')?.value || '');
+        const sA = parseS(document.getElementById('eval-a')?.value || '');
+        const sB = parseS(document.getElementById('eval-b')?.value || '');
+        const sets = { U: sU, A: sA, B: sB };
+
+        let expr = (document.getElementById('eval-expr')?.value || '').trim();
+        // Normalize
+        expr = expr.replace(/∪/g, 'u').replace(/∩/g, 'n').replace(/Δ/g, 'd')
+                    .replace(/'/g, 'c').replace(/\s+/g, '');
+        // Tokenize
+        const tokens = expr.match(/([A-Z]c?|u|n|d|\-|\(|\))/g);
+        if (!tokens) throw new Error('Expresión vacía');
+
+        const precedence = { u: 1, d: 1, n: 2, '-': 2 };
+        const values = [], ops = [];
+        const applyOp = () => {
+            const op = ops.pop();
+            const right = values.pop(), left = values.pop();
+            if (!left || !right) throw new Error('Error de sintaxis');
+            switch(op) {
+                case 'u': values.push(new Set([...left, ...right])); break;
+                case 'n': values.push(new Set([...left].filter(x => right.has(x)))); break;
+                case '-': values.push(new Set([...left].filter(x => !right.has(x)))); break;
+                case 'd': values.push(new Set([...[...left].filter(x => !right.has(x)), ...[...right].filter(x => !left.has(x))])); break;
+            }
+        };
+        for (const token of tokens) {
+            const letter = token[0];
+            if (/[A-Z]/.test(letter)) {
+                const base = sets[letter];
+                if (!base) throw new Error(`Conjunto '${letter}' no definido`);
+                values.push(token.endsWith('c') ? new Set([...sU].filter(x => !base.has(x))) : base);
+            } else if (token === '(') { ops.push(token); }
+            else if (token === ')') {
+                while (ops.length && ops[ops.length-1] !== '(') applyOp();
+                ops.pop();
+            } else {
+                while (ops.length && precedence[ops[ops.length-1]] >= precedence[token]) applyOp();
+                ops.push(token);
+            }
+        }
+        while (ops.length) applyOp();
+        const result = values[0];
+        const sorted = [...result].sort((a,b) => {
+            const na = parseFloat(a), nb = parseFloat(b);
+            if (!isNaN(na) && !isNaN(nb)) return na - nb;
+            return String(a).localeCompare(String(b));
+        });
+        const resEl = document.getElementById('eval-result');
+        const resTxt = document.getElementById('eval-result-text');
+        if (resEl) resEl.style.display = 'block';
+        if (resTxt) resTxt.textContent = `{ ${sorted.join(', ')} }`;
+    } catch(e) {
+        const resEl = document.getElementById('eval-result');
+        const resTxt = document.getElementById('eval-result-text');
+        if (resEl) resEl.style.display = 'block';
+        if (resTxt) resTxt.textContent = '⚠ Error: ' + e.message;
+    }
+};
+
+// ─── QUIZ (Page 13) ───
+const quizQuestions = [
+    { q: '¿Cuál es la cardinalidad de A = {2, 4, 6, 8}?', opts: ['3','4','5','8'], correct: 1 },
+    { q: 'Si A = {1,2,3} y B = {2,3,4}, ¿cuál es A ∩ B?', opts: ['{1,2,3,4}','{2,3}','{1,4}','{1}'], correct: 1 },
+    { q: '¿Cuál es el complemento de A si U={1,2,3,4,5} y A={1,3,5}?', opts: ['{1,3,5}','{2,4}','{1,2,3,4,5}','∅'], correct: 1 },
+    { q: 'El conjunto potencia de {a, b} tiene...', opts: ['2 elementos','3 elementos','4 elementos','8 elementos'], correct: 2 },
+    { q: 'Si |A|=10, |B|=8, |A∩B|=3, ¿cuánto vale |A∪B|?', opts: ['18','15','21','13'], correct: 1 },
+    { q: '¿Cuántos pares tiene A×B si |A|=3, |B|=4?', opts: ['7','12','64','81'], correct: 1 },
+    { q: '∅ es subconjunto de todo conjunto. ¿Verdadero o falso?', opts: ['Verdadero','Falso','Solo de ∅','Depende'], correct: 0 },
+    { q: '¿Cuál es A Δ B si A={1,2,3} y B={2,3,4}?', opts: ['{2,3}','{1,4}','{1,2,3,4}','{4}'], correct: 1 },
+    { q: 'Por De Morgan: (A∪B)\' es igual a...', opts: ['A\'∪B\'','A\'∩B\'','(A∩B)\'','A−B'], correct: 1 },
+    { q: '¿Cuántos subconjuntos tiene un conjunto de 5 elementos?', opts: ['5','10','25','32'], correct: 3 }
+];
+let quizAnswered = 0;
+let quizCorrect = 0;
+
+function initQuiz() {
+    quizAnswered = 0; quizCorrect = 0;
+    const container = document.getElementById('quiz-container');
+    if (!container) return;
+    container.innerHTML = '';
+    const scoreEl = document.getElementById('quiz-score');
+    if (scoreEl) scoreEl.style.display = 'none';
+
+    quizQuestions.forEach((q, qi) => {
+        const div = document.createElement('div');
+        div.className = 'concept-box';
+        div.style.marginBottom = '14px';
+        div.innerHTML = `<h4 style="margin-top:0"><i class="fas fa-question-circle"></i> Pregunta ${qi+1}</h4><p style="font-size:.9rem">${q.q}</p>`;
+        q.opts.forEach((opt, oi) => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-option';
+            btn.textContent = opt;
+            btn.id = `q${qi}-o${oi}`;
+            btn.onclick = () => answerQuiz(qi, oi);
+            div.appendChild(btn);
+        });
+        container.appendChild(div);
+    });
+}
+
+window.answerQuiz = function(qi, oi) {
+    const q = quizQuestions[qi];
+    // Disable all options for this question
+    q.opts.forEach((_, j) => {
+        const btn = document.getElementById(`q${qi}-o${j}`);
+        if (btn) { btn.disabled = true; btn.style.pointerEvents = 'none'; }
+    });
+    const selected = document.getElementById(`q${qi}-o${oi}`);
+    const correct = document.getElementById(`q${qi}-o${q.correct}`);
+    if (oi === q.correct) {
+        if (selected) selected.className = 'quiz-option correct';
+        quizCorrect++;
+    } else {
+        if (selected) selected.className = 'quiz-option wrong';
+        if (correct) correct.className = 'quiz-option correct';
+    }
+    quizAnswered++;
+    if (quizAnswered === quizQuestions.length) {
+        const scoreEl = document.getElementById('quiz-score');
+        const scoreTxt = document.getElementById('quiz-score-text');
+        if (scoreEl) scoreEl.style.display = 'block';
+        if (scoreTxt) scoreTxt.textContent = `${quizCorrect}/${quizQuestions.length} — ${quizCorrect === quizQuestions.length ? '¡Perfecto! 🏆' : quizCorrect >= 3 ? '¡Bien hecho! 👏' : 'Sigue practicando 💪'}`;
+    }
+};
+
+// ─── CONCEPT MAP LINES (Page 3) ───
+function drawConceptMapLines() {
+    const svg = document.getElementById('cm-svg');
+    if (!svg) return;
+    svg.innerHTML = '';
+    const lines = [
+        [50,12, 18,36], [50,12, 50,36], [50,12, 82,36],
+        [18,36, 8,62], [18,36, 26,62],
+        [50,36, 38,62], [50,36, 52,62], [50,36, 66,62], [50,36, 50,85],
+        [82,36, 80,62], [82,36, 82,85]
+    ];
+    lines.forEach(([x1,y1,x2,y2]) => {
+        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1', x1+'%'); line.setAttribute('y1', y1+'%');
+        line.setAttribute('x2', x2+'%'); line.setAttribute('y2', y2+'%');
+        line.setAttribute('stroke','rgba(13,148,136,0.3)');
+        line.setAttribute('stroke-width','2');
+        line.setAttribute('stroke-dasharray','6,4');
+        svg.appendChild(line);
+    });
+}
+
+// ═══════════════════════════════════════
+// CARTESIAN PRODUCT (Page 13)
+// ═══════════════════════════════════════
+window.generateCartesian = function(reverse) {
+    const parse = s => s.split(',').map(x => x.trim()).filter(x => x);
+    const a = parse(document.getElementById('cart-a')?.value || '');
+    const b = parse(document.getElementById('cart-b')?.value || '');
+    const first = reverse ? b : a, second = reverse ? a : b;
+    const pairs = [];
+    first.forEach(x => second.forEach(y => pairs.push([x, y])));
+    const container = document.getElementById('cart-result');
+    if (container) {
+        container.innerHTML = '';
+        pairs.forEach(([x, y], i) => {
+            const el = document.createElement('span');
+            el.className = 'cart-pair' + (reverse ? ' reverse' : '');
+            el.textContent = `(${x}, ${y})`;
+            el.style.animationDelay = (i * 0.06) + 's';
+            container.appendChild(el);
+        });
+    }
+    const info = document.getElementById('cart-info');
+    const count = document.getElementById('cart-count');
+    if (info) info.style.display = 'block';
+    if (count) count.textContent = `|${reverse?'B×A':'A×B'}| = ${first.length} × ${second.length} = ${pairs.length} pares`;
+};
+
+// ═══════════════════════════════════════
+// INTERACTIVE VENN DIAGRAMS (Page 14)
+// ═══════════════════════════════════════
+function initVennInteractive() { drawVenn2(); drawVenn3(); }
+
+function drawVenn2() {
+    const canvas = document.getElementById('venn2-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    const isDark = document.body.classList.contains('dark-mode');
+    const cx1 = w*0.38, cy = h*0.5, cx2 = w*0.62, r = w*0.25;
+    function draw(hl) {
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = isDark ? '#1a2332' : '#f0f9ff';
+        ctx.strokeStyle = isDark ? '#334155' : '#94a3b8'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.roundRect(10, 10, w-20, h-20, 12); ctx.fill(); ctx.stroke();
+        ctx.font = 'bold 13px Nunito'; ctx.fillStyle = isDark ? '#94a3b8' : '#64748b'; ctx.fillText('U', 22, 30);
+        // A only
+        ctx.save(); ctx.beginPath(); ctx.arc(cx1, cy, r, 0, Math.PI*2); ctx.clip();
+        ctx.beginPath(); ctx.rect(0,0,w,h); ctx.arc(cx2, cy, r, 0, Math.PI*2, true);
+        ctx.fillStyle = hl==='onlyA' ? 'rgba(13,148,136,0.55)' : 'rgba(13,148,136,0.22)'; ctx.fill(); ctx.restore();
+        // B only
+        ctx.save(); ctx.beginPath(); ctx.arc(cx2, cy, r, 0, Math.PI*2); ctx.clip();
+        ctx.beginPath(); ctx.rect(0,0,w,h); ctx.arc(cx1, cy, r, 0, Math.PI*2, true);
+        ctx.fillStyle = hl==='onlyB' ? 'rgba(245,158,11,0.55)' : 'rgba(245,158,11,0.22)'; ctx.fill(); ctx.restore();
+        // Intersection
+        ctx.save(); ctx.beginPath(); ctx.arc(cx1, cy, r, 0, Math.PI*2); ctx.clip();
+        ctx.beginPath(); ctx.arc(cx2, cy, r, 0, Math.PI*2); ctx.clip();
+        ctx.fillStyle = hl==='inter' ? 'rgba(34,197,94,0.6)' : 'rgba(34,197,94,0.22)';
+        ctx.fillRect(0, 0, w, h); ctx.restore();
+        // Outside
+        if (hl === 'outside') {
+            ctx.save(); ctx.beginPath(); ctx.roundRect(10,10,w-20,h-20,12);
+            ctx.arc(cx1, cy, r, 0, Math.PI*2, true); ctx.arc(cx2, cy, r, 0, Math.PI*2, true);
+            ctx.fillStyle = 'rgba(99,102,241,0.25)'; ctx.fill(); ctx.restore();
+        }
+        ctx.strokeStyle = isDark?'#14b8a6':'#0d9488'; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.arc(cx1, cy, r, 0, Math.PI*2); ctx.stroke();
+        ctx.strokeStyle = isDark?'#fbbf24':'#f59e0b';
+        ctx.beginPath(); ctx.arc(cx2, cy, r, 0, Math.PI*2); ctx.stroke();
+        ctx.font = 'bold 18px Nunito'; ctx.textAlign = 'center';
+        ctx.fillStyle = isDark?'#5eead4':'#0d9488'; ctx.fillText('A', cx1 - r*0.5, cy + 5);
+        ctx.fillStyle = isDark?'#fcd34d':'#d97706'; ctx.fillText('B', cx2 + r*0.5, cy + 5);
+    }
+    draw(null);
+    canvas.onclick = function(e) {
+        const rect = canvas.getBoundingClientRect();
+        const sx = canvas.width/rect.width, sy = canvas.height/rect.height;
+        const x = (e.clientX-rect.left)*sx, y = (e.clientY-rect.top)*sy;
+        const inA = Math.hypot(x-cx1,y-cy)<=r, inB = Math.hypot(x-cx2,y-cy)<=r;
+        let region, text;
+        if (inA && inB) { region='inter'; text='A ∩ B — Elementos en ambos'; }
+        else if (inA) { region='onlyA'; text='A − B — Solo en A'; }
+        else if (inB) { region='onlyB'; text='B − A — Solo en B'; }
+        else { region='outside'; text="(A ∪ B)' — Fuera de ambos"; }
+        draw(region);
+        const el = document.getElementById('venn2-text');
+        if (el) el.textContent = text;
+    };
+}
+
+function drawVenn3() {
+    const canvas = document.getElementById('venn3-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    const isDark = document.body.classList.contains('dark-mode');
+    const r = w*0.22;
+    const cx1=w*0.38, cy1=h*0.38, cx2=w*0.62, cy2=h*0.38, cx3=w*0.50, cy3=h*0.62;
+    function inC(x,y,cx,cy){ return Math.hypot(x-cx,y-cy)<=r; }
+    function draw(hl) {
+        ctx.clearRect(0,0,w,h);
+        ctx.fillStyle = isDark?'#1a2332':'#f0f9ff';
+        ctx.strokeStyle = isDark?'#334155':'#94a3b8'; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.roundRect(10,10,w-20,h-20,12); ctx.fill(); ctx.stroke();
+        ctx.font='bold 12px Nunito'; ctx.fillStyle=isDark?'#94a3b8':'#64748b'; ctx.fillText('U',22,28);
+        const cols = {onlyA:['rgba(13,148,136,','0.22)','0.55)'],onlyB:['rgba(245,158,11,','0.22)','0.55)'],onlyC:['rgba(99,102,241,','0.22)','0.55)'],AB:['rgba(34,197,94,','0.22)','0.55)'],AC:['rgba(6,182,212,','0.22)','0.55)'],BC:['rgba(244,63,94,','0.22)','0.55)'],ABC:['rgba(168,85,247,','0.28)','0.6)']};
+        function cf(id){const c=cols[id];return hl===id?c[0]+c[2]:c[0]+c[1];}
+        // Only A
+        ctx.save();ctx.beginPath();ctx.arc(cx1,cy1,r,0,Math.PI*2);ctx.clip();
+        ctx.beginPath();ctx.rect(0,0,w,h);ctx.arc(cx2,cy2,r,0,Math.PI*2,true);ctx.arc(cx3,cy3,r,0,Math.PI*2,true);
+        ctx.fillStyle=cf('onlyA');ctx.fill();ctx.restore();
+        // Only B
+        ctx.save();ctx.beginPath();ctx.arc(cx2,cy2,r,0,Math.PI*2);ctx.clip();
+        ctx.beginPath();ctx.rect(0,0,w,h);ctx.arc(cx1,cy1,r,0,Math.PI*2,true);ctx.arc(cx3,cy3,r,0,Math.PI*2,true);
+        ctx.fillStyle=cf('onlyB');ctx.fill();ctx.restore();
+        // Only C
+        ctx.save();ctx.beginPath();ctx.arc(cx3,cy3,r,0,Math.PI*2);ctx.clip();
+        ctx.beginPath();ctx.rect(0,0,w,h);ctx.arc(cx1,cy1,r,0,Math.PI*2,true);ctx.arc(cx2,cy2,r,0,Math.PI*2,true);
+        ctx.fillStyle=cf('onlyC');ctx.fill();ctx.restore();
+        // A∩B only
+        ctx.save();ctx.beginPath();ctx.arc(cx1,cy1,r,0,Math.PI*2);ctx.clip();
+        ctx.beginPath();ctx.arc(cx2,cy2,r,0,Math.PI*2);ctx.clip();
+        ctx.beginPath();ctx.rect(0,0,w,h);ctx.arc(cx3,cy3,r,0,Math.PI*2,true);
+        ctx.fillStyle=cf('AB');ctx.fill();ctx.restore();
+        // A∩C only
+        ctx.save();ctx.beginPath();ctx.arc(cx1,cy1,r,0,Math.PI*2);ctx.clip();
+        ctx.beginPath();ctx.arc(cx3,cy3,r,0,Math.PI*2);ctx.clip();
+        ctx.beginPath();ctx.rect(0,0,w,h);ctx.arc(cx2,cy2,r,0,Math.PI*2,true);
+        ctx.fillStyle=cf('AC');ctx.fill();ctx.restore();
+        // B∩C only
+        ctx.save();ctx.beginPath();ctx.arc(cx2,cy2,r,0,Math.PI*2);ctx.clip();
+        ctx.beginPath();ctx.arc(cx3,cy3,r,0,Math.PI*2);ctx.clip();
+        ctx.beginPath();ctx.rect(0,0,w,h);ctx.arc(cx1,cy1,r,0,Math.PI*2,true);
+        ctx.fillStyle=cf('BC');ctx.fill();ctx.restore();
+        // A∩B∩C
+        ctx.save();ctx.beginPath();ctx.arc(cx1,cy1,r,0,Math.PI*2);ctx.clip();
+        ctx.beginPath();ctx.arc(cx2,cy2,r,0,Math.PI*2);ctx.clip();
+        ctx.beginPath();ctx.arc(cx3,cy3,r,0,Math.PI*2);ctx.clip();
+        ctx.fillStyle=cf('ABC');ctx.fillRect(0,0,w,h);ctx.restore();
+        // Outside
+        if(hl==='outside'){ctx.save();ctx.beginPath();ctx.roundRect(10,10,w-20,h-20,12);ctx.arc(cx1,cy1,r,0,Math.PI*2,true);ctx.arc(cx2,cy2,r,0,Math.PI*2,true);ctx.arc(cx3,cy3,r,0,Math.PI*2,true);ctx.fillStyle='rgba(148,163,184,0.3)';ctx.fill();ctx.restore();}
+        // Strokes
+        ctx.lineWidth=2.5;
+        ctx.strokeStyle=isDark?'#14b8a6':'#0d9488';ctx.beginPath();ctx.arc(cx1,cy1,r,0,Math.PI*2);ctx.stroke();
+        ctx.strokeStyle=isDark?'#fbbf24':'#f59e0b';ctx.beginPath();ctx.arc(cx2,cy2,r,0,Math.PI*2);ctx.stroke();
+        ctx.strokeStyle=isDark?'#a78bfa':'#6366f1';ctx.beginPath();ctx.arc(cx3,cy3,r,0,Math.PI*2);ctx.stroke();
+        ctx.font='bold 16px Nunito';ctx.textAlign='center';
+        ctx.fillStyle=isDark?'#5eead4':'#0d9488';ctx.fillText('A',cx1-r*0.6,cy1-r*0.3);
+        ctx.fillStyle=isDark?'#fcd34d':'#d97706';ctx.fillText('B',cx2+r*0.6,cy2-r*0.3);
+        ctx.fillStyle=isDark?'#c4b5fd':'#6366f1';ctx.fillText('C',cx3,cy3+r*0.8);
+    }
+    draw(null);
+    canvas.onclick = function(e) {
+        const rect=canvas.getBoundingClientRect();
+        const sx=canvas.width/rect.width,sy=canvas.height/rect.height;
+        const x=(e.clientX-rect.left)*sx,y=(e.clientY-rect.top)*sy;
+        const a=inC(x,y,cx1,cy1),b=inC(x,y,cx2,cy2),c=inC(x,y,cx3,cy3);
+        let region,text;
+        if(a&&b&&c){region='ABC';text='A ∩ B ∩ C';}
+        else if(a&&b){region='AB';text='(A ∩ B) − C';}
+        else if(a&&c){region='AC';text='(A ∩ C) − B';}
+        else if(b&&c){region='BC';text='(B ∩ C) − A';}
+        else if(a){region='onlyA';text='A − (B ∪ C)';}
+        else if(b){region='onlyB';text='B − (A ∪ C)';}
+        else if(c){region='onlyC';text='C − (A ∪ B)';}
+        else{region='outside';text="(A ∪ B ∪ C)'";}
+        draw(region);
+        const el=document.getElementById('venn3-text');
+        if(el) el.textContent=text;
+    };
+}
+
+// ═══════════════════════════════════════
+// CHALLENGE GAME (Page 15)
+// ═══════════════════════════════════════
+const CH_PROBLEMS = [
+    {u:[1,2,3,4,5,6,7,8,9,10],a:[1,2,3,4,5],b:[3,4,5,6,7],op:'A ∪ B',ans:[1,2,3,4,5,6,7]},
+    {u:[1,2,3,4,5,6,7,8,9,10],a:[1,2,3,4,5],b:[3,4,5,6,7],op:'A ∩ B',ans:[3,4,5]},
+    {u:[1,2,3,4,5,6,7,8,9,10],a:[1,2,3,4,5],b:[3,4,5,6,7],op:'A − B',ans:[1,2]},
+    {u:[1,2,3,4,5,6,7,8,9,10],a:[1,2,3,4,5],b:[3,4,5,6,7],op:'B − A',ans:[6,7]},
+    {u:[1,2,3,4,5,6,7,8,9,10],a:[1,2,3,4,5],b:[3,4,5,6,7],op:"A'",ans:[6,7,8,9,10]},
+    {u:[1,2,3,4,5,6,7,8,9,10],a:[2,4,6,8,10],b:[1,3,5,7,9],op:'A Δ B',ans:[1,2,3,4,5,6,7,8,9,10]},
+    {u:[1,2,3,4,5,6,7,8],a:[1,2,3,4],b:[2,4,6,8],op:"(A ∩ B)'",ans:[1,3,5,6,7,8]},
+    {u:[1,2,3,4,5,6,7,8],a:[1,2,3,4],b:[2,4,6,8],op:"A' ∪ B'",ans:[1,3,5,6,7,8]},
+    {u:[1,2,3,4,5],a:[1,2,3],b:[3,4,5],op:'(A ∪ B) ∩ A',ans:[1,2,3]},
+    {u:[1,2,3,4,5,6,7,8,9,10],a:[1,3,5,7,9],b:[2,4,6,8,10],op:'A ∩ B',ans:[]}
+];
+let chIdx=0,chCorrect=0,chTotal=0,chStreak=0,chAnswered=false;
+function initChallenge(){chIdx=0;chCorrect=0;chTotal=0;chStreak=0;chAnswered=false;showChallenge();}
+function showChallenge(){
+    if(chIdx>=CH_PROBLEMS.length) chIdx=0;
+    chAnswered=false;
+    const p=CH_PROBLEMS[chIdx];
+    const ctxEl=document.getElementById('ch-context');
+    const qEl=document.getElementById('ch-question');
+    const fbEl=document.getElementById('ch-feedback');
+    const ansEl=document.getElementById('ch-answer');
+    if(ctxEl) ctxEl.innerHTML=`<strong>U</strong> = {${p.u.join(', ')}} &nbsp;·&nbsp; <strong>A</strong> = {${p.a.join(', ')}} &nbsp;·&nbsp; <strong>B</strong> = {${p.b.join(', ')}}`;
+    if(qEl) qEl.innerHTML=`<span class="q-num">Reto ${chTotal+1}</span><div style="font-size:1.2rem;font-weight:800;margin-top:8px;font-family:'Courier New',monospace">${p.op} = ?</div>`;
+    if(fbEl) fbEl.innerHTML='';
+    if(ansEl){ansEl.value='';ansEl.focus();}
+}
+window.checkChallenge=function(){
+    if(chAnswered) return;
+    chAnswered=true;
+    const p=CH_PROBLEMS[chIdx];
+    const raw=(document.getElementById('ch-answer')?.value||'').trim();
+    let userAns;
+    if(raw==='vacío'||raw==='{}'||raw==='∅'||raw==='') userAns=[];
+    else userAns=raw.split(',').map(x=>x.trim()).filter(x=>x).map(Number).sort((a,b)=>a-b);
+    const correct=[...p.ans].sort((a,b)=>a-b);
+    const isOk=JSON.stringify(userAns)===JSON.stringify(correct);
+    chTotal++;
+    if(isOk){chCorrect++;chStreak++;}else{chStreak=0;}
+    const fb=document.getElementById('ch-feedback');
+    const card=document.getElementById('ch-question');
+    if(isOk){
+        if(fb) fb.innerHTML=`<div class="result-display" style="background:linear-gradient(135deg,#22c55e,#059669)"><div class="result-value">✅ ¡Correcto!</div></div>`;
+        if(card) card.classList.add('answer-correct');
+    }else{
+        if(fb) fb.innerHTML=`<div class="result-display" style="background:linear-gradient(135deg,#ef4444,#dc2626)"><div class="result-title">Respuesta correcta</div><div class="result-value">{${correct.length?correct.join(', '):'∅'}}</div></div>`;
+        if(card) card.classList.add('answer-wrong');
+    }
+    const sc=document.getElementById('ch-score');
+    if(sc) sc.textContent=`${chCorrect} / ${chTotal}`;
+    const hist=document.getElementById('ch-history');
+    if(hist) hist.innerHTML=`<div class="history-item ${isOk?'ok':'fail'}"><i class="fas fa-${isOk?'check-circle':'times-circle'}"></i> ${p.op} = {${correct.length?correct.join(','):'∅'}} ${isOk?'✓':'✗'}</div>`+hist.innerHTML;
+    const stk=document.getElementById('ch-streak');
+    if(stk) stk.innerHTML=chStreak>=3?`<span class="streak-badge">🔥 Racha: ${chStreak}</span>`:'';
+    setTimeout(()=>{if(card){card.classList.remove('answer-correct','answer-wrong');}},600);
+};
+window.nextChallenge=function(){chIdx++;showChallenge();};
+
+</script>
+</body>
+</html>

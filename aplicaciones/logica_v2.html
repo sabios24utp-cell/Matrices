@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<title>LogicVerse · Calculadora Lógica Proposicional</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* ═══════════════════════════════════════════════════════
+   RESET & CSS VARIABLES
+═══════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050a14;
+  --surface:#0c1424;
+  --panel:#0f1829;
+  --panel2:#111d30;
+  --border:rgba(100,180,255,.1);
+  --border2:rgba(255,255,255,.06);
+  --glow:#3b8eff;
+  --glow2:#8b5cf6;
+  --glow3:#06d6a0;
+  --amber:#f59e0b;
+  --rose:#f43f5e;
+  --text:#ddeeff;
+  --muted:#4e6a88;
+  --tv:#06d6a0;
+  --fv:#ff6b6b;
+  --ribbon-h:62px;
+  --footer-h:52px;
+  --fm:'JetBrains Mono',monospace;
+  --fu:'Outfit',sans-serif;
+  --radius:14px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+html{
+  height:100%;
+  scroll-behavior:smooth;
+  overflow-x:auto;
+  overflow-y:auto;
+  -webkit-text-size-adjust:100%;
+}
+/* Touch optimization for all interactive elements */
+button,a,.ch,.display-wrap,.var-btn,.rbtn,.gen-btn,.modal-close,.key{
+  touch-action:manipulation;
+  -webkit-touch-callout:none;
+}
+body{
+  font-family:var(--fu);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding-top:calc(var(--ribbon-h) + 16px);
+  padding-bottom:calc(var(--footer-h) + 20px + var(--safe-bottom));
+  padding-left:12px;
+  padding-right:12px;
+  overflow-x:auto;
+  overflow-y:auto;
+  overscroll-behavior-y:contain;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -8%, rgba(59,142,255,.12) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 35% at 85% 80%, rgba(139,92,246,.08) 0%,transparent 55%),
+    radial-gradient(ellipse 40% 25% at 10% 65%, rgba(6,214,160,.05) 0%,transparent 50%);
+}
+
+/* Scrollbar global */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:rgba(0,0,0,.2);border-radius:4px}
+::-webkit-scrollbar-thumb{background:rgba(100,180,255,.2);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:rgba(100,180,255,.35)}
+*{scrollbar-width:thin;scrollbar-color:rgba(100,180,255,.2) transparent}
+
+/* ═══════════════════════════════════════════════════════
+   RIBBON
+═══════════════════════════════════════════════════════ */
+.ribbon{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:var(--ribbon-h);
+  background:rgba(8,13,24,.92);
+  backdrop-filter:blur(28px) saturate(160%);
+  -webkit-backdrop-filter:blur(28px) saturate(160%);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 16px;
+  box-shadow:0 4px 40px rgba(0,0,0,.5),0 1px 0 rgba(255,255,255,.04) inset;
+}
+.ribbon::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2.5px;
+  background:linear-gradient(90deg,transparent 0%,var(--glow) 15%,var(--glow2) 40%,var(--glow3) 65%,var(--amber) 85%,transparent 100%);
+  background-size:200% 100%;
+  animation:shimmer 5s linear infinite;
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.ribbon-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+.logo-icon{
+  width:36px;height:36px;
+  background:linear-gradient(135deg,var(--glow),var(--glow2),var(--glow3));
+  border-radius:10px;display:grid;place-items:center;
+  font-size:1.05rem;color:#fff;font-weight:800;
+  box-shadow:0 0 20px rgba(59,142,255,.35),0 0 40px rgba(139,92,246,.15);
+  animation:logoFloat 3s ease-in-out infinite;
+  flex-shrink:0;
+}
+@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+.logo-text{display:flex;flex-direction:column;line-height:1.1}
+.logo-name{
+  font-family:var(--fm);font-weight:700;font-size:1.05rem;
+  background:linear-gradient(135deg,#6ec6ff,#c084fc,#06d6a0);
+  background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:textShimmer 4s linear infinite;
+  letter-spacing:-.02em;
+}
+@keyframes textShimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.logo-sub{font-size:.55rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.ribbon-center{flex:1;text-align:center;font-size:.72rem;font-weight:600;color:var(--muted);letter-spacing:.04em;display:none}
+@media(min-width:580px){.ribbon-center{display:block}}
+
+.ribbon-btns{display:flex;align-items:center;gap:8px;margin-left:auto}
+.rbtn{
+  position:relative;display:flex;align-items:center;gap:6px;
+  padding:7px 12px;border:1px solid var(--border);border-radius:11px;
+  background:rgba(255,255,255,.03);color:var(--text);
+  font-family:var(--fu);font-size:.75rem;font-weight:600;
+  cursor:pointer;transition:all .22s;white-space:nowrap;overflow:hidden;
+}
+.rbtn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,transparent 60%);
+  border-radius:inherit;pointer-events:none;
+}
+.rbtn:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(0,0,0,.35),0 0 0 1px rgba(59,142,255,.2)}
+.rbtn:active{transform:scale(.96)}
+.rbtn-help:hover{background:rgba(59,142,255,.1);border-color:rgba(59,142,255,.45);color:#93c5fd}
+.rbtn-theory:hover{background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.45);color:#d8b4fe}
+.rbtn-icon{
+  width:26px;height:26px;border-radius:8px;display:grid;place-items:center;
+  font-size:.95rem;flex-shrink:0;
+}
+.rbtn-help .rbtn-icon{background:rgba(59,142,255,.15);color:#60a5fa}
+.rbtn-theory .rbtn-icon{background:rgba(139,92,246,.15);color:#c084fc}
+.rbtn-label{display:none}
+@media(min-width:440px){.rbtn-label{display:inline}}
+
+/* ═══════════════════════════════════════════════════════
+   MAIN CARD
+═══════════════════════════════════════════════════════ */
+.card{
+  width:100%;max-width:520px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:20px;padding:16px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.03) inset,0 24px 64px rgba(0,0,0,.55);
+  position:relative;
+  overflow:visible;
+}
+.card::before{
+  content:'';position:absolute;inset:-1px;border-radius:21px;
+  background:linear-gradient(135deg,rgba(59,142,255,.12),transparent 40%,transparent 60%,rgba(139,92,246,.08));
+  z-index:-1;pointer-events:none;
+}
+
+/* VAR SELECTOR */
+.var-row{display:flex;gap:6px;margin-bottom:12px}
+.var-btn{
+  flex:1;padding:8px 4px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;color:var(--muted);
+  font-family:var(--fu);font-size:.8rem;font-weight:600;
+  cursor:pointer;transition:all .25s;line-height:1.35;text-align:center;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+.var-btn small{font-size:.68rem;opacity:.7;font-weight:500}
+.var-btn.active{
+  background:rgba(59,142,255,.12);border-color:rgba(59,142,255,.5);
+  color:var(--glow);
+  box-shadow:0 0 16px rgba(59,142,255,.15),inset 0 1px 0 rgba(255,255,255,.05);
+}
+.var-btn:hover:not(.active){border-color:var(--muted);color:var(--text)}
+.var-btn:active{transform:scale(.96)}
+
+/* DISPLAY */
+.display-wrap{
+  position:relative;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--radius);
+  margin-bottom:12px;min-height:76px;overflow:hidden;cursor:text;
+  transition:border-color .25s,box-shadow .25s;
+}
+.display-wrap:focus-within,.display-wrap.active{
+  border-color:rgba(59,142,255,.45);
+  box-shadow:0 0 0 3px rgba(59,142,255,.08),0 0 20px rgba(59,142,255,.08);
+}
+.display-label{
+  position:absolute;top:7px;left:12px;
+  font-size:.58rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--muted);
+  pointer-events:none;z-index:2;
+}
+.display-inner{
+  position:absolute;bottom:10px;left:12px;right:12px;
+  font-family:var(--fm);font-size:1.4rem;font-weight:600;
+  color:var(--text);white-space:nowrap;
+  overflow-x:auto;overflow-y:hidden;
+  display:flex;align-items:center;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  padding-right:8px;
+}
+.display-inner::-webkit-scrollbar{display:none}
+.display-placeholder{
+  color:var(--muted);font-size:1rem;font-weight:400;
+  opacity:.5;font-style:italic;pointer-events:none;
+}
+.cursor-beam{
+  display:inline-block;width:2.5px;height:1.35em;
+  background:var(--glow);border-radius:2px;margin:0 1px;
+  animation:blink 1s step-end infinite;flex-shrink:0;
+  box-shadow:0 0 8px rgba(59,142,255,.6);
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.ch{
+  cursor:pointer;border-radius:4px;padding:1px 2px;
+  transition:all .12s;display:inline-block;
+  line-height:1;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+.ch:hover{background:rgba(59,142,255,.2);transform:scale(1.08)}
+.ch:active{transform:scale(.95)}
+.ch.vp{color:#60a5fa}.ch.vq{color:#a78bfa}.ch.vr{color:#34d399}.ch.vs{color:#fbbf24}
+.ch.op{color:#f0abfc}.ch.pa{color:#fb923c}.ch.neg{color:#ff6b6b}
+
+/* KEYPAD */
+.keypad{display:grid;gap:6px;margin-bottom:10px}
+.key{
+  position:relative;border:none;outline:none;border-radius:11px;
+  font-family:var(--fm);font-size:1.1rem;font-weight:700;
+  cursor:pointer;transition:transform .12s,box-shadow .2s,border-color .2s;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none;
+  height:52px;min-width:0;
+  touch-action:manipulation;
+  -webkit-touch-callout:none;
+}
+.key::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 60%);
+  border-radius:inherit;pointer-events:none;
+}
+.key:active{transform:scale(.9)}
+.key.kvar{
+  background:linear-gradient(145deg,#14223c,#0c1628);
+  border:1px solid rgba(96,165,250,.25);color:#93c5fd;
+  box-shadow:0 3px 10px rgba(0,0,0,.35);
+}
+.key.kvar:hover{border-color:rgba(96,165,250,.55);box-shadow:0 4px 16px rgba(96,165,250,.2)}
+.key.kq{color:#c4b5fd;border-color:rgba(167,139,250,.25)}
+.key.kq:hover{border-color:rgba(167,139,250,.55);box-shadow:0 4px 16px rgba(167,139,250,.2)}
+.key.kr{color:#6ee7b7;border-color:rgba(52,211,153,.25)}
+.key.kr:hover{border-color:rgba(52,211,153,.55);box-shadow:0 4px 16px rgba(52,211,153,.2)}
+.key.ks{color:#fcd34d;border-color:rgba(251,191,36,.25)}
+.key.ks:hover{border-color:rgba(251,191,36,.55);box-shadow:0 4px 16px rgba(251,191,36,.2)}
+.key.kop{
+  background:linear-gradient(145deg,#1c1335,#120a24);
+  border:1px solid rgba(240,171,252,.2);color:#f0abfc;font-size:1.25rem;
+  box-shadow:0 3px 10px rgba(0,0,0,.35);
+}
+.key.kop:hover{border-color:rgba(240,171,252,.5);box-shadow:0 4px 16px rgba(240,171,252,.2)}
+.key.kpar{
+  background:linear-gradient(145deg,#1c1808,#120f02);
+  border:1px solid rgba(251,146,60,.2);color:#fb923c;font-size:1.3rem;
+  box-shadow:0 3px 10px rgba(0,0,0,.35);
+}
+.key.kpar:hover{border-color:rgba(251,146,60,.5);box-shadow:0 4px 16px rgba(251,146,60,.2)}
+.key.kdel{
+  background:linear-gradient(145deg,#28100e,#1c0808);
+  border:1px solid rgba(239,68,68,.2);color:#fca5a5;font-size:.85rem;
+  box-shadow:0 3px 10px rgba(0,0,0,.35);
+}
+.key.kdel:hover{border-color:rgba(239,68,68,.5);box-shadow:0 4px 16px rgba(239,68,68,.15)}
+.key.kac{
+  background:linear-gradient(145deg,#0e2810,#081c08);
+  border:1px solid rgba(34,197,94,.2);color:#86efac;font-size:.82rem;
+  box-shadow:0 3px 10px rgba(0,0,0,.35);
+}
+.key.kac:hover{border-color:rgba(34,197,94,.5);box-shadow:0 4px 16px rgba(34,197,94,.15)}
+
+/* GENERATE BTN */
+.gen-btn{
+  width:100%;padding:13px;border:none;outline:none;border-radius:13px;
+  background:linear-gradient(135deg,var(--glow),var(--glow2));
+  color:#fff;font-family:var(--fu);font-weight:700;font-size:.95rem;
+  cursor:pointer;letter-spacing:.02em;transition:all .25s;
+  box-shadow:0 4px 20px rgba(59,142,255,.3);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  position:relative;overflow:hidden;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+.gen-btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.12) 50%,transparent 60%);
+  background-size:300% 100%;
+  animation:btnShine 3s ease-in-out infinite;
+}
+@keyframes btnShine{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.gen-btn:hover{transform:translateY(-2px);box-shadow:0 6px 30px rgba(59,142,255,.45)}
+.gen-btn:active{transform:scale(.97)}
+.gen-btn .btn-icon{position:relative;z-index:1}
+.gen-btn .btn-text{position:relative;z-index:1}
+
+/* STATUS */
+.status-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;min-height:36px;flex-wrap:wrap}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 16px;border-radius:20px;
+  font-weight:700;font-size:.85rem;
+  animation:badgeIn .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes badgeIn{from{opacity:0;transform:scale(.8) translateY(4px)}to{opacity:1;transform:none}}
+.badge.tauto{background:rgba(6,214,160,.12);border:1px solid rgba(6,214,160,.35);color:var(--tv)}
+.badge.contra{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.35);color:var(--fv)}
+.badge.contin{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.3);color:#fcd34d}
+.badge.err{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.3);color:var(--fv);font-weight:600}
+
+/* ═══════════════════════════════════════════════════════
+   TABLE SECTION
+═══════════════════════════════════════════════════════ */
+.tbl-section{
+  display:none;margin-top:20px;width:100%;max-width:920px;
+  animation:fadeSlideUp .4s cubic-bezier(.34,1.56,.64,1);
+}
+.tbl-section.visible{display:block}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+.tbl-hdr{
+  display:flex;align-items:center;gap:8px;margin-bottom:10px;
+  font-weight:700;font-size:.92rem;
+}
+.tbl-hdr i{color:var(--glow);font-size:.85rem}
+
+.tbl-scroll{
+  overflow-x:auto;overflow-y:auto;
+  max-height:70vh;
+  background:var(--panel);
+  border:1px solid var(--border);border-radius:16px;
+  box-shadow:0 10px 40px rgba(0,0,0,.4);
+}
+table.tt{width:100%;border-collapse:collapse;font-family:var(--fm);font-size:.85rem}
+table.tt th{
+  padding:10px 13px;background:var(--surface);
+  font-size:.7rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--muted);
+  border-bottom:1px solid var(--border);
+  white-space:nowrap;position:sticky;top:0;z-index:2;
+}
+table.tt th.th-var{color:#60a5fa}
+table.tt th.th-sub{color:#c4b5fd;border-left:1px solid var(--border)}
+table.tt th.th-main{
+  color:#fff;border-left:2px solid rgba(59,142,255,.4);
+  background:rgba(59,142,255,.1);
+  font-size:.72rem;
+}
+table.tt th.th-num{color:var(--muted);width:36px;text-align:center}
+table.tt td{
+  padding:8px 13px;text-align:center;
+  border-bottom:1px solid rgba(100,180,255,.04);
+  font-weight:600;font-size:.88rem;
+}
+table.tt td.td-sub{border-left:1px solid rgba(100,180,255,.06)}
+table.tt td.td-main{
+  border-left:2px solid rgba(59,142,255,.2);
+  background:rgba(59,142,255,.04);font-weight:700;
+}
+table.tt td.td-num{color:var(--muted);font-size:.7rem;text-align:center}
+table.tt tbody tr:nth-child(even) td{background:rgba(255,255,255,.015)}
+table.tt tbody tr:nth-child(even) td.td-main{background:rgba(59,142,255,.06)}
+table.tt tbody tr:hover td{background:rgba(59,142,255,.06);transition:background .15s}
+table.tt tbody tr:hover td.td-main{background:rgba(59,142,255,.14)}
+table.tt tbody tr:last-child td{border-bottom:none}
+table.tt td.tv{color:var(--tv)}
+table.tt td.fv{color:var(--fv)}
+
+/* RIPPLE */
+.ripple{
+  position:absolute;border-radius:50%;transform:scale(0);
+  background:rgba(255,255,255,.18);animation:rip .45s linear;pointer-events:none;
+}
+@keyframes rip{to{transform:scale(4);opacity:0}}
+
+/* ═══════════════════════════════════════════════════════
+   MODAL OVERLAY
+═══════════════════════════════════════════════════════ */
+.overlay{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(3,6,16,.85);
+  backdrop-filter:blur(18px) saturate(150%);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);
+  align-items:center;justify-content:center;
+  padding:12px;
+  overflow-y:auto;overflow-x:hidden;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.overlay.open{display:flex;animation:overlayIn .25s}
+@keyframes overlayIn{from{opacity:0}to{opacity:1}}
+
+.modal-box{
+  background:var(--panel);
+  border:1px solid var(--border2);
+  border-radius:20px;
+  width:100%;max-width:640px;
+  max-height:90vh;max-height:90dvh;
+  display:flex;flex-direction:column;
+  box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04) inset;
+  animation:modalIn .3s cubic-bezier(.34,1.56,.64,1);
+  overflow:hidden;
+}
+@keyframes modalIn{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:none}}
+
+.modal-hdr{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 20px 14px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.modal-icon{
+  width:38px;height:38px;border-radius:10px;
+  display:grid;place-items:center;font-size:1.15rem;flex-shrink:0;
+}
+.modal-icon.blue{background:rgba(59,142,255,.18);color:#60a5fa;box-shadow:0 0 14px rgba(59,142,255,.25)}
+.modal-icon.purple{background:rgba(139,92,246,.18);color:#c084fc;box-shadow:0 0 14px rgba(139,92,246,.25)}
+.modal-hdr-text{flex:1;min-width:0}
+.modal-hdr-title{font-weight:800;font-size:1.05rem}
+.modal-hdr-sub{font-size:.67rem;color:var(--muted);margin-top:1px}
+
+/* X close button with rotation */
+.modal-close{
+  width:34px;height:34px;border-radius:50%;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.04);
+  color:var(--muted);cursor:pointer;
+  display:grid;place-items:center;
+  font-size:.9rem;
+  transition:all .35s cubic-bezier(.34,1.56,.64,1);
+  flex-shrink:0;
+}
+.modal-close:hover{
+  background:rgba(255,59,59,.18);border-color:rgba(255,59,59,.45);
+  color:#fca5a5;
+  transform:rotate(180deg) scale(1.15);
+  box-shadow:0 0 16px rgba(255,59,59,.3);
+}
+.modal-close:active{transform:rotate(180deg) scale(.9)}
+
+.modal-body{
+  overflow-y:auto;overflow-x:auto;
+  padding:18px 20px 22px;
+  flex:1;min-height:0;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.08) transparent;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+}
+.modal-body::-webkit-scrollbar{width:5px;height:5px}
+.modal-body::-webkit-scrollbar-track{background:transparent}
+.modal-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+.modal-body::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.2)}
+
+/* ═══════════════════════════════════════════════════════
+   HELP MODAL CONTENT
+═══════════════════════════════════════════════════════ */
+.m-section{margin-bottom:20px}
+.m-section-title{
+  font-size:.66rem;font-weight:800;text-transform:uppercase;
+  letter-spacing:.1em;margin-bottom:10px;padding-bottom:6px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+}
+.m-section-title i{font-size:.8rem}
+.m-section-title.c-blue{color:#60a5fa}
+.m-section-title.c-green{color:#34d399}
+.m-section-title.c-amber{color:#fbbf24}
+.m-section-title.c-purple{color:#c084fc}
+.m-section-title.c-rose{color:#fb7185}
+.m-section-title.c-cyan{color:#22d3ee}
+
+.hrow{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);
+  font-size:.85rem;
+}
+.hrow:last-child{border:none;padding-bottom:0}
+.hsym{
+  font-family:var(--fm);font-size:1.1rem;font-weight:700;
+  min-width:44px;text-align:center;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
+  border-radius:8px;padding:4px 6px;flex-shrink:0;
+}
+.hname{color:var(--text);flex:1;line-height:1.5}
+.hname .dim{color:var(--muted);font-size:.78rem;margin-top:1px}
+
+.tip-box{
+  background:rgba(59,142,255,.06);
+  border:1px solid rgba(59,142,255,.18);
+  border-radius:10px;padding:12px 14px;
+  font-size:.83rem;color:var(--text);line-height:1.6;
+}
+.tip-box.amber{background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);color:#fde68a}
+.tip-box.green{background:rgba(6,214,160,.06);border-color:rgba(6,214,160,.18);color:#a7f3d0}
+
+kbd{
+  display:inline-block;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:5px;padding:1px 7px;
+  font-family:var(--fm);font-size:.78rem;color:#c4b5fd;
+  box-shadow:0 2px 0 rgba(0,0,0,.4);
+}
+
+/* ═══════════════════════════════════════════════════════
+   THEORY MODAL CONTENT
+═══════════════════════════════════════════════════════ */
+.theory-block{margin-bottom:22px}
+.theory-h2{
+  font-size:.66rem;font-weight:800;text-transform:uppercase;
+  letter-spacing:.1em;margin-bottom:12px;padding-bottom:6px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+}
+.theory-h2 i{font-size:.85rem}
+.theory-h2.c-blue{color:#60a5fa}
+.theory-h2.c-purple{color:#c084fc}
+.theory-h2.c-green{color:#34d399}
+.theory-h2.c-amber{color:#fbbf24}
+.theory-h2.c-rose{color:#fb7185}
+.theory-h2.c-cyan{color:#22d3ee}
+
+.def-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:12px 14px;margin-bottom:8px;
+  transition:border-color .2s;
+}
+.def-card:hover{border-color:rgba(100,180,255,.22)}
+.def-card .dc-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.dc-sym{font-family:var(--fm);font-size:1.35rem;font-weight:700;min-width:42px;text-align:center}
+.dc-name{font-weight:700;font-size:.92rem}
+.dc-name .tag{
+  display:inline-block;margin-left:6px;
+  font-size:.6rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.07em;padding:1px 7px;border-radius:10px;
+  vertical-align:middle;
+}
+.tag-and{background:rgba(59,142,255,.2);color:#93c5fd}
+.tag-or{background:rgba(139,92,246,.2);color:#c4b5fd}
+.tag-not{background:rgba(255,107,107,.2);color:#fca5a5}
+.tag-imp{background:rgba(6,214,160,.15);color:#6ee7b7}
+.tag-bic{background:rgba(245,158,11,.15);color:#fcd34d}
+
+.dc-def{font-size:.83rem;color:var(--muted);line-height:1.55;margin-bottom:6px}
+
+/* Mini truth tables in theory (real tables) */
+.mini-tt{
+  margin-top:8px;border-collapse:collapse;
+  font-family:var(--fm);font-size:.78rem;font-weight:600;
+  border:1px solid rgba(100,180,255,.12);
+  border-radius:8px;overflow:hidden;
+}
+.mini-tt th{
+  padding:5px 12px;text-align:center;
+  background:rgba(255,255,255,.06);
+  color:var(--muted);font-size:.7rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.04em;
+  border-bottom:1.5px solid rgba(100,180,255,.15);
+  border-right:1px solid rgba(100,180,255,.06);
+  white-space:nowrap;
+}
+.mini-tt th:last-child{border-right:none}
+.mini-tt th.th-res{
+  color:#93c5fd;background:rgba(59,142,255,.08);
+  border-left:1.5px solid rgba(59,142,255,.25);
+}
+.mini-tt td{
+  padding:4px 12px;text-align:center;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  border-right:1px solid rgba(100,180,255,.06);
+  font-weight:600;
+}
+.mini-tt td:last-child{border-right:none}
+.mini-tt td.td-res{
+  border-left:1.5px solid rgba(59,142,255,.15);
+  background:rgba(59,142,255,.03);
+}
+.mini-tt tr:last-child td{border-bottom:none}
+.mini-tt tr:hover td{background:rgba(59,142,255,.05);transition:background .15s}
+.mini-tt td.tv,.mini-tt .tv{color:var(--tv)}
+.mini-tt td.fv,.mini-tt .fv{color:var(--fv)}
+
+/* LAWS */
+.laws-grid{display:grid;gap:7px}
+.law-row{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:10px 14px;
+  display:flex;align-items:flex-start;gap:12px;
+  transition:border-color .2s,background .2s;
+}
+.law-row:hover{border-color:rgba(100,180,255,.2);background:rgba(100,180,255,.02)}
+.law-num{
+  font-family:var(--fm);font-size:.7rem;font-weight:700;
+  color:var(--muted);min-width:24px;padding-top:2px;flex-shrink:0;
+}
+.law-name{font-weight:700;font-size:.88rem;margin-bottom:3px}
+.law-expr{font-family:var(--fm);font-size:.85rem;color:#c4b5fd;line-height:1.6}
+.law-expr .tv{color:var(--tv)}
+.law-expr .fv{color:var(--fv)}
+.law-expr .op{color:#f0abfc}
+.law-expr .vv{color:#60a5fa}
+
+/* ═══════════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════════ */
+.app-footer{
+  position:fixed;bottom:0;left:0;right:0;z-index:150;
+  height:var(--footer-h);
+  background:rgba(8,13,24,.92);
+  backdrop-filter:blur(20px) saturate(150%);
+  -webkit-backdrop-filter:blur(20px) saturate(150%);
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  padding:0 16px;padding-bottom:var(--safe-bottom);
+  box-shadow:0 -4px 30px rgba(0,0,0,.4);
+}
+.app-footer::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--glow2),var(--glow),var(--glow3),transparent);
+  background-size:200% 100%;
+  animation:shimmer 5s linear infinite;
+}
+.footer-text{
+  font-size:.68rem;font-weight:500;color:var(--muted);
+  text-align:center;line-height:1.45;
+}
+.footer-text .name{
+  color:#93c5fd;font-weight:700;
+}
+.footer-text .ai{
+  color:#c084fc;font-weight:600;
+}
+.footer-text .sep{
+  margin:0 4px;opacity:.4;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════ */
+@media(min-width:600px){
+  .key{height:54px}
+  .card{padding:22px}
+  .display-inner{font-size:1.5rem}
+}
+
+@media(max-width:380px){
+  .key{font-size:.95rem;height:46px}
+  .display-inner{font-size:1.15rem}
+  .rbtn{padding:6px 8px}
+  .rbtn-icon{width:24px;height:24px;font-size:.85rem}
+  .card{padding:12px;border-radius:16px}
+  .logo-name{font-size:.95rem}
+  .logo-sub{font-size:.48rem}
+  .gen-btn{padding:12px;font-size:.88rem}
+  .modal-box{border-radius:16px}
+  .modal-hdr{padding:14px 16px 12px}
+  .modal-body{padding:14px 16px 18px}
+}
+
+@media(max-width:340px){
+  .key{height:42px;font-size:.85rem;border-radius:9px}
+  .display-inner{font-size:1.05rem}
+  body{padding-left:8px;padding-right:8px}
+  .card{padding:10px}
+}
+
+/* Large screens */
+@media(min-width:768px){
+  .card{padding:28px}
+  .key{height:58px;font-size:1.15rem}
+  .display-wrap{min-height:84px}
+  .display-inner{font-size:1.6rem}
+  .modal-box{max-width:680px}
+}
+
+@media(min-width:1024px){
+  .modal-box{max-width:720px}
+}
+
+/* Print */
+@media print{
+  .ribbon,.app-footer,.overlay,.gen-btn,.keypad,.var-row,.display-wrap{display:none !important}
+  .tbl-section{display:block !important;margin-top:0}
+  body{background:#fff;color:#000;padding:0}
+  table.tt th,table.tt td{color:#000;border-color:#ccc}
+  table.tt td.tv{color:#006644}
+  table.tt td.fv{color:#cc0000}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     RIBBON
+═══════════════════════════════════════════════════ -->
+<div class="ribbon">
+  <a class="ribbon-logo" href="#">
+    <div class="logo-icon"><i class="fa-solid fa-infinity"></i></div>
+    <div class="logo-text">
+      <span class="logo-name">LogicVerse</span>
+      <span class="logo-sub">Lógica Proposicional</span>
+    </div>
+  </a>
+
+  <div class="ribbon-center">Calculadora de Tablas de Verdad</div>
+
+  <div class="ribbon-btns">
+    <button class="rbtn rbtn-help" id="helpBtn" title="Ayuda y Manual">
+      <div class="rbtn-icon"><i class="fa-solid fa-circle-question"></i></div>
+      <span class="rbtn-label">Ayuda</span>
+    </button>
+    <button class="rbtn rbtn-theory" id="theoryBtn" title="Teoría Matemática">
+      <div class="rbtn-icon"><i class="fa-solid fa-book-open"></i></div>
+      <span class="rbtn-label">Teoría</span>
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MAIN CARD
+═══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="var-row" id="varRow">
+    <button class="var-btn" data-n="2">2 vars<br><small>p, q</small></button>
+    <button class="var-btn active" data-n="3">3 vars<br><small>p, q, r</small></button>
+    <button class="var-btn" data-n="4">4 vars<br><small>p, q, r, s</small></button>
+  </div>
+
+  <div class="display-wrap" id="displayWrap">
+    <div class="display-label"><i class="fa-solid fa-terminal" style="margin-right:4px;font-size:.5rem"></i> Expresión lógica</div>
+    <div class="display-inner" id="displayInner"></div>
+  </div>
+
+  <div class="keypad" id="keypad"></div>
+
+  <button class="gen-btn" id="genBtn">
+    <i class="fa-solid fa-table-cells btn-icon"></i>
+    <span class="btn-text">Generar Tabla de Verdad</span>
+  </button>
+
+  <div class="status-row" id="statusRow"></div>
+</div>
+
+<!-- TABLE -->
+<div class="tbl-section" id="tblSection">
+  <div class="tbl-hdr">
+    <i class="fa-solid fa-table"></i>
+    Tabla de Verdad
+  </div>
+  <div class="tbl-scroll">
+    <table class="tt" id="tt"></table>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     MODAL: AYUDA Y MANUAL
+═══════════════════════════════════════════════════ -->
+<div class="overlay" id="helpModal">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div class="modal-icon blue"><i class="fa-solid fa-circle-question"></i></div>
+      <div class="modal-hdr-text">
+        <div class="modal-hdr-title" style="color:#93c5fd">Manual de Usuario</div>
+        <div class="modal-hdr-sub">LogicVerse · Calculadora Lógica Proposicional v5.0</div>
+      </div>
+      <button class="modal-close" id="closeHelp"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <!-- SECTION 1 -->
+      <div class="m-section">
+        <div class="m-section-title c-blue"><i class="fa-solid fa-rocket"></i> ① Cómo usar la calculadora</div>
+        <div class="tip-box">
+          <strong style="color:#93c5fd">Paso 1 —</strong> Selecciona cuántas variables necesitas con los botones <kbd>2 vars</kbd> <kbd>3 vars</kbd> <kbd>4 vars</kbd>.<br><br>
+          <strong style="color:#93c5fd">Paso 2 —</strong> Construye tu expresión tocando los botones del teclado lógico. Los símbolos se insertan en la posición del cursor parpadeante.<br><br>
+          <strong style="color:#93c5fd">Paso 3 —</strong> Presiona <strong style="color:#06d6a0">Generar Tabla de Verdad</strong> y el programa calculará todas las combinaciones posibles, mostrando subexpresiones intermedias.<br><br>
+          <strong style="color:#fbbf24">Resultado —</strong> El sistema clasifica automáticamente la expresión como <span style="color:#06d6a0;font-weight:700">Tautología</span>, <span style="color:#ff6b6b;font-weight:700">Contradicción</span> o <span style="color:#fcd34d;font-weight:700">Contingencia</span>.
+        </div>
+      </div>
+
+      <!-- SECTION 2 -->
+      <div class="m-section">
+        <div class="m-section-title c-green"><i class="fa-solid fa-hand-pointer"></i> ② Display táctil con cursor</div>
+        <div class="hrow">
+          <span class="hsym" style="color:#60a5fa"><i class="fa-solid fa-i-cursor"></i></span>
+          <div class="hname">El <strong style="color:#60a5fa">cursor parpadeante</strong> indica dónde se insertará el siguiente símbolo.<div class="dim">Toca cualquier carácter del display para mover el cursor a esa posición.</div></div>
+        </div>
+        <div class="hrow">
+          <span class="hsym" style="color:#60a5fa">◀ ▶</span>
+          <div class="hname">Puedes <strong style="color:#60a5fa">desplazar el cursor</strong> con las flechas del teclado físico para posicionarte exactamente donde necesites editar.</div>
+        </div>
+        <div class="hrow">
+          <span class="hsym" style="color:#fca5a5">DEL</span>
+          <div class="hname">Borra el carácter inmediatamente <strong>anterior</strong> al cursor.<div class="dim">Edición paso a paso sin borrar toda la expresión.</div></div>
+        </div>
+        <div class="hrow">
+          <span class="hsym" style="color:#86efac">AC</span>
+          <div class="hname">Borra <strong>toda</strong> la expresión y limpia la tabla.<div class="dim">All Clear — vuelve al estado inicial.</div></div>
+        </div>
+      </div>
+
+      <!-- SECTION 3 -->
+      <div class="m-section">
+        <div class="m-section-title c-purple"><i class="fa-solid fa-keyboard"></i> ③ Teclado lógico</div>
+        <div class="hrow">
+          <span class="hsym" style="color:#93c5fd">p q r s</span>
+          <div class="hname" style="color:#93c5fd">Variables proposicionales<div class="dim">Representan proposiciones que pueden ser V o F.</div></div>
+        </div>
+        <div class="hrow">
+          <span class="hsym" style="color:#ff6b6b">¬</span>
+          <div class="hname" style="color:#fca5a5">Negación (NOT)<div class="dim">Invierte el valor: ¬V = F, ¬F = V</div></div>
+        </div>
+        <div class="hrow">
+          <span class="hsym" style="color:#f0abfc">∧</span>
+          <div class="hname" style="color:#f0abfc">Conjunción (AND)<div class="dim">V solo si ambas son V</div></div>
+        </div>
+        <div class="hrow">
+          <span class="hsym" style="color:#c4b5fd">∨</span>
+          <div class="hname" style="color:#c4b5fd">Disyunción (OR)<div class="dim">V si al menos una es V</div></div>
+        </div>
+        <div class="hrow">
+          <span class="hsym" style="color:#6ee7b7">→</span>
+          <div class="hname" style="color:#6ee7b7">Condicional (IF...THEN)<div class="dim">F solo cuando V → F</div></div>
+        </div>
+        <div class="hrow">
+          <span class="hsym" style="color:#fcd34d">↔</span>
+          <div class="hname" style="color:#fcd34d">Bicondicional (SI Y SOLO SI)<div class="dim">V cuando ambas tienen el mismo valor</div></div>
+        </div>
+        <div class="hrow">
+          <span class="hsym" style="color:#fb923c">( )</span>
+          <div class="hname" style="color:#fb923c">Paréntesis<div class="dim">Cambian la precedencia de evaluación</div></div>
+        </div>
+      </div>
+
+      <!-- SECTION 4 -->
+      <div class="m-section">
+        <div class="m-section-title c-amber"><i class="fa-solid fa-trophy"></i> ④ Clasificación automática</div>
+        <div class="hrow">
+          <span class="hsym" style="color:#06d6a0"><i class="fa-solid fa-check-circle"></i></span>
+          <div class="hname" style="color:#06d6a0"><strong>Tautología</strong> — siempre Verdadero<div class="dim">Todas las filas del resultado son V.</div></div>
+        </div>
+        <div class="hrow">
+          <span class="hsym" style="color:#ff6b6b"><i class="fa-solid fa-times-circle"></i></span>
+          <div class="hname" style="color:#ff6b6b"><strong>Contradicción</strong> — siempre Falso<div class="dim">Todas las filas del resultado son F.</div></div>
+        </div>
+        <div class="hrow">
+          <span class="hsym" style="color:#fcd34d"><i class="fa-solid fa-diamond"></i></span>
+          <div class="hname" style="color:#fcd34d"><strong>Contingencia</strong> — puede ser V o F<div class="dim">El resultado depende de los valores de las variables.</div></div>
+        </div>
+      </div>
+
+      <!-- SECTION 5 -->
+      <div class="m-section">
+        <div class="m-section-title c-rose"><i class="fa-solid fa-table-columns"></i> ⑤ Tabla con subexpresiones</div>
+        <div class="tip-box green">
+          La tabla genera automáticamente una <strong style="color:#34d399">columna por cada subexpresión</strong> de la fórmula, tal como se hace en clase. Por ejemplo, para <span style="font-family:var(--fm);color:#f0abfc">(p∧q)↔(¬p∨r)</span> se generan columnas para <span style="font-family:var(--fm);color:#60a5fa">¬p</span>, <span style="font-family:var(--fm);color:#60a5fa">(p∧q)</span>, <span style="font-family:var(--fm);color:#60a5fa">(¬p∨r)</span> y finalmente el resultado principal.
+        </div>
+      </div>
+
+      <!-- SECTION 6 -->
+      <div class="m-section">
+        <div class="m-section-title c-cyan"><i class="fa-regular fa-keyboard"></i> ⑥ Atajos de teclado físico</div>
+        <div class="hrow">
+          <span class="hsym" style="font-size:.8rem"><kbd>←</kbd><kbd>→</kbd></span>
+          <div class="hname">Mueve el cursor izquierda / derecha.</div>
+        </div>
+        <div class="hrow">
+          <span class="hsym" style="font-size:.75rem"><kbd>⌫</kbd></span>
+          <div class="hname">Borra el carácter anterior (como DEL).</div>
+        </div>
+        <div class="hrow">
+          <span class="hsym" style="font-size:.8rem"><kbd>Supr</kbd></span>
+          <div class="hname">Borra toda la expresión (como AC).</div>
+        </div>
+        <div class="hrow">
+          <span class="hsym" style="font-size:.8rem"><kbd>↵</kbd></span>
+          <div class="hname">Genera la tabla de verdad.</div>
+        </div>
+        <div class="tip-box amber" style="margin-top:10px">
+          Puedes escribir directamente: <kbd>p</kbd> <kbd>q</kbd> <kbd>r</kbd> <kbd>s</kbd> y los operadores con <kbd>!</kbd>=¬ &nbsp;<kbd>&</kbd>=∧ &nbsp;<kbd>|</kbd>=∨ &nbsp;<kbd>></kbd>=→ &nbsp;<kbd>=</kbd>=↔
+        </div>
+      </div>
+
+      <!-- SECTION 7 -->
+      <div class="m-section">
+        <div class="m-section-title c-blue"><i class="fa-solid fa-lightbulb"></i> ⑦ Ejemplos</div>
+        <div class="tip-box">
+          <div style="display:grid;gap:6px;font-family:var(--fm);font-size:.82rem">
+            <div><span style="color:#f0abfc">p∧q</span> <span style="color:var(--muted)">— Conjunción simple</span></div>
+            <div><span style="color:#f0abfc">p∨(q∧r)</span> <span style="color:var(--muted)">— Disyunción con agrupación</span></div>
+            <div><span style="color:#f0abfc">(p→q)∧(q→r)</span> <span style="color:var(--muted)">— Silogismo hipotético</span></div>
+            <div><span style="color:#f0abfc">p↔(¬q∨r)</span> <span style="color:var(--muted)">— Bicondicional compuesto</span></div>
+            <div><span style="color:#f0abfc">(p∨q)∧(¬p∨r)∧(¬q∨s)</span> <span style="color:var(--muted)">— 4 variables</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     MODAL: TEORÍA MATEMÁTICA
+═══════════════════════════════════════════════════ -->
+<div class="overlay" id="theoryModal">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div class="modal-icon purple"><i class="fa-solid fa-book-open"></i></div>
+      <div class="modal-hdr-text">
+        <div class="modal-hdr-title" style="color:#d8b4fe">Teoría Matemática</div>
+        <div class="modal-hdr-sub">Lógica Proposicional · Conectores · Leyes</div>
+      </div>
+      <button class="modal-close" id="closeTheory"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <!-- PROPOSICIONES -->
+      <div class="theory-block">
+        <div class="theory-h2 c-blue"><i class="fa-solid fa-quote-left"></i> Proposiciones</div>
+        <div class="def-card">
+          <div class="dc-def">Una <strong style="color:#93c5fd">proposición</strong> es un enunciado declarativo que puede ser clasificado como <strong style="color:#06d6a0">Verdadero (V)</strong> o <strong style="color:#ff6b6b">Falso (F)</strong>, pero no ambos simultáneamente. Se denotan con letras minúsculas <span style="font-family:var(--fm);color:#60a5fa">p, q, r, s</span>.</div>
+          <div style="font-size:.82rem;color:var(--muted);margin-top:6px">
+            <strong style="color:#fbbf24">Ejemplos:</strong><br>
+            • <em style="color:#06d6a0">"2 + 2 = 4"</em> → Verdadero (V)<br>
+            • <em style="color:#ff6b6b">"El Sol es frío"</em> → Falso (F)<br>
+            • <em style="color:#fbbf24">"La Tierra gira alrededor del Sol"</em> → Verdadero (V)
+          </div>
+        </div>
+      </div>
+
+      <!-- CONECTORES -->
+      <div class="theory-block">
+        <div class="theory-h2 c-purple"><i class="fa-solid fa-link"></i> Conectores Lógicos</div>
+
+        <!-- NEGACIÓN -->
+        <div class="def-card">
+          <div class="dc-head">
+            <span class="dc-sym" style="color:#ff6b6b">¬</span>
+            <div><div class="dc-name" style="color:#fca5a5">Negación <span class="tag tag-not">NOT</span></div></div>
+          </div>
+          <div class="dc-def">Invierte el valor de verdad. Si <span style="font-family:var(--fm);color:#60a5fa">p</span> es V, entonces <span style="font-family:var(--fm);color:#ff6b6b">¬p</span> es F, y viceversa.</div>
+          <table class="mini-tt">
+            <thead><tr><th>p</th><th class="th-res">¬p</th></tr></thead>
+            <tbody>
+              <tr><td class="tv">V</td><td class="td-res fv">F</td></tr>
+              <tr><td class="fv">F</td><td class="td-res tv">V</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- CONJUNCIÓN -->
+        <div class="def-card">
+          <div class="dc-head">
+            <span class="dc-sym" style="color:#93c5fd">∧</span>
+            <div><div class="dc-name" style="color:#93c5fd">Conjunción <span class="tag tag-and">AND</span></div></div>
+          </div>
+          <div class="dc-def">Es verdadera <strong>solo cuando ambas</strong> proposiciones son verdaderas.</div>
+          <table class="mini-tt">
+            <thead><tr><th>p</th><th>q</th><th class="th-res">p∧q</th></tr></thead>
+            <tbody>
+              <tr><td class="tv">V</td><td class="tv">V</td><td class="td-res tv">V</td></tr>
+              <tr><td class="tv">V</td><td class="fv">F</td><td class="td-res fv">F</td></tr>
+              <tr><td class="fv">F</td><td class="tv">V</td><td class="td-res fv">F</td></tr>
+              <tr><td class="fv">F</td><td class="fv">F</td><td class="td-res fv">F</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- DISYUNCIÓN -->
+        <div class="def-card">
+          <div class="dc-head">
+            <span class="dc-sym" style="color:#c4b5fd">∨</span>
+            <div><div class="dc-name" style="color:#c4b5fd">Disyunción <span class="tag tag-or">OR</span></div></div>
+          </div>
+          <div class="dc-def">Es verdadera cuando <strong>al menos una</strong> de las proposiciones es verdadera.</div>
+          <table class="mini-tt">
+            <thead><tr><th>p</th><th>q</th><th class="th-res">p∨q</th></tr></thead>
+            <tbody>
+              <tr><td class="tv">V</td><td class="tv">V</td><td class="td-res tv">V</td></tr>
+              <tr><td class="tv">V</td><td class="fv">F</td><td class="td-res tv">V</td></tr>
+              <tr><td class="fv">F</td><td class="tv">V</td><td class="td-res tv">V</td></tr>
+              <tr><td class="fv">F</td><td class="fv">F</td><td class="td-res fv">F</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- CONDICIONAL -->
+        <div class="def-card">
+          <div class="dc-head">
+            <span class="dc-sym" style="color:#6ee7b7">→</span>
+            <div><div class="dc-name" style="color:#6ee7b7">Condicional <span class="tag tag-imp">IF → THEN</span></div></div>
+          </div>
+          <div class="dc-def">Es <strong style="color:#ff6b6b">falsa únicamente</strong> cuando el antecedente es V y el consecuente es F. Se lee: <em style="color:var(--muted)">"Si p, entonces q"</em>.</div>
+          <table class="mini-tt">
+            <thead><tr><th>p</th><th>q</th><th class="th-res">p→q</th></tr></thead>
+            <tbody>
+              <tr><td class="tv">V</td><td class="tv">V</td><td class="td-res tv">V</td></tr>
+              <tr><td class="tv">V</td><td class="fv">F</td><td class="td-res fv">F</td></tr>
+              <tr><td class="fv">F</td><td class="tv">V</td><td class="td-res tv">V</td></tr>
+              <tr><td class="fv">F</td><td class="fv">F</td><td class="td-res tv">V</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- BICONDICIONAL -->
+        <div class="def-card">
+          <div class="dc-head">
+            <span class="dc-sym" style="color:#fcd34d">↔</span>
+            <div><div class="dc-name" style="color:#fcd34d">Bicondicional <span class="tag tag-bic">IFF ↔</span></div></div>
+          </div>
+          <div class="dc-def">Es verdadera cuando ambas proposiciones tienen el <strong>mismo valor de verdad</strong>. Se lee: <em style="color:var(--muted)">"p si y solo si q"</em>.</div>
+          <table class="mini-tt">
+            <thead><tr><th>p</th><th>q</th><th class="th-res">p↔q</th></tr></thead>
+            <tbody>
+              <tr><td class="tv">V</td><td class="tv">V</td><td class="td-res tv">V</td></tr>
+              <tr><td class="tv">V</td><td class="fv">F</td><td class="td-res fv">F</td></tr>
+              <tr><td class="fv">F</td><td class="tv">V</td><td class="td-res fv">F</td></tr>
+              <tr><td class="fv">F</td><td class="fv">F</td><td class="td-res tv">V</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PRECEDENCIA -->
+      <div class="theory-block">
+        <div class="theory-h2 c-amber"><i class="fa-solid fa-bolt"></i> Precedencia de Conectores</div>
+        <div class="def-card">
+          <div class="dc-def" style="margin-bottom:10px">Los conectores se evalúan en este orden (de <strong style="color:#fca5a5">mayor</strong> a <strong style="color:#fcd34d">menor</strong> prioridad):</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-family:var(--fm);font-size:.9rem">
+            <div style="display:flex;align-items:center;gap:10px"><span style="color:#ff6b6b;font-size:1.1rem;min-width:26px;text-align:center">¬</span> <span style="color:var(--text);font-weight:600">Negación</span> <span style="margin-left:auto;font-size:.68rem;background:rgba(255,107,107,.15);color:#fca5a5;padding:2px 8px;border-radius:10px;font-weight:700">1° mayor</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="color:#93c5fd;font-size:1.1rem;min-width:26px;text-align:center">∧</span> <span style="color:var(--text);font-weight:600">Conjunción</span> <span style="margin-left:auto;font-size:.68rem;background:rgba(96,165,250,.12);color:#93c5fd;padding:2px 8px;border-radius:10px;font-weight:700">2°</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="color:#c4b5fd;font-size:1.1rem;min-width:26px;text-align:center">∨</span> <span style="color:var(--text);font-weight:600">Disyunción</span> <span style="margin-left:auto;font-size:.68rem;background:rgba(196,181,253,.1);color:#c4b5fd;padding:2px 8px;border-radius:10px;font-weight:700">3°</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="color:#6ee7b7;font-size:1.1rem;min-width:26px;text-align:center">→</span> <span style="color:var(--text);font-weight:600">Condicional</span> <span style="margin-left:auto;font-size:.68rem;background:rgba(110,231,183,.1);color:#6ee7b7;padding:2px 8px;border-radius:10px;font-weight:700">4°</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="color:#fcd34d;font-size:1.1rem;min-width:26px;text-align:center">↔</span> <span style="color:var(--text);font-weight:600">Bicondicional</span> <span style="margin-left:auto;font-size:.68rem;background:rgba(252,211,77,.1);color:#fcd34d;padding:2px 8px;border-radius:10px;font-weight:700">5° menor</span></div>
+          </div>
+          <div class="tip-box amber" style="margin-top:10px">Usa paréntesis <span style="font-family:var(--fm);color:#fb923c">( )</span> para cambiar el orden de evaluación.</div>
+        </div>
+      </div>
+
+      <!-- LEYES -->
+      <div class="theory-block">
+        <div class="theory-h2 c-green"><i class="fa-solid fa-scale-balanced"></i> Leyes y Propiedades de la Lógica</div>
+        <div class="laws-grid">
+
+          <div class="law-row">
+            <span class="law-num">L1</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#06d6a0">Ley de Identidad</div>
+              <div class="law-expr"><span class="vv">p</span> <span class="op">∧</span> <span class="tv">V</span> ≡ <span class="vv">p</span> &nbsp;&nbsp;│&nbsp;&nbsp; <span class="vv">p</span> <span class="op">∨</span> <span class="fv">F</span> ≡ <span class="vv">p</span></div>
+            </div>
+          </div>
+
+          <div class="law-row">
+            <span class="law-num">L2</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#06d6a0">Ley de Dominación</div>
+              <div class="law-expr"><span class="vv">p</span> <span class="op">∨</span> <span class="tv">V</span> ≡ <span class="tv">V</span> &nbsp;&nbsp;│&nbsp;&nbsp; <span class="vv">p</span> <span class="op">∧</span> <span class="fv">F</span> ≡ <span class="fv">F</span></div>
+            </div>
+          </div>
+
+          <div class="law-row">
+            <span class="law-num">L3</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#34d399">Ley de Idempotencia</div>
+              <div class="law-expr"><span class="vv">p</span> <span class="op">∧</span> <span class="vv">p</span> ≡ <span class="vv">p</span> &nbsp;&nbsp;│&nbsp;&nbsp; <span class="vv">p</span> <span class="op">∨</span> <span class="vv">p</span> ≡ <span class="vv">p</span></div>
+            </div>
+          </div>
+
+          <div class="law-row">
+            <span class="law-num">L4</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#34d399">Ley de Doble Negación</div>
+              <div class="law-expr">¬¬<span class="vv">p</span> ≡ <span class="vv">p</span></div>
+            </div>
+          </div>
+
+          <div class="law-row">
+            <span class="law-num">L5</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#60a5fa">Ley de Conmutatividad</div>
+              <div class="law-expr"><span class="vv">p</span> <span class="op">∧</span> <span class="vv">q</span> ≡ <span class="vv">q</span> <span class="op">∧</span> <span class="vv">p</span><br><span class="vv">p</span> <span class="op">∨</span> <span class="vv">q</span> ≡ <span class="vv">q</span> <span class="op">∨</span> <span class="vv">p</span></div>
+            </div>
+          </div>
+
+          <div class="law-row">
+            <span class="law-num">L6</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#60a5fa">Ley de Asociatividad</div>
+              <div class="law-expr">(<span class="vv">p</span> <span class="op">∧</span> <span class="vv">q</span>) <span class="op">∧</span> <span class="vv">r</span> ≡ <span class="vv">p</span> <span class="op">∧</span> (<span class="vv">q</span> <span class="op">∧</span> <span class="vv">r</span>)<br>(<span class="vv">p</span> <span class="op">∨</span> <span class="vv">q</span>) <span class="op">∨</span> <span class="vv">r</span> ≡ <span class="vv">p</span> <span class="op">∨</span> (<span class="vv">q</span> <span class="op">∨</span> <span class="vv">r</span>)</div>
+            </div>
+          </div>
+
+          <div class="law-row">
+            <span class="law-num">L7</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#c4b5fd">Ley de Distributividad</div>
+              <div class="law-expr"><span class="vv">p</span> <span class="op">∧</span> (<span class="vv">q</span> <span class="op">∨</span> <span class="vv">r</span>) ≡ (<span class="vv">p</span> <span class="op">∧</span> <span class="vv">q</span>) <span class="op">∨</span> (<span class="vv">p</span> <span class="op">∧</span> <span class="vv">r</span>)<br><span class="vv">p</span> <span class="op">∨</span> (<span class="vv">q</span> <span class="op">∧</span> <span class="vv">r</span>) ≡ (<span class="vv">p</span> <span class="op">∨</span> <span class="vv">q</span>) <span class="op">∧</span> (<span class="vv">p</span> <span class="op">∨</span> <span class="vv">r</span>)</div>
+            </div>
+          </div>
+
+          <div class="law-row">
+            <span class="law-num">L8</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#f0abfc">Leyes de De Morgan</div>
+              <div class="law-expr">¬(<span class="vv">p</span> <span class="op">∧</span> <span class="vv">q</span>) ≡ ¬<span class="vv">p</span> <span class="op">∨</span> ¬<span class="vv">q</span><br>¬(<span class="vv">p</span> <span class="op">∨</span> <span class="vv">q</span>) ≡ ¬<span class="vv">p</span> <span class="op">∧</span> ¬<span class="vv">q</span></div>
+            </div>
+          </div>
+
+          <div class="law-row">
+            <span class="law-num">L9</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#fb923c">Ley de Absorción</div>
+              <div class="law-expr"><span class="vv">p</span> <span class="op">∨</span> (<span class="vv">p</span> <span class="op">∧</span> <span class="vv">q</span>) ≡ <span class="vv">p</span><br><span class="vv">p</span> <span class="op">∧</span> (<span class="vv">p</span> <span class="op">∨</span> <span class="vv">q</span>) ≡ <span class="vv">p</span></div>
+            </div>
+          </div>
+
+          <div class="law-row">
+            <span class="law-num">L10</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#fbbf24">Ley del Tercero Excluido</div>
+              <div class="law-expr"><span class="vv">p</span> <span class="op">∨</span> ¬<span class="vv">p</span> ≡ <span class="tv">V</span> &nbsp; (Tautología)</div>
+            </div>
+          </div>
+
+          <div class="law-row">
+            <span class="law-num">L11</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#fbbf24">Ley de Contradicción</div>
+              <div class="law-expr"><span class="vv">p</span> <span class="op">∧</span> ¬<span class="vv">p</span> ≡ <span class="fv">F</span> &nbsp; (Contradicción)</div>
+            </div>
+          </div>
+
+          <div class="law-row">
+            <span class="law-num">L12</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#22d3ee">Equivalencia del Condicional</div>
+              <div class="law-expr"><span class="vv">p</span> <span class="op">→</span> <span class="vv">q</span> ≡ ¬<span class="vv">p</span> <span class="op">∨</span> <span class="vv">q</span></div>
+            </div>
+          </div>
+
+          <div class="law-row">
+            <span class="law-num">L13</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#22d3ee">Contraposición (Contrarrecíproco)</div>
+              <div class="law-expr"><span class="vv">p</span> <span class="op">→</span> <span class="vv">q</span> ≡ ¬<span class="vv">q</span> <span class="op">→</span> ¬<span class="vv">p</span></div>
+            </div>
+          </div>
+
+          <div class="law-row">
+            <span class="law-num">L14</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#22d3ee">Exportación / Importación</div>
+              <div class="law-expr">(<span class="vv">p</span> <span class="op">∧</span> <span class="vv">q</span>) <span class="op">→</span> <span class="vv">r</span> ≡ <span class="vv">p</span> <span class="op">→</span> (<span class="vv">q</span> <span class="op">→</span> <span class="vv">r</span>)</div>
+            </div>
+          </div>
+
+          <div class="law-row">
+            <span class="law-num">L15</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#a78bfa">Equivalencia del Bicondicional</div>
+              <div class="law-expr"><span class="vv">p</span> <span class="op">↔</span> <span class="vv">q</span> ≡ (<span class="vv">p</span> <span class="op">→</span> <span class="vv">q</span>) <span class="op">∧</span> (<span class="vv">q</span> <span class="op">→</span> <span class="vv">p</span>)</div>
+            </div>
+          </div>
+
+          <div class="law-row">
+            <span class="law-num">L16</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#fb7185">Modus Ponens</div>
+              <div class="law-expr">[<span class="vv">p</span> <span class="op">∧</span> (<span class="vv">p</span> <span class="op">→</span> <span class="vv">q</span>)] <span class="op">→</span> <span class="vv">q</span> &nbsp; (Tautología)</div>
+            </div>
+          </div>
+
+          <div class="law-row">
+            <span class="law-num">L17</span>
+            <div class="law-body">
+              <div class="law-name" style="color:#fb7185">Modus Tollens</div>
+              <div class="law-expr">[¬<span class="vv">q</span> <span class="op">∧</span> (<span class="vv">p</span> <span class="op">→</span> <span class="vv">q</span>)] <span class="op">→</span> ¬<span class="vv">p</span> &nbsp; (Tautología)</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════ -->
+<div class="app-footer">
+  <div class="footer-text">
+    <i class="fa-solid fa-graduation-cap" style="color:#60a5fa;margin-right:4px"></i>
+    Creado por <span class="name">Msc. Néstor Fabio Montoya Palacios</span>
+    <span class="sep">·</span>
+    Asistido por <span class="ai"><i class="fa-solid fa-robot" style="margin-right:2px"></i>Claude AI</span>
+    <span class="sep">·</span>
+    LogicVerse v5.0
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     JAVASCRIPT ENGINE
+═══════════════════════════════════════════════════ -->
+<script>
+/* ── STATE ─────────────────────────────────────────────────── */
+let expr = [], cursor = 0, numVars = 3;
+const ALL_VARS = ['p','q','r','s'];
+const OPS = ['¬','∧','∨','→','↔'];
+
+/* ── DISPLAY ────────────────────────────────────────────────── */
+function chClass(c) {
+  if (c === '¬') return 'neg';
+  if (OPS.includes(c)) return 'op';
+  if (c === '(' || c === ')') return 'pa';
+  return {p:'vp',q:'vq',r:'vr',s:'vs'}[c] || '';
+}
+
+function renderDisplay() {
+  const inner = document.getElementById('displayInner');
+  inner.innerHTML = '';
+
+  if (expr.length === 0) {
+    // Show placeholder
+    const beam = document.createElement('span');
+    beam.className = 'cursor-beam';
+    inner.appendChild(beam);
+    const ph = document.createElement('span');
+    ph.className = 'display-placeholder';
+    ph.textContent = 'Toca los botones...';
+    inner.appendChild(ph);
+    return;
+  }
+
+  for (let i = 0; i <= expr.length; i++) {
+    if (i === cursor) {
+      const b = document.createElement('span');
+      b.className = 'cursor-beam';
+      inner.appendChild(b);
+    }
+    if (i === expr.length) break;
+    const s = document.createElement('span');
+    s.className = 'ch ' + chClass(expr[i]);
+    s.textContent = expr[i];
+    const idx = i;
+    // Use pointerdown for instant response on touch
+    s.addEventListener('pointerdown', e => {
+      e.stopPropagation();
+      e.preventDefault();
+      cursor = idx;
+      renderDisplay();
+      // Haptic feedback if available
+      if (navigator.vibrate) navigator.vibrate(10);
+    });
+    inner.appendChild(s);
+  }
+
+  requestAnimationFrame(() => {
+    const b = inner.querySelector('.cursor-beam');
+    if (b) b.scrollIntoView({inline:'nearest', behavior:'smooth'});
+  });
+}
+
+// Click on display wrap to set cursor at end
+document.getElementById('displayWrap').addEventListener('pointerdown', e => {
+  if (e.target === e.currentTarget || e.target.id === 'displayInner' ||
+      e.target.classList.contains('display-placeholder') ||
+      e.target.classList.contains('display-label')) {
+    e.preventDefault();
+    cursor = expr.length;
+    renderDisplay();
+  }
+});
+
+/* ── EDIT ───────────────────────────────────────────────────── */
+function insert(c) {
+  expr.splice(cursor, 0, c);
+  cursor++;
+  renderDisplay();
+}
+function delChar() {
+  if (cursor > 0) {
+    expr.splice(cursor - 1, 1);
+    cursor--;
+    renderDisplay();
+  }
+}
+function clearAll() {
+  expr = []; cursor = 0;
+  renderDisplay();
+  document.getElementById('statusRow').innerHTML = '';
+  document.getElementById('tblSection').classList.remove('visible');
+}
+
+/* ── KEYPAD ─────────────────────────────────────────────────── */
+function buildKeypad() {
+  const kp = document.getElementById('keypad');
+  kp.innerHTML = '';
+  const vars = ALL_VARS.slice(0, numVars);
+  const varCls = ['kvar','kvar kq','kvar kr','kvar ks'];
+
+  // Row 1: Variables
+  // Row 2: Operators
+  // Row 3: Parentheses + DEL + AC
+  const defs = [
+    ...vars.map((v,i) => ({sym:v, cls:varCls[i]})),
+    {sym:'¬', cls:'kop'}, {sym:'∧', cls:'kop'}, {sym:'∨', cls:'kop'},
+    {sym:'→', cls:'kop'}, {sym:'↔', cls:'kop'},
+    {sym:'(', cls:'kpar'}, {sym:')', cls:'kpar'},
+    {sym:'DEL', cls:'kdel', action:'del'},
+    {sym:'AC', cls:'kac', action:'ac'},
+  ];
+
+  // Calculate grid columns based on total buttons
+  const total = defs.length;
+  let cols;
+  if (numVars === 2) cols = 4; // 12 buttons → 4 cols
+  else if (numVars === 3) cols = 4; // 13 buttons → 4 cols
+  else cols = 5; // 14 buttons → 5 cols
+
+  kp.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+  defs.forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'key ' + d.cls;
+    btn.textContent = d.sym;
+    btn.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      ripple(btn, e);
+      // Haptic feedback on mobile
+      if (navigator.vibrate) navigator.vibrate(12);
+      if (d.action === 'del') delChar();
+      else if (d.action === 'ac') clearAll();
+      else insert(d.sym);
+    });
+    kp.appendChild(btn);
+  });
+}
+
+function ripple(btn, e) {
+  const r = document.createElement('span');
+  r.className = 'ripple';
+  const rc = btn.getBoundingClientRect();
+  const sz = Math.max(rc.width, rc.height);
+  r.style.cssText = `width:${sz}px;height:${sz}px;left:${e.clientX-rc.left-sz/2}px;top:${e.clientY-rc.top-sz/2}px`;
+  btn.appendChild(r);
+  setTimeout(() => r.remove(), 500);
+}
+
+/* ── VAR SELECTOR ───────────────────────────────────────────── */
+document.getElementById('varRow').addEventListener('pointerdown', e => {
+  const btn = e.target.closest('.var-btn');
+  if (!btn) return;
+  e.preventDefault();
+  numVars = parseInt(btn.dataset.n);
+  document.querySelectorAll('.var-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildKeypad();
+  clearAll();
+});
+
+/* ── PARSER ─────────────────────────────────────────────────── */
+const PREC = {'↔':0, '→':1, '∨':2, '∧':3, '¬':4};
+
+function tokenize(str) {
+  const out = [];
+  for (const c of str.replace(/\s/g, '')) {
+    if (/[p-s]/.test(c) || OPS.includes(c) || c === '(' || c === ')') out.push(c);
+    else throw new Error(`Símbolo desconocido: '${c}'`);
+  }
+  return out;
+}
+
+function mkNode(type, str, left, right) {
+  return {type, str, left, right};
+}
+
+function parse(tokens) {
+  let pos = 0;
+  const peek = () => tokens[pos];
+  const consume = () => tokens[pos++];
+
+  function parseBin(minP) {
+    let left = parseUnary();
+    while (pos < tokens.length && peek() in PREC && PREC[peek()] >= minP && peek() !== '¬') {
+      const op = consume();
+      const right = parseBin(PREC[op] + 1);
+      left = mkNode('bin', `(${left.str}${op}${right.str})`, left, right);
+      left._op = op;
+    }
+    return left;
+  }
+
+  function parseUnary() {
+    if (peek() === '¬') {
+      consume();
+      const o = parseUnary();
+      return mkNode('neg', `¬${o.str}`, o, null);
+    }
+    return parsePrimary();
+  }
+
+  function parsePrimary() {
+    if (peek() === '(') {
+      consume();
+      const inner = parseBin(0);
+      if (peek() !== ')') throw new Error('Falta paréntesis de cierre ")".');
+      consume();
+      return mkNode('paren', `(${inner.str})`, inner, null);
+    }
+    const t = consume();
+    if (t === undefined) throw new Error('Expresión incompleta.');
+    if (/[p-s]/.test(t)) return mkNode('var', t, null, null);
+    throw new Error(`Token inesperado: '${t}'`);
+  }
+
+  const tree = parseBin(0);
+  if (pos < tokens.length) throw new Error('Expresión mal formada. Verifica paréntesis y conectores.');
+  return tree;
+}
+
+function collectSubExprs(n, list, seen) {
+  if (!n) return;
+  collectSubExprs(n.left, list, seen);
+  collectSubExprs(n.right, list, seen);
+  const s = n.str;
+  if (n.type !== 'var' && !seen.has(s)) {
+    seen.add(s);
+    list.push(n);
+  }
+}
+
+function evalNode(n, vals) {
+  if (n.type === 'var')   return vals[n.str];
+  if (n.type === 'neg')   return !evalNode(n.left, vals);
+  if (n.type === 'paren') return evalNode(n.left, vals);
+  const a = evalNode(n.left, vals), b = evalNode(n.right, vals);
+  if (n._op === '∧') return a && b;
+  if (n._op === '∨') return a || b;
+  if (n._op === '→') return !a || b;
+  if (n._op === '↔') return a === b;
+}
+
+/* ── GENERATE ───────────────────────────────────────────────── */
+document.getElementById('genBtn').addEventListener('pointerdown', e => {
+  e.preventDefault();
+  generate();
+});
+
+function generate() {
+  const exprStr = expr.join('').trim();
+  if (!exprStr) {
+    statusMsg('err', '<i class="fa-solid fa-triangle-exclamation"></i> Escribe una expresión primero.');
+    return;
+  }
+
+  let ast;
+  try {
+    const tokens = tokenize(exprStr);
+    ast = parse(tokens);
+  } catch(e) {
+    statusMsg('err', `<i class="fa-solid fa-triangle-exclamation"></i> ${e.message}`);
+    return;
+  }
+
+  function collectVarsUsed(n, set) {
+    if (!n) return;
+    if (n.type === 'var') set.add(n.str);
+    collectVarsUsed(n.left, set);
+    collectVarsUsed(n.right, set);
+  }
+  const usedSet = new Set();
+  collectVarsUsed(ast, usedSet);
+  const vars = ALL_VARS.filter(v => usedSet.has(v));
+
+  if (vars.length === 0) {
+    statusMsg('err', '<i class="fa-solid fa-triangle-exclamation"></i> No se encontraron variables.');
+    return;
+  }
+
+  const nv = vars.length;
+  const subNodes = [];
+  collectSubExprs(ast, subNodes, new Set(vars));
+
+  const rows = 1 << nv;
+  const tableData = [];
+
+  // Generate: V,V,V  V,V,F  V,F,V  V,F,F  F,V,V  F,V,F  F,F,V  F,F,F
+  // i from rows-1 down to 0 ensures this order
+  for (let i = rows - 1; i >= 0; i--) {
+    const vals = {};
+    for (let j = 0; j < nv; j++) {
+      vals[vars[j]] = !!((i >> (nv - 1 - j)) & 1);
+    }
+    const subVals = {};
+    for (const sn of subNodes) subVals[sn.str] = evalNode(sn, vals);
+    tableData.push({vals, subVals, result: evalNode(ast, vals)});
+  }
+
+  const allT = tableData.every(r => r.result);
+  const allF = tableData.every(r => !r.result);
+
+  if (allT)      statusMsg('tauto', '<i class="fa-solid fa-check-circle"></i> Tautología — Siempre Verdadero');
+  else if (allF) statusMsg('contra', '<i class="fa-solid fa-times-circle"></i> Contradicción — Siempre Falso');
+  else           statusMsg('contin', '<i class="fa-solid fa-diamond"></i> Contingencia');
+
+  renderTable(vars, subNodes, ast, tableData);
+}
+
+function renderTable(vars, subNodes, ast, data) {
+  const t = document.getElementById('tt');
+  t.innerHTML = '';
+
+  const thead = t.createTHead();
+  const hr = thead.insertRow();
+
+  // # column
+  const thN = document.createElement('th');
+  thN.className = 'th-num';
+  thN.textContent = '#';
+  hr.appendChild(thN);
+
+  // Variable columns
+  vars.forEach(v => {
+    const th = document.createElement('th');
+    th.className = 'th-var';
+    th.textContent = v;
+    hr.appendChild(th);
+  });
+
+  // Sub-expression columns (excluding main)
+  const subH = subNodes.filter(n => n.str !== ast.str);
+  subH.forEach(n => {
+    const th = document.createElement('th');
+    th.className = 'th-sub';
+    th.textContent = n.str;
+    th.title = n.str;
+    hr.appendChild(th);
+  });
+
+  // Main expression column
+  const thM = document.createElement('th');
+  thM.className = 'th-main';
+  thM.textContent = ast.str;
+  thM.title = ast.str;
+  hr.appendChild(thM);
+
+  const tbody = t.createTBody();
+  data.forEach((row, idx) => {
+    const tr = tbody.insertRow();
+
+    // Row number
+    const tdN = tr.insertCell();
+    tdN.className = 'td-num';
+    tdN.textContent = idx + 1;
+
+    // Variable values
+    vars.forEach(v => {
+      const td = tr.insertCell();
+      td.className = row.vals[v] ? 'tv' : 'fv';
+      td.textContent = row.vals[v] ? 'V' : 'F';
+    });
+
+    // Sub-expression values
+    subH.forEach(n => {
+      const td = tr.insertCell();
+      const val = row.subVals[n.str];
+      td.className = 'td-sub ' + (val ? 'tv' : 'fv');
+      td.textContent = val ? 'V' : 'F';
+    });
+
+    // Main result
+    const tdM = tr.insertCell();
+    tdM.className = 'td-main ' + (row.result ? 'tv' : 'fv');
+    tdM.textContent = row.result ? 'V' : 'F';
+  });
+
+  document.getElementById('tblSection').classList.add('visible');
+  setTimeout(() => {
+    document.getElementById('tblSection').scrollIntoView({behavior:'smooth', block:'start'});
+  }, 120);
+}
+
+function statusMsg(type, msg) {
+  document.getElementById('statusRow').innerHTML = `<div class="badge ${type}">${msg}</div>`;
+}
+
+/* ── PHYSICAL KEYBOARD ──────────────────────────────────────── */
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey) return;
+
+  // Overlay open? Don't process calc keys
+  if (document.querySelector('.overlay.open')) return;
+
+  if (e.key === 'Backspace')  { e.preventDefault(); delChar(); return; }
+  if (e.key === 'Delete')     { e.preventDefault(); clearAll(); return; }
+  if (e.key === 'ArrowLeft')  { e.preventDefault(); cursor = Math.max(0, cursor-1); renderDisplay(); return; }
+  if (e.key === 'ArrowRight') { e.preventDefault(); cursor = Math.min(expr.length, cursor+1); renderDisplay(); return; }
+  if (e.key === 'Enter')      { e.preventDefault(); generate(); return; }
+
+  // Direct logical symbols
+  const allowed = ['p','q','r','s','¬','∧','∨','→','↔','(',')'];
+  if (allowed.includes(e.key)) { insert(e.key); return; }
+
+  // Aliases for easier typing
+  const aliases = {'!':'¬', '~':'¬', '&':'∧', '|':'∨', '>':'→', '=':'↔'};
+  if (aliases[e.key]) { insert(aliases[e.key]); return; }
+});
+
+/* ── MODALS ─────────────────────────────────────────────────── */
+function openModal(id) {
+  const overlay = document.getElementById(id);
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Prevent background scroll on iOS
+  document.body.style.position = 'fixed';
+  document.body.style.width = '100%';
+  document.body.dataset.scrollY = window.scrollY;
+  document.body.style.top = `-${window.scrollY}px`;
+  // Focus close button for accessibility
+  const close = overlay.querySelector('.modal-close');
+  if (close) setTimeout(() => close.focus(), 100);
+}
+
+function closeModal(id) {
+  const overlay = document.getElementById(id);
+  if (!overlay.classList.contains('open')) return;
+  overlay.classList.remove('open');
+  // Restore scroll position on iOS
+  document.body.style.overflow = '';
+  document.body.style.position = '';
+  document.body.style.width = '';
+  document.body.style.top = '';
+  const scrollY = parseInt(document.body.dataset.scrollY || '0');
+  window.scrollTo(0, scrollY);
+}
+
+// Help modal
+document.getElementById('helpBtn').addEventListener('pointerdown', e => {
+  e.preventDefault();
+  openModal('helpModal');
+});
+document.getElementById('closeHelp').addEventListener('pointerdown', e => {
+  e.preventDefault();
+  closeModal('helpModal');
+});
+// Close on background tap — use click to avoid closing during scroll
+document.getElementById('helpModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal('helpModal');
+});
+
+// Theory modal
+document.getElementById('theoryBtn').addEventListener('pointerdown', e => {
+  e.preventDefault();
+  openModal('theoryModal');
+});
+document.getElementById('closeTheory').addEventListener('pointerdown', e => {
+  e.preventDefault();
+  closeModal('theoryModal');
+});
+document.getElementById('theoryModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal('theoryModal');
+});
+
+// Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeModal('helpModal');
+    closeModal('theoryModal');
+  }
+});
+
+/* ── TOUCH HANDLING ─────────────────────────────────────────── */
+// Prevent double-tap zoom on ALL interactive elements (including dynamic ones)
+document.addEventListener('touchend', e => {
+  const target = e.target.closest('.key, .var-btn, .rbtn, .gen-btn, .modal-close, .ch');
+  if (target) {
+    e.preventDefault();
+  }
+}, {passive: false});
+
+// Prevent iOS rubber-band scroll when modal is open
+document.addEventListener('touchmove', e => {
+  if (document.querySelector('.overlay.open')) {
+    const modalBody = e.target.closest('.modal-body');
+    if (!modalBody) {
+      e.preventDefault();
+    }
+  }
+}, {passive: false});
+
+/* ── INIT ───────────────────────────────────────────────────── */
+buildKeypad();
+renderDisplay();
+</script>
+</body>
+</html>

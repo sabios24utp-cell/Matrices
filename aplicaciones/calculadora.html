@@ -1,0 +1,3701 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumCalc: Calculadora Simbólica</title>
+
+    <!-- 📚 LIBRERÍAS EXTERNAS 📚 -->
+    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/nerdamer.core.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Calculus.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Algebra.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Solve.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Extra.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+
+    <!-- MathJax para renderizar fórmulas matemáticas (LaTeX) -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <!-- 💅 ESTILOS CSS DEL DISEÑO ORIGINAL 💅 -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+        :root {
+            --bg-color: #2c3e50;
+            --container-color: #34495e;
+            --screen-bg: #1d2b38;
+            --text-color: #ecf0f1;
+            --accent-color-1: #3498db;
+            --accent-color-2: #9b59b6;
+            --op-key-color: #f39c12;
+            --clear-key-color: #e74c3c;
+            --eq-key-color: #1abc9c;
+            --num-key-bg: #4a637c;
+            --func-key-bg: #5f7b97;
+            --adv-func-key-bg: #3e566d;
+            --modal-bg: rgba(30, 41, 59, 0.8);
+            --modal-content-bg: #2c3e50;
+            --shadow-light: rgba(255, 255, 255, 0.1);
+            --shadow-dark: rgba(0, 0, 0, 0.4);
+            --error-color: #e74c3c;
+            --special-func-bg: #27ae60;
+        }
+
+        body.theme-matrix {
+            --bg-color: #0D0208;
+            --container-color: #1a1a1a;
+            --screen-bg: #000000;
+            --text-color: #00FF41;
+            --accent-color-1: #00FF41;
+            --accent-color-2: #39FF14;
+            --op-key-color: #00b32d;
+            --clear-key-color: #c0392b;
+            --eq-key-color: #008f39;
+            --num-key-bg: #111;
+            --func-key-bg: #222;
+            --adv-func-key-bg: #000;
+            --special-func-bg: #00FF41;
+        }
+
+        body.theme-solar {
+            --bg-color: #f4f6f7;
+            --container-color: #ffffff;
+            --screen-bg: #e5e8e8;
+            --text-color: #212f3c;
+            --accent-color-1: #2980b9;
+            --accent-color-2: #8e44ad;
+            --op-key-color: #f39c12;
+            --clear-key-color: #e74c3c;
+            --eq-key-color: #16a085;
+            --num-key-bg: #ecf0f1;
+            --func-key-bg: #d5dbdb;
+            --adv-func-key-bg: #bdc3c7;
+            --shadow-light: rgba(255, 255, 255, 0.8);
+            --shadow-dark: rgba(0, 0, 0, 0.1);
+            --special-func-bg: #27ae60;
+        }
+
+        body.theme-ruby {
+            --bg-color: #4A0404;
+            --container-color: #780206;
+            --screen-bg: #330101;
+            --text-color: #f5b7b1;
+            --accent-color-1: #E84A5F;
+            --accent-color-2: #FF847C;
+            --op-key-color: #c0392b;
+            --clear-key-color: #922b21;
+            --eq-key-color: #e74c3c;
+            --num-key-bg: #641e16;
+            --func-key-bg: #943126;
+            --adv-func-key-bg: #512e2e;
+            --special-func-bg: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .calculator-body {
+            width: 100%;
+            max-width: 500px;
+            background-color: var(--container-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 10px 10px 30px var(--shadow-dark), -10px -10px 30px var(--shadow-light);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            background: linear-gradient(45deg, var(--accent-color-1), var(--accent-color-2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .angle-selector {
+            display: flex;
+            background-color: var(--screen-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .angle-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            padding: 0.3rem 0.6rem;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: background-color 0.3s;
+        }
+
+        .angle-btn.active {
+            background-color: var(--accent-color-1);
+        }
+
+        .screen {
+            background-color: var(--screen-bg);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        #input-math-display {
+            min-height: 30px;
+            text-align: right;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            padding-bottom: 0.5rem;
+            overflow-x: auto;
+            white-space: nowrap;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .input-display {
+            width: 100%;
+            font-family: 'Poppins', monospace;
+            font-size: 2rem;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            text-align: right;
+            outline: none;
+        }
+
+        .output-section {
+            min-height: 70px;
+            padding-top: 1rem;
+            border-top: 1px solid var(--accent-color-1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        #output {
+            font-size: 1.5rem;
+            text-align: center;
+            overflow-x: auto;
+            word-wrap: break-word;
+            flex-grow: 1;
+            padding-right: 30px;
+        }
+
+        #error-message {
+            color: var(--error-color);
+            text-align: center;
+            font-weight: 500;
+            display: none;
+            flex-grow: 1;
+        }
+
+        #info-btn {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            background-color: var(--func-key-bg);
+            color: var(--text-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+            display: none;
+        }
+
+        #info-btn:active {
+            transform: translateY(-50%) scale(0.95);
+            box-shadow: inset 2px 2px 5px var(--shadow-dark);
+        }
+
+        .keypad-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .function-pad,
+        .number-pad {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .function-pad {
+            grid-template-columns: repeat(6, 1fr);
+        }
+
+        .number-pad {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .keypad-button {
+            padding: 0.8rem 0;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--func-key-bg);
+        }
+
+        .keypad-button:active {
+            transform: scale(0.95);
+            box-shadow: inset 2px 2px 5px var(--shadow-dark);
+        }
+
+        .keypad-button sup {
+            font-size: 0.7em;
+            position: relative;
+            top: -0.5em;
+        }
+
+        .num-key {
+            background-color: var(--num-key-bg);
+        }
+
+        .op-key {
+            background-color: var(--op-key-color);
+        }
+
+        .clear-key {
+            background-color: var(--clear-key-color);
+        }
+
+        .equals-key {
+            background: linear-gradient(145deg, var(--accent-color-1), var(--accent-color-2));
+        }
+
+        .eq-key {
+            background-color: var(--eq-key-color);
+        }
+
+        .special-func-key {
+            background-color: var(--special-func-bg);
+            font-weight: 600;
+        }
+
+        #adv-controls-toggle {
+            cursor: pointer;
+            text-align: center;
+            padding: 0.5rem;
+            background-color: var(--adv-func-key-bg);
+            border-radius: 8px;
+            margin-top: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        #adv-controls-toggle:hover {
+            background-color: #4e6a85;
+        }
+
+        #advanced-controls-panel {
+            display: none;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--accent-color-1);
+        }
+
+        .adv-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .adv-button {
+            background-color: var(--func-key-bg);
+            padding: 0.6rem;
+            font-size: 0.8rem;
+        }
+
+        #menu-toggle {
+            cursor: pointer;
+            z-index: 1001;
+            width: 30px;
+            height: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        #menu-toggle .bar {
+            width: 100%;
+            height: 3px;
+            background-color: var(--text-color);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        #main-menu {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background-color: var(--container-color);
+            backdrop-filter: blur(5px);
+            border-radius: 10px;
+            list-style: none;
+            padding: 0.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 1000;
+        }
+
+        #main-menu.active {
+            display: block;
+        }
+
+        #main-menu li {
+            padding: 0.5rem 1rem;
+        }
+
+        #main-menu a,
+        #main-menu .theme-title {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .theme-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            padding-top: 0.5rem;
+        }
+
+        .theme-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--text-color);
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: var(--modal-bg);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background-color: var(--modal-content-bg);
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid var(--accent-color-1);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            animation: modal-appear 0.3s ease-out;
+        }
+
+        @keyframes modal-appear {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #4a637c;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: white;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .input-styled {
+            background-color: var(--screen-bg);
+            border: 1px solid #4a637c;
+            color: var(--text-color);
+            border-radius: 5px;
+            padding: 0.5rem;
+            width: 100%;
+        }
+
+        .matrix-grid {
+            display: grid;
+            gap: 0.5rem;
+            margin: 0 auto;
+        }
+
+        .matrix-grid input {
+            text-align: center;
+        }
+
+        .modal-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .modal-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .modal-result {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #4a637c;
+            text-align: center;
+            font-size: 1.1rem;
+            min-height: 40px;
+            overflow-x: auto;
+        }
+
+        .mini-keypad {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .mini-keypad button {
+            flex-grow: 1;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        .text-red-400 {
+            color: var(--error-color);
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+
+        .modal-result p {
+            margin: 0.5rem 0;
+        }
+
+        .ultramodern-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            width: 100%;
+            max-width: 500px;
+            font-size: 0.85rem;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .ultramodern-footer .authors {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .ultramodern-footer .separator {
+            font-weight: 300;
+        }
+
+        .keyboard-toggle-btn {
+            display: none;
+            background-color: var(--func-key-bg);
+            border: none;
+            color: var(--text-color);
+            width: 40px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+        }
+
+        .keyboard-toggle-btn:active {
+            transform: scale(0.95);
+            box-shadow: inset 2px 2px 5px var(--shadow-dark);
+        }
+
+        .keyboard-toggle-btn.disabled {
+            background-color: var(--accent-color-2);
+        }
+
+        @media (max-width: 768px) {
+            .keyboard-toggle-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        #history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--num-key-bg);
+            border-radius: 8px;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            background-color: var(--screen-bg);
+        }
+
+        .history-item {
+            background-color: var(--container-color);
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .history-item:hover {
+            background-color: var(--func-key-bg);
+        }
+
+        .history-expression,
+        .history-result {
+            width: 100%;
+            text-align: right;
+            overflow-x: auto;
+            white-space: nowrap;
+            font-size: 1rem;
+        }
+
+        .history-expression {
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .history-result {
+            color: var(--accent-color-1);
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+
+        .history-timestamp {
+            font-size: 0.7rem;
+            color: var(--text-color);
+            opacity: 0.6;
+            text-align: right;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        #clear-history-btn {
+            background-color: var(--clear-key-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+
+        #clear-history-btn:hover {
+            background-color: #c0392b;
+        }
+
+        #info-modal-content p {
+            margin-bottom: 0.5rem;
+        }
+
+        #info-modal-content strong {
+            color: var(--accent-color-1);
+        }
+
+        #info-modal-content .math-formula {
+            display: block;
+            text-align: center;
+            margin: 0.75rem 0;
+            font-size: 1.1rem;
+            background-color: var(--screen-bg);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        /* ✅ MEJORA: Modal Redimensionable con Scroll */
+        .modal-content.resizable {
+            resize: both;
+            overflow: auto;
+            min-width: 320px;
+            min-height: 300px;
+            max-height: 90vh;
+            max-width: 95vw;
+            position: relative;
+        }
+
+        .modal-content.resizable::after {
+            content: '';
+            position: absolute;
+            right: 4px;
+            bottom: 4px;
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, transparent 50%, var(--accent-color-1) 50%);
+            border-radius: 0 0 10px 0;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .modal-body-scroll {
+            max-height: calc(90vh - 120px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 8px;
+        }
+
+        .modal-body-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-body-scroll::-webkit-scrollbar-track {
+            background: var(--screen-bg);
+            border-radius: 4px;
+        }
+
+        .modal-body-scroll::-webkit-scrollbar-thumb {
+            background: var(--accent-color-1);
+            border-radius: 4px;
+        }
+
+        /* ✅ MEJORA: Teclado Colapsable para Álgebra */
+        .collapsible-keyboard {
+            background: var(--screen-bg);
+            border: 1px solid var(--accent-color-1);
+            border-radius: 10px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .keyboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(145deg, var(--accent-color-1), var(--accent-color-2));
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .keyboard-header:hover {
+            filter: brightness(1.1);
+        }
+
+        .keyboard-header h4 {
+            margin: 0;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .keyboard-toggle-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .keyboard-toggle-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .keyboard-body {
+            padding: 1rem;
+            display: none;
+        }
+
+        .keyboard-body.show {
+            display: block;
+        }
+
+        .keyboard-section {
+            margin-bottom: 0.75rem;
+        }
+
+        .keyboard-section-title {
+            font-size: 0.7rem;
+            color: var(--accent-color-1);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .keyboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 4px;
+        }
+
+        .keyboard-btn {
+            padding: 8px 4px;
+            font-size: 0.85rem;
+            border: none;
+            border-radius: 6px;
+            background: var(--num-key-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .keyboard-btn:hover {
+            background: var(--accent-color-1);
+            transform: translateY(-1px);
+        }
+
+        .keyboard-btn.op {
+            background: var(--op-key-color);
+        }
+
+        .keyboard-btn.func {
+            background: var(--special-func-bg);
+        }
+
+        /* ✅ MEJORA: Estilos para Combinatoria Mejorada */
+        .comb-panel {
+            background: var(--screen-bg);
+            border: 1px solid var(--accent-color-1);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .comb-panel-header {
+            padding: 0.75rem 1rem;
+            background: linear-gradient(145deg, var(--accent-color-1), var(--accent-color-2));
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .comb-panel-body {
+            padding: 1rem;
+        }
+
+        .comb-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .comb-row:last-child {
+            border-bottom: none;
+        }
+
+        .comb-notation {
+            font-size: 1.1rem;
+            min-width: 60px;
+        }
+
+        .comb-inputs {
+            display: flex;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .comb-inputs input {
+            width: 60px;
+            padding: 6px;
+            text-align: center;
+        }
+
+        .comb-btn {
+            padding: 6px 12px;
+            background: var(--eq-key-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .comb-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .comb-result {
+            min-width: 80px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--accent-color-1);
+        }
+
+        /* Estilos para matrices mejoradas */
+        .matrix-ops {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .matrix-op-btn {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .matrix-op-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Cuadrícula para entrada de matriz */
+        .matrix-grid {
+            display: grid;
+            gap: 8px;
+            margin: 1rem 0;
+        }
+
+        .matrix-grid input {
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="calculator-body">
+        <header>
+            <h1>Calc NF</h1>
+            <div class="header-controls">
+                <button id="toggle-keyboard-btn" class="keyboard-toggle-btn"
+                    title="Habilitar/Deshabilitar teclado"></button>
+
+                <div id="angle-mode-selector" class="angle-selector">
+                    <button class="angle-btn active" data-mode="deg">D</button>
+                    <button class="angle-btn" data-mode="rad">R</button>
+                    <button class="angle-btn" data-mode="grad">G</button>
+                </div>
+                <div id="menu-toggle">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </div>
+            <nav>
+                <ul id="main-menu">
+                    <li><a id="help-btn">Ayuda</a></li>
+                    <li><a id="history-btn">Historial</a></li>
+                    <li class="theme-title">Temas</li>
+                    <li class="theme-selector">
+                        <button class="theme-btn" data-theme="default" style="background-color: #34495e;"></button>
+                        <button class="theme-btn" data-theme="theme-matrix" style="background-color: #00FF41;"></button>
+                        <button class="theme-btn" data-theme="theme-solar" style="background-color: #f1c40f;"></button>
+                        <button class="theme-btn" data-theme="theme-ruby" style="background-color: #c0392b;"></button>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <section class="screen">
+                <div id="input-math-display"></div>
+                <input type="text" id="function-input" class="input-display" placeholder="0">
+                <div class="output-section">
+                    <div id="output"></div>
+                    <p id="error-message"></p>
+                    <button id="info-btn">ⓘ</button>
+                </div>
+            </section>
+
+            <div class="keypad-container">
+                <div class="function-pad">
+                    <button class="keypad-button func-key" data-value="sin(">sin</button>
+                    <button class="keypad-button func-key" data-value="cos(">cos</button>
+                    <button class="keypad-button func-key" data-value="tan(">tan</button>
+                    <button class="keypad-button func-key" data-value="asin(">sin⁻¹</button>
+                    <button class="keypad-button func-key" data-value="acos(">cos⁻¹</button>
+                    <button class="keypad-button func-key" data-value="atan(">tan⁻¹</button>
+                    <button class="keypad-button func-key" data-value="sinh(">sinh</button>
+                    <button class="keypad-button func-key" data-value="cosh(">cosh</button>
+                    <button class="keypad-button func-key" data-value="tanh(">tanh</button>
+                    <button class="keypad-button func-key" data-value="asinh(">asinh</button>
+                    <button class="keypad-button func-key" data-value="acosh(">acosh</button>
+                    <button class="keypad-button func-key" data-value="atanh(">atanh</button>
+                    <button class="keypad-button func-key" data-value="log10(">log₁₀</button>
+                    <button class="keypad-button func-key" data-value="ln(">ln</button>
+                    <button class="keypad-button func-key" data-value="^">x<sup>y</sup></button>
+                    <button class="keypad-button special-func-key"
+                        data-modal-target="nthroot-modal"><sup>n</sup>√</button>
+                    <button class="keypad-button func-key" data-value="pi">π</button>
+                    <button class="keypad-button func-key" data-value="e">e</button>
+                    <button class="keypad-button func-key" data-value="(">(</button>
+                    <button class="keypad-button func-key" data-value=")">)</button>
+                    <button class="keypad-button func-key" data-value="abs(">abs</button>
+                    <button class="keypad-button special-func-key" data-modal-target="integral-modal">∫</button>
+                    <button class="keypad-button special-func-key" data-modal-target="derivative-modal">∂</button>
+                    <button class="keypad-button special-func-key" data-modal-target="limit-modal">lim</button>
+                </div>
+                <div class="number-pad">
+                    <button class="keypad-button clear-key" data-action="AC">AC</button>
+                    <button class="keypad-button clear-key" data-action="DEL">DEL</button>
+                    <button class="keypad-button func-key" data-value="i">i</button>
+                    <button class="keypad-button op-key" data-value="/">÷</button>
+                    <button class="keypad-button num-key" data-value="7">7</button>
+                    <button class="keypad-button num-key" data-value="8">8</button>
+                    <button class="keypad-button num-key" data-value="9">9</button>
+                    <button class="keypad-button op-key" data-value="*">×</button>
+                    <button class="keypad-button num-key" data-value="4">4</button>
+                    <button class="keypad-button num-key" data-value="5">5</button>
+                    <button class="keypad-button num-key" data-value="6">6</button>
+                    <button class="keypad-button op-key" data-value="-">−</button>
+                    <button class="keypad-button num-key" data-value="1">1</button>
+                    <button class="keypad-button num-key" data-value="2">2</button>
+                    <button class="keypad-button num-key" data-value="3">3</button>
+                    <button class="keypad-button op-key" data-value="+">+</button>
+                    <button class="keypad-button num-key" data-value="0">0</button>
+                    <button class="keypad-button num-key" data-value=".">.</button>
+                    <button class="keypad-button func-key" data-action="S2D">S↔D</button>
+                    <button class="keypad-button special-func-key" data-modal-target="sum-modal">Σ</button>
+                    <button class="keypad-button equals-key" data-action="EVAL" style="grid-column: span 4;">=</button>
+                </div>
+            </div>
+
+            <div id="adv-controls-toggle" class="adv-controls-toggle">▼ Funciones Avanzadas ▼</div>
+            <section id="advanced-controls-panel">
+                <div class="adv-grid">
+                    <button class="adv-button keypad-button" data-value="x">x</button>
+                    <button class="adv-button keypad-button" data-modal-target="algebra-modal">Álgebra</button>
+                    <button class="adv-button keypad-button"
+                        data-modal-target="combinatorics-modal">Combinatoria</button>
+                    <button class="adv-button keypad-button" data-modal-target="equations-modal">Sist.
+                        Ecuaciones</button>
+                    <button class="adv-button keypad-button" data-modal-target="matrix-modal">Matrices</button>
+                    <button class="adv-button keypad-button" data-modal-target="edo-modal">EDO</button>
+                    <button class="adv-button keypad-button" data-modal-target="laplace-modal">Laplace</button>
+                    <button class="adv-button keypad-button" data-modal-target="convert-modal">Conversiones</button>
+                    <button class="adv-button keypad-button" data-modal-target="graph-modal">Graficar</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="ultramodern-footer">
+        <div class="authors">
+            <span>Autor: Msc. Néstor Fabio Montoya</span>
+            <span class="separator">&</span>
+            <span>Gemini AI</span>
+        </div>
+    </footer>
+
+    <!-- 🏛️ INICIO DE LOS MODALES 🏛️ -->
+    <div id="help-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Ayuda y Consejos</h2> <span class="modal-close"
+                    data-modal-target="help-modal">&times;</span>
+            </div>
+            <div style="font-size: 0.9rem; line-height: 1.6;">
+                <p><strong>Calculadora Científica Avanzada</strong></p>
+                <p class="mt-4"><strong>✨ CARACTERÍSTICAS PRINCIPALES:</strong></p>
+                <ul style="list-style-position: inside; padding-left: 1rem;">
+                    <li>Operaciones básicas y trigonométricas</li>
+                    <li>Cálculo simbólico con visualización LaTeX</li>
+                    <li>Derivadas e integrales (botones <strong>∂</strong> y <strong>∫</strong>)</li>
+                    <li>Límites y sumatorias (botones <strong>lim</strong> y <strong>Σ</strong>)</li>
+                    <li>Álgebra: factorización, expansión, resolver ecuaciones</li>
+                    <li>Matrices: determinante e inversa</li>
+                    <li>Ecuaciones diferenciales ordinarias (EDO)</li>
+                    <li>Graficador de funciones interactivo</li>
+                    <li>Transformada de Laplace</li>
+                </ul>
+                <p class="mt-4"><strong>💡 CONSEJOS:</strong></p>
+                <ul style="list-style-position: inside; padding-left: 1rem;">
+                    <li><strong>(Móvil)</strong> Usa el nuevo botón de teclado en la cabecera para mostrar/ocultar el
+                        teclado de tu dispositivo.</li>
+                    <li>Use los botones verdes para acceso rápido a cálculo.</li>
+                    <li>Presione <strong>Enter</strong> en el teclado para calcular.</li>
+                    <li>Presione <strong>Escape</strong> para limpiar la pantalla.</li>
+                    <li>Use el botón <strong>S↔D</strong> para cambiar entre formato simbólico y decimal.</li>
+                    <li>Los ángulos se pueden cambiar entre grados (<strong>D</strong>), radianes (<strong>R</strong>) y
+                        gradianes (<strong>G</strong>).</li>
+                    <li>Puede escribir funciones directamente, p. ej., <code>solve(x^2-4=0, x)</code>.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="algebra-modal" class="modal">
+        <div class="modal-content resizable" style="max-width: 650px;">
+            <div class="modal-header">
+                <h2 class="modal-title">🔢 Álgebra y Aritmética</h2><span class="modal-close"
+                    data-modal-target="algebra-modal">&times;</span>
+            </div>
+            <div class="modal-body-scroll">
+                <select id="algebra-op" class="input-styled mb-4">
+                    <option value="factor">Factorizar</option>
+                    <option value="expand">Expandir</option>
+                    <option value="solve">Resolver Ecuación</option>
+                    <option value="divisors">Divisores</option>
+                    <option value="gcd">MCD</option>
+                    <option value="lcm">MCM</option>
+                </select>
+                <div class="input-group"> <label for="algebra-input">Expresión (ej: x^2-1=0) o Números (ej: 12,
+                        18)</label>
+                    <input id="algebra-input" type="text" class="input-styled" placeholder="e.g., x^2-4=0 or 12, 18">
+                </div>
+
+                <!-- ✅ TECLADO COLAPSABLE -->
+                <div class="collapsible-keyboard">
+                    <div class="keyboard-header" onclick="toggleAlgebraKeyboard()">
+                        <h4>⌨️ Teclado Matemático</h4>
+                        <span class="keyboard-toggle-icon" id="algebra-keyboard-icon">▼</span>
+                    </div>
+                    <div class="keyboard-body" id="algebra-keyboard-body">
+                        <div class="keyboard-section">
+                            <div class="keyboard-section-title">Variables</div>
+                            <div class="keyboard-grid">
+                                <button class="keyboard-btn" onclick="insertAlgebra('x')">x</button>
+                                <button class="keyboard-btn" onclick="insertAlgebra('y')">y</button>
+                                <button class="keyboard-btn" onclick="insertAlgebra('z')">z</button>
+                                <button class="keyboard-btn" onclick="insertAlgebra('n')">n</button>
+                                <button class="keyboard-btn" onclick="insertAlgebra('a')">a</button>
+                                <button class="keyboard-btn" onclick="insertAlgebra('b')">b</button>
+                            </div>
+                        </div>
+                        <div class="keyboard-section">
+                            <div class="keyboard-section-title">Operadores</div>
+                            <div class="keyboard-grid">
+                                <button class="keyboard-btn op" onclick="insertAlgebra('+')">+</button>
+                                <button class="keyboard-btn op" onclick="insertAlgebra('-')">−</button>
+                                <button class="keyboard-btn op" onclick="insertAlgebra('*')">×</button>
+                                <button class="keyboard-btn op" onclick="insertAlgebra('/')">÷</button>
+                                <button class="keyboard-btn op" onclick="insertAlgebra('^')">xⁿ</button>
+                                <button class="keyboard-btn op" onclick="insertAlgebra('^2')">x²</button>
+                                <button class="keyboard-btn op" onclick="insertAlgebra('^3')">x³</button>
+                                <button class="keyboard-btn op" onclick="insertAlgebra('=')">＝</button>
+                                <button class="keyboard-btn" onclick="insertAlgebra('(')">(</button>
+                                <button class="keyboard-btn" onclick="insertAlgebra(')')">)</button>
+                            </div>
+                        </div>
+                        <div class="keyboard-section">
+                            <div class="keyboard-section-title">Funciones</div>
+                            <div class="keyboard-grid">
+                                <button class="keyboard-btn func" onclick="insertAlgebra('sqrt(')">√</button>
+                                <button class="keyboard-btn func" onclick="insertAlgebra('nroot(')">ⁿ√</button>
+                                <button class="keyboard-btn func" onclick="insertAlgebra('abs(')">|x|</button>
+                                <button class="keyboard-btn func" onclick="insertAlgebra('log10(')">log</button>
+                                <button class="keyboard-btn func" onclick="insertAlgebra('ln(')">ln</button>
+                                <button class="keyboard-btn func" onclick="insertAlgebra('exp(')">eˣ</button>
+                            </div>
+                        </div>
+                        <div class="keyboard-section">
+                            <div class="keyboard-section-title">Trigonométricas</div>
+                            <div class="keyboard-grid">
+                                <button class="keyboard-btn func" onclick="insertAlgebra('sin(')">sin</button>
+                                <button class="keyboard-btn func" onclick="insertAlgebra('cos(')">cos</button>
+                                <button class="keyboard-btn func" onclick="insertAlgebra('tan(')">tan</button>
+                                <button class="keyboard-btn func" onclick="insertAlgebra('asin(')">sin⁻¹</button>
+                                <button class="keyboard-btn func" onclick="insertAlgebra('acos(')">cos⁻¹</button>
+                                <button class="keyboard-btn func" onclick="insertAlgebra('atan(')">tan⁻¹</button>
+                            </div>
+                        </div>
+                        <div class="keyboard-section">
+                            <div class="keyboard-section-title">Hiperbólicas</div>
+                            <div class="keyboard-grid">
+                                <button class="keyboard-btn func" onclick="insertAlgebra('sinh(')">sinh</button>
+                                <button class="keyboard-btn func" onclick="insertAlgebra('cosh(')">cosh</button>
+                                <button class="keyboard-btn func" onclick="insertAlgebra('tanh(')">tanh</button>
+                                <button class="keyboard-btn func" onclick="insertAlgebra('asinh(')">asinh</button>
+                                <button class="keyboard-btn func" onclick="insertAlgebra('acosh(')">acosh</button>
+                                <button class="keyboard-btn func" onclick="insertAlgebra('atanh(')">atanh</button>
+                            </div>
+                        </div>
+                        <div class="keyboard-section">
+                            <div class="keyboard-section-title">Constantes</div>
+                            <div class="keyboard-grid">
+                                <button class="keyboard-btn" onclick="insertAlgebra('pi')">π</button>
+                                <button class="keyboard-btn" onclick="insertAlgebra('e')">e</button>
+                                <button class="keyboard-btn" onclick="insertAlgebra('i')">i</button>
+                                <button class="keyboard-btn" onclick="insertAlgebra('0')">0</button>
+                                <button class="keyboard-btn" onclick="insertAlgebra('1')">1</button>
+                                <button class="keyboard-btn" onclick="insertAlgebra('2')">2</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="algebra-calc-btn" class="keypad-button equals-key" style="width:100%">Calcular</button>
+                <div id="algebra-result" class="modal-result"></div>
+            </div>
+        </div>
+    </div>
+    <div id="laplace-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Calcular Transformada de Laplace</h2><span class="modal-close"
+                    data-modal-target="laplace-modal">&times;</span>
+            </div>
+            <div class="input-group"> <label>Función f(t)</label> <input id="laplace-func" type="text"
+                    class="input-styled" placeholder="e.g., t^2 + sin(t)"> </div>
+            <div class="modal-grid-2">
+                <div class="input-group"> <label>Variable Original</label> <input type="text" class="input-styled"
+                        value="t" disabled> </div>
+                <div class="input-group"> <label>Variable Transformada</label> <input type="text" class="input-styled"
+                        value="s" disabled> </div>
+            </div> <button id="laplace-calc-btn" class="keypad-button equals-key" style="width:100%">Calcular</button>
+            <div id="laplace-result" class="modal-result"></div>
+        </div>
+    </div>
+    <div id="convert-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Conversor de Unidades</h2><span class="modal-close"
+                    data-modal-target="convert-modal">&times;</span>
+            </div>
+            <h3
+                style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; border-bottom: 1px solid var(--num-key-bg); padding-bottom: 0.5rem;">
+                Conversión Angular</h3>
+            <div class="modal-grid-3">
+                <div class="input-group"> <label for="conv-degrees">Grados (°)</label> <input type="number"
+                        id="conv-degrees" class="input-styled" oninput="convertAngles('degrees')"> </div>
+                <div class="input-group"> <label for="conv-radians">Radianes (rad)</label> <input type="number"
+                        id="conv-radians" class="input-styled" oninput="convertAngles('radians')"> </div>
+                <div class="input-group"> <label for="conv-gradians">Gradianes (grad)</label> <input type="number"
+                        id="conv-gradians" class="input-styled" oninput="convertAngles('gradians')"> </div>
+            </div>
+            <h3
+                style="font-size: 1.1rem; font-weight: 600; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid var(--num-key-bg); padding-bottom: 0.5rem;">
+                Conversión de Coordenadas</h3>
+            <div class="modal-grid-2">
+                <div> <label style="font-weight: 500;">Rectangulares</label>
+                    <div class="input-group mt-4"> <label for="coord-x">Valor X</label> <input type="number"
+                            id="coord-x" class="input-styled" oninput="convertCoords('rect')"> </div>
+                    <div class="input-group"> <label for="coord-y">Valor Y</label> <input type="number" id="coord-y"
+                            class="input-styled" oninput="convertCoords('rect')"> </div>
+                </div>
+                <div> <label style="font-weight: 500;">Polares</label>
+                    <div class="input-group mt-4"> <label for="coord-r">Radio (r)</label> <input type="number"
+                            id="coord-r" class="input-styled" oninput="convertCoords('polar')"> </div>
+                    <div class="input-group"> <label for="coord-theta">Ángulo θ (°)</label> <input type="number"
+                            id="coord-theta" class="input-styled" oninput="convertCoords('polar')"> </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ✅ MODAL DE RAÍCES ENÉSIMAS -->
+    <div id="nthroot-modal" class="modal">
+        <div class="modal-content resizable" style="max-width: 550px;">
+            <div class="modal-header">
+                <h2 class="modal-title">ⁿ√ Raíces Enésimas</h2>
+                <span class="modal-close" data-modal-target="nthroot-modal">&times;</span>
+            </div>
+            <div class="modal-body-scroll">
+                <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 1rem;">
+                    Calcula raíces de cualquier índice: cuadrada (n=2), cúbica (n=3), cuarta (n=4), etc.
+                </p>
+
+                <div class="modal-grid-2">
+                    <div class="input-group">
+                        <label>Índice de la raíz (n):</label>
+                        <input id="nthroot-index" type="number" class="input-styled" value="2" min="2" max="100"
+                            placeholder="2, 3, 4, 5...">
+                    </div>
+                    <div class="input-group">
+                        <label>Radicando (número):</label>
+                        <input id="nthroot-radicand" type="text" class="input-styled" placeholder="8, 16, 27, -8...">
+                    </div>
+                </div>
+
+                <!-- Ejemplos rápidos -->
+                <div style="margin: 1rem 0;">
+                    <p style="font-size: 0.8rem; color: var(--accent-color-1); margin-bottom: 0.5rem;">
+                        <strong>📚 Ejemplos rápidos (clic para usar):</strong>
+                    </p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <button class="keypad-button" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;"
+                            onclick="loadNthRootExample(2, 16)">√16 = 4</button>
+                        <button class="keypad-button" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;"
+                            onclick="loadNthRootExample(3, 27)">³√27 = 3</button>
+                        <button class="keypad-button" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;"
+                            onclick="loadNthRootExample(3, -8)">³√-8 = -2</button>
+                        <button class="keypad-button" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;"
+                            onclick="loadNthRootExample(4, 81)">⁴√81 = 3</button>
+                        <button class="keypad-button" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;"
+                            onclick="loadNthRootExample(5, 32)">⁵√32 = 2</button>
+                        <button class="keypad-button" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;"
+                            onclick="loadNthRootExample(2, 2)">√2 ≈ 1.414</button>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                    <button id="nthroot-calc-btn" class="keypad-button equals-key" style="flex: 1;">
+                        ⁿ√ Calcular Raíz
+                    </button>
+                    <button id="nthroot-insert-btn" class="keypad-button func-key" style="flex: 1;">
+                        📥 Insertar en Display
+                    </button>
+                </div>
+
+                <div id="nthroot-result" class="modal-result"></div>
+
+                <!-- Sintaxis para expresiones -->
+                <div style="margin-top: 1rem; padding: 1rem; background: var(--screen-bg); border-radius: 10px;">
+                    <p style="font-size: 0.85rem; color: var(--accent-color-1); margin-bottom: 0.5rem;">
+                        <strong>⌨️ Sintaxis para escribir en el display:</strong>
+                    </p>
+                    <ul style="font-size: 0.8rem; color: #bbb; list-style: inside; margin-left: 0.5rem;">
+                        <li><code>sqrt(x)</code> → Raíz cuadrada: √x</li>
+                        <li><code>cbrt(x)</code> → Raíz cúbica: ³√x</li>
+                        <li><code>nroot(n, x)</code> → Raíz n-ésima: ⁿ√x</li>
+                    </ul>
+                    <p style="font-size: 0.75rem; color: #888; margin-top: 0.5rem;">
+                        Ejemplo: <code>nroot(3, 27) + sqrt(16) - cbrt(8)</code> = 3 + 4 - 2 = 5
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="limit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Calcular Límite</h2><span class="modal-close"
+                    data-modal-target="limit-modal">&times;</span>
+            </div>
+            <div class="input-group"> <label>Función f(x)</label> <input id="limit-func" type="text"
+                    class="input-styled" placeholder="sin(x)/x"> </div>
+            <div class="modal-grid-2">
+                <div class="input-group"> <label>Variable</label> <input id="limit-var" type="text" class="input-styled"
+                        value="x"> </div>
+                <div class="input-group"> <label>Tiende a</label> <input id="limit-point" type="text"
+                        class="input-styled" placeholder="0"> </div>
+            </div> <button id="limit-calc-btn" class="keypad-button equals-key" style="width:100%">Calcular</button>
+            <div id="limit-result" class="modal-result"></div>
+        </div>
+    </div>
+    <div id="sum-modal" class="modal">
+        <div class="modal-content resizable" style="max-width: 650px;">
+            <div class="modal-header">
+                <h2 class="modal-title">∑ Calculador de Sumatorias</h2><span class="modal-close"
+                    data-modal-target="sum-modal">&times;</span>
+            </div>
+            <div class="modal-body-scroll">
+                <!-- Toggle para modo simbólico -->
+                <div style="background: var(--screen-bg); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="sum-symbolic-mode" onchange="toggleSumMode()">
+                        <span><strong>📐 Modo Simbólico</strong> (resultado con variable n)</span>
+                    </label>
+                </div>
+
+                <div class="input-group"> <label>Expresión f(i):</label> <input id="sum-func" type="text"
+                        class="input-styled" placeholder="i, i^2, i^3, 1/i, etc."> </div>
+                <div class="modal-grid-3">
+                    <div class="input-group"> <label>Variable</label> <input id="sum-var" type="text"
+                            class="input-styled" value="i"> </div>
+                    <div class="input-group"> <label>Desde</label> <input id="sum-from" type="text" class="input-styled"
+                            placeholder="1"> </div>
+                    <div class="input-group"> <label>Hasta</label> <input id="sum-to" type="text" class="input-styled"
+                            placeholder="10 o n"> </div>
+                </div>
+
+                <!-- Ejemplos de sumatorias simbólicas -->
+                <div style="margin-bottom: 1rem;">
+                    <p style="font-size: 0.8rem; color: var(--accent-color-1); margin-bottom: 0.5rem;"><strong>📚
+                            Fórmulas conocidas (clic para usar):</strong></p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <button class="keypad-button" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;"
+                            onclick="loadSumExample('i','1','n')">Σi = n(n+1)/2</button>
+                        <button class="keypad-button" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;"
+                            onclick="loadSumExample('i^2','1','n')">Σi² = n(n+1)(2n+1)/6</button>
+                        <button class="keypad-button" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;"
+                            onclick="loadSumExample('i^3','1','n')">Σi³ = [n(n+1)/2]²</button>
+                        <button class="keypad-button" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;"
+                            onclick="loadSumExample('1','1','n')">Σ1 = n</button>
+                    </div>
+                </div>
+
+                <button id="sum-calc-btn" class="keypad-button equals-key" style="width:100%">∑ Calcular
+                    Sumatoria</button>
+                <div id="sum-result" class="modal-result"></div>
+            </div>
+        </div>
+    </div>
+    <div id="derivative-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Calcular Derivada</h2><span class="modal-close"
+                    data-modal-target="derivative-modal">&times;</span>
+            </div>
+            <div class="input-group"> <label>Función f(x)</label> <input id="derivative-func" type="text"
+                    class="input-styled" placeholder="x^2 + sin(x)"> </div>
+            <div class="modal-grid-2">
+                <div class="input-group"> <label>Variable</label> <input id="derivative-var" type="text"
+                        class="input-styled" value="x"> </div>
+                <div class="input-group"> <label>Orden (opcional)</label> <input id="derivative-order" type="number"
+                        class="input-styled" value="1" min="1"> </div>
+            </div>
+            <div class="input-group"> <label> <input type="checkbox" id="derivative-evaluate"> Evaluar en punto </label>
+                <input id="derivative-point" type="text" class="input-styled" placeholder="x = " style="display:none;">
+            </div> <button id="derivative-calc-btn" class="keypad-button equals-key"
+                style="width:100%">Calcular</button>
+            <div id="derivative-result" class="modal-result"></div>
+        </div>
+    </div>
+    <div id="integral-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Calcular Integral</h2><span class="modal-close"
+                    data-modal-target="integral-modal">&times;</span>
+            </div>
+            <div class="input-group"> <label>Función f(x)</label> <input id="integral-func" type="text"
+                    class="input-styled" placeholder="x^2 + sin(x)"> </div>
+            <div class="input-group"> <label>Variable de integración</label> <input id="integral-var" type="text"
+                    class="input-styled" value="x"> </div>
+            <div class="input-group"> <label> <input type="checkbox" id="integral-definite"> Integral definida </label>
+            </div>
+            <div id="integral-limits" style="display:none;" class="modal-grid-2">
+                <div class="input-group"> <label>Límite inferior</label> <input id="integral-lower" type="text"
+                        class="input-styled" placeholder="0"> </div>
+                <div class="input-group"> <label>Límite superior</label> <input id="integral-upper" type="text"
+                        class="input-styled" placeholder="1"> </div>
+            </div> <button id="integral-calc-btn" class="keypad-button equals-key" style="width:100%">Calcular</button>
+            <div id="integral-result" class="modal-result"></div>
+        </div>
+    </div>
+    <div id="combinatorics-modal" class="modal">
+        <div class="modal-content resizable" style="max-width: 750px;">
+            <div class="modal-header">
+                <h2 class="modal-title">🎲 Combinatoria Avanzada</h2><span class="modal-close"
+                    data-modal-target="combinatorics-modal">&times;</span>
+            </div>
+            <div class="modal-body-scroll">
+
+                <!-- Panel: Combinaciones y Variaciones -->
+                <div class="comb-panel">
+                    <div class="comb-panel-header">📊 Combinaciones y Variaciones (Sin Repetición)</div>
+                    <div class="comb-panel-body">
+                        <!-- C(n,r) -->
+                        <div class="comb-row">
+                            <span class="comb-notation" id="comb-cnr-label">C<sub>n,r</sub></span>
+                            <div class="comb-inputs">
+                                <input type="number" id="comb-cnr-n" class="input-styled" value="10" min="0"
+                                    placeholder="n">
+                                <input type="number" id="comb-cnr-r" class="input-styled" value="3" min="0"
+                                    placeholder="r">
+                            </div>
+                            <button class="comb-btn" onclick="calcCombinatorics('C')">Calc</button>
+                            <span class="comb-result" id="comb-cnr-result">= ?</span>
+                        </div>
+                        <!-- V(n,r) -->
+                        <div class="comb-row">
+                            <span class="comb-notation">V<sub>n,r</sub></span>
+                            <div class="comb-inputs">
+                                <input type="number" id="comb-vnr-n" class="input-styled" value="10" min="0"
+                                    placeholder="n">
+                                <input type="number" id="comb-vnr-r" class="input-styled" value="3" min="0"
+                                    placeholder="r">
+                            </div>
+                            <button class="comb-btn" onclick="calcCombinatorics('V')">Calc</button>
+                            <span class="comb-result" id="comb-vnr-result">= ?</span>
+                        </div>
+                        <!-- P(n) -->
+                        <div class="comb-row">
+                            <span class="comb-notation">P<sub>n</sub></span>
+                            <div class="comb-inputs">
+                                <input type="number" id="comb-pn-n" class="input-styled" value="5" min="0"
+                                    placeholder="n">
+                            </div>
+                            <button class="comb-btn" onclick="calcCombinatorics('P')">Calc</button>
+                            <span class="comb-result" id="comb-pn-result">= ?</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel: Con Repetición -->
+                <div class="comb-panel">
+                    <div class="comb-panel-header">🔄 Con Repetición</div>
+                    <div class="comb-panel-body">
+                        <!-- VR(n,r) -->
+                        <div class="comb-row">
+                            <span class="comb-notation">VR<sub>n,r</sub></span>
+                            <div class="comb-inputs">
+                                <input type="number" id="comb-vr-n" class="input-styled" value="4" min="0"
+                                    placeholder="n">
+                                <input type="number" id="comb-vr-r" class="input-styled" value="2" min="0"
+                                    placeholder="r">
+                            </div>
+                            <button class="comb-btn" onclick="calcCombinatorics('VR')">Calc</button>
+                            <span class="comb-result" id="comb-vr-result">= ?</span>
+                        </div>
+                        <!-- CR(n,r) -->
+                        <div class="comb-row">
+                            <span class="comb-notation">CR<sub>n,r</sub></span>
+                            <div class="comb-inputs">
+                                <input type="number" id="comb-cr-n" class="input-styled" value="4" min="0"
+                                    placeholder="n">
+                                <input type="number" id="comb-cr-r" class="input-styled" value="2" min="0"
+                                    placeholder="r">
+                            </div>
+                            <button class="comb-btn" onclick="calcCombinatorics('CR')">Calc</button>
+                            <span class="comb-result" id="comb-cr-result">= ?</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel: Factorial y Binomial -->
+                <div class="comb-panel">
+                    <div class="comb-panel-header"># Factorial y Coeficiente Binomial</div>
+                    <div class="comb-panel-body">
+                        <!-- n! -->
+                        <div class="comb-row">
+                            <span class="comb-notation">n!</span>
+                            <div class="comb-inputs">
+                                <input type="number" id="comb-fact-n" class="input-styled" value="5" min="0"
+                                    placeholder="n">
+                            </div>
+                            <button class="comb-btn" onclick="calcCombinatorics('FACT')">Calc</button>
+                            <span class="comb-result" id="comb-fact-result">= ?</span>
+                        </div>
+                        <!-- Binomial -->
+                        <div class="comb-row">
+                            <span class="comb-notation" style="font-size: 0.9rem;">(<sup>n</sup>/<sub>r</sub>)</span>
+                            <div class="comb-inputs">
+                                <input type="number" id="comb-binom-n" class="input-styled" value="5" min="0"
+                                    placeholder="n">
+                                <input type="number" id="comb-binom-r" class="input-styled" value="2" min="0"
+                                    placeholder="r">
+                            </div>
+                            <button class="comb-btn" onclick="calcCombinatorics('BINOM')">Calc</button>
+                            <span class="comb-result" id="comb-binom-result">= ?</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Área de resultado detallado -->
+                <div id="comb-detailed-result" class="modal-result"
+                    style="background: var(--screen-bg); padding: 1rem; border-radius: 10px; min-height: 60px;">
+                    <p style="opacity: 0.6; text-align: center;">Seleccione una operación y presione "Calc"</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="equations-modal" class="modal">
+        <div class="modal-content resizable" style="max-width: 650px;">
+            <div class="modal-header">
+                <h2 class="modal-title">⚙️ Resolver Sistema de Ecuaciones</h2><span class="modal-close"
+                    data-modal-target="equations-modal">&times;</span>
+            </div>
+            <div class="modal-body-scroll">
+                <div
+                    style="background: var(--screen-bg); padding: 1rem; border-radius: 10px; margin-bottom: 1rem; border-left: 3px solid var(--accent-color-1);">
+                    <p style="font-size: 0.85rem; margin-bottom: 0.5rem;"><strong>💡 Sistemas soportados:</strong></p>
+                    <ul style="font-size: 0.8rem; color: #aaa; padding-left: 1.5rem;">
+                        <li>Sistemas 2×2, 3×3, 4×4, 5×5 (¡o más!)</li>
+                        <li>Use variables: x, y, z, w, v, u...</li>
+                        <li>Escriba una ecuación por línea</li>
+                    </ul>
+                </div>
+                <div class="input-group">
+                    <label>Ecuaciones (una por línea):</label>
+                    <textarea id="eq-sys-input" class="input-styled" rows="6" placeholder="Ejemplo sistema 3x3:
+2*x + y - z = 8
+-3*x - y + 2*z = -11
+-2*x + y + 2*z = -3"></textarea>
+                </div>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                    <button class="keypad-button" style="flex: 1;" onclick="loadExampleSystem(2)">📌 Ejemplo
+                        2×2</button>
+                    <button class="keypad-button" style="flex: 1;" onclick="loadExampleSystem(3)">📌 Ejemplo
+                        3×3</button>
+                    <button class="keypad-button" style="flex: 1;" onclick="loadExampleSystem(4)">📌 Ejemplo
+                        4×4</button>
+                </div>
+                <button id="eq-sys-calc-btn" class="keypad-button equals-key" style="width:100%">🔍 Resolver
+                    Sistema</button>
+                <div id="eq-sys-result" class="modal-result"></div>
+            </div>
+        </div>
+    </div>
+    <div id="matrix-modal" class="modal">
+        <div class="modal-content resizable" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2 class="modal-title">🧮 Operaciones de Matriz</h2><span class="modal-close"
+                    data-modal-target="matrix-modal">&times;</span>
+            </div>
+            <div class="modal-body-scroll">
+                <div class="input-group">
+                    <label>Tamaño de Matriz:</label>
+                    <select id="matrix-size" class="input-styled">
+                        <option value="2">Matriz 2×2</option>
+                        <option value="3" selected>Matriz 3×3</option>
+                        <option value="4">Matriz 4×4</option>
+                    </select>
+                </div>
+
+                <div id="matrix-input-container" style="margin-bottom: 1rem;"></div>
+
+                <!-- Botones de operaciones -->
+                <div style="background: var(--screen-bg); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                    <p style="font-size: 0.85rem; margin-bottom: 0.75rem; color: var(--accent-color-1);"><strong>📐
+                            Operaciones Disponibles:</strong></p>
+                    <div class="matrix-ops">
+                        <button class="matrix-op-btn keypad-button" style="background: var(--op-key-color);"
+                            onclick="calcMatrix('det')">→ Determinante</button>
+                        <button class="matrix-op-btn keypad-button" style="background: var(--op-key-color);"
+                            onclick="calcMatrix('inv')">→ Inversa</button>
+                        <button class="matrix-op-btn keypad-button" style="background: var(--special-func-bg);"
+                            onclick="calcMatrix('trans')">→ Transpuesta</button>
+                        <button class="matrix-op-btn keypad-button" style="background: var(--special-func-bg);"
+                            onclick="calcMatrix('trace')">→ Traza</button>
+                        <button class="matrix-op-btn keypad-button"
+                            style="background: linear-gradient(145deg, #9333ea, #6366f1);"
+                            onclick="calcMatrix('eigen')">→ Valores Propios</button>
+                    </div>
+                </div>
+
+                <button id="matrix-calc-btn" class="keypad-button equals-key" style="width:100%">🔢 Calcular Todo (Det +
+                    Inv)</button>
+                <div id="matrix-result" class="modal-result"></div>
+            </div>
+        </div>
+    </div>
+    <div id="edo-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Resolver Ecuación Diferencial</h2><span class="modal-close"
+                    data-modal-target="edo-modal">&times;</span>
+            </div> <select id="edo-type" class="input-styled mb-4">
+                <option value="first_order">1er Orden: y' + p(x)y = q(x)</option>
+                <option value="second_order">2º Orden: ay'' + by' + cy = 0</option>
+            </select>
+            <div id="edo-first-order-fields">
+                <div class="input-group"> <label>p(x) =</label> <input id="edo-p" type="text" class="input-styled"
+                        value="1"> </div>
+                <div class="input-group"> <label>q(x) =</label> <input id="edo-q" type="text" class="input-styled"
+                        value="x"> </div>
+            </div>
+            <div class="input-group"> <label> <input type="checkbox" id="edo-initial-conditions"> Condiciones iniciales
+                </label>
+                <div id="edo-initial-conditions-fields" style="display:none;"> <input id="edo-x0" type="text"
+                        class="input-styled" placeholder="x0"> <input id="edo-y0" type="text" class="input-styled"
+                        placeholder="y(x0)"> <input id="edo-yprime0" type="text" class="input-styled"
+                        placeholder="y'(x0)" style="display:none;"> </div>
+            </div>
+            <div id="edo-second-order-fields" style="display:none;" class="modal-grid-3">
+                <div class="input-group"> <label>a =</label> <input id="edo-a" type="number" class="input-styled"
+                        value="1"> </div>
+                <div class="input-group"> <label>b =</label> <input id="edo-b" type="number" class="input-styled"
+                        value="5"> </div>
+                <div class="input-group"> <label>c =</label> <input id="edo-c" type="number" class="input-styled"
+                        value="6"> </div>
+            </div> <button id="edo-solve-btn" class="keypad-button equals-key" style="width:100%">Resolver</button>
+            <div id="edo-result" class="modal-result"></div>
+        </div>
+    </div>
+    <div id="graph-modal" class="modal">
+        <div class="modal-content resizable" style="max-width: 800px; min-width: 400px;">
+            <div class="modal-header">
+                <h2 class="modal-title">📈 Graficador de Funciones</h2><span class="modal-close"
+                    data-modal-target="graph-modal">&times;</span>
+            </div>
+            <div class="modal-body-scroll">
+                <div class="input-group"> <label for="graph-func">f(x) =</label> <input id="graph-func" type="text"
+                        class="input-styled" placeholder="e.g., x^3 - sin(x)"> </div>
+                <div class="modal-grid-2">
+                    <div class="input-group"> <label>x min:</label> <input id="graph-xmin" type="number" value="-10"
+                            class="input-styled"> </div>
+                    <div class="input-group"> <label>x max:</label> <input id="graph-xmax" type="number" value="10"
+                            class="input-styled"> </div>
+                </div>
+
+                <!-- Panel de controles de estilo de gráfica -->
+                <div
+                    style="background: var(--screen-bg); border-radius: 10px; padding: 1rem; margin: 1rem 0; border: 1px solid var(--accent-color-1);">
+                    <h4 style="margin-bottom: 0.75rem; font-size: 0.9rem; color: var(--accent-color-1);">⚙️
+                        Configuración de
+                        la Gráfica</h4>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        <div class="input-group" style="margin-bottom: 0;">
+                            <label for="graph-color" style="font-size: 0.8rem;">🎨 Color</label>
+                            <input type="color" id="graph-color" value="#3498db"
+                                style="width: 100%; height: 35px; border: none; border-radius: 5px; cursor: pointer;">
+                        </div>
+                        <div class="input-group" style="margin-bottom: 0;">
+                            <label for="graph-width" style="font-size: 0.8rem;">📏 Grosor</label>
+                            <select id="graph-width" class="input-styled" style="padding: 0.4rem;">
+                                <option value="1">Fino (1px)</option>
+                                <option value="2" selected>Normal (2px)</option>
+                                <option value="3">Grueso (3px)</option>
+                                <option value="4">Muy grueso (4px)</option>
+                                <option value="5">Extra grueso (5px)</option>
+                            </select>
+                        </div>
+                        <div class="input-group" style="margin-bottom: 0;">
+                            <label for="graph-style" style="font-size: 0.8rem;">✏️ Estilo</label>
+                            <select id="graph-style" class="input-styled" style="padding: 0.4rem;">
+                                <option value="solid">Sólido ───</option>
+                                <option value="dot">Punteado ···</option>
+                                <option value="dash">A rayas - - -</option>
+                                <option value="dashdot">Raya-punto -·-</option>
+                                <option value="longdash">Rayas largas ─ ─</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="graph-btn" class="keypad-button equals-key" style="width:100%">📊 Graficar</button>
+                <div id="plot-container" class="mt-4"
+                    style="width:100%;height:380px;border-radius:10px;overflow:hidden;">
+                </div>
+            </div>
+            <p style="font-size: 0.7rem; color: #888; text-align: center; margin-top: 0.5rem;">↘ Arrastra la esquina
+                inferior derecha para redimensionar</p>
+        </div>
+    </div>
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Historial de Cálculos</h2> <span class="modal-close"
+                    data-modal-target="history-modal">&times;</span>
+            </div>
+            <div id="history-list">
+                <p class="text-center" style="opacity: 0.7;">No hay cálculos en el historial.</p>
+            </div> <button id="clear-history-btn">Limpiar Historial</button>
+        </div>
+    </div>
+    <div id="info-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Información del Resultado</h2> <span class="modal-close"
+                    data-modal-target="info-modal">&times;</span>
+            </div>
+            <div id="info-modal-content">
+                <p class="text-center" style="opacity: 0.7;">No hay información detallada disponible para este
+                    resultado.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================================================================================
+        // 🩺 INICIO DE LA ZONA DE CORRECCIÓN: LÓGICA DE CÁLCULO Y FUNCIONES AUXILIARES 🩺
+        // ==================================================================================
+
+        /**
+         * Convierte un valor angular a radianes, según el modo actual.
+         * @param {number} angle - El valor del ángulo.
+         * @param {string} angleMode - El modo angular actual ('deg', 'rad', 'grad').
+         * @returns {number} El ángulo en radianes.
+         */
+        const toRadians = (angle, angleMode) => {
+            if (angleMode === 'deg') return angle * Math.PI / 180;
+            if (angleMode === 'grad') return angle * Math.PI / 200;
+            return angle; // ya está en radianes
+        };
+
+        /**
+         * Convierte un valor en radianes al modo angular especificado.
+         * @param {number} rad - El valor en radianes.
+         * @param {string} angleMode - El modo angular deseado ('deg', 'rad', 'grad').
+         * @returns {number} El valor en el modo angular deseado.
+         */
+        const fromRadians = (rad, angleMode) => {
+            if (angleMode === 'deg') return rad * 180 / Math.PI;
+            if (angleMode === 'grad') return rad * 200 / Math.PI;
+            return rad;
+        };
+
+        /**
+         * Formatea un valor numérico para su visualización en LaTeX.
+         * @param {number} numericValue El valor numérico a formatear.
+         * @param {string} mode El modo de formato: 'fraction' o 'decimal'
+         * @returns {string} La cadena LaTeX formateada.
+         */
+        const formatNumericValueForLatex = (numericValue, mode = 'fraction') => {
+            const tolerance = 1e-9;
+            const pi = Math.PI;
+
+            // Si está en modo decimal, devolver el número directamente
+            if (mode === 'decimal') {
+                if (Math.abs(numericValue) < tolerance) return '0';
+                // Mostrar con hasta 10 decimales, eliminando ceros innecesarios
+                const formatted = parseFloat(numericValue.toPrecision(10));
+                return formatted.toString();
+            }
+
+            // Modo fracción: intentar encontrar representación simbólica
+            if (Math.abs(numericValue) < tolerance) return '0';
+
+            const exactValues = [
+                { val: pi, latex: '\\pi' }, { val: pi / 2, latex: '\\frac{\\pi}{2}' },
+                { val: pi / 3, latex: '\\frac{\\pi}{3}' }, { val: pi / 4, latex: '\\frac{\\pi}{4}' },
+                { val: pi / 6, latex: '\\frac{\\pi}{6}' }, { val: 2 * pi, latex: '2\\pi' },
+                { val: 3 * pi / 2, latex: '\\frac{3\\pi}{2}' }, { val: Math.E, latex: 'e' },
+                { val: Math.sqrt(2), latex: '\\sqrt{2}' }, { val: Math.sqrt(2) / 2, latex: '\\frac{\\sqrt{2}}{2}' },
+                { val: Math.sqrt(3), latex: '\\sqrt{3}' }, { val: Math.sqrt(3) / 2, latex: '\\frac{\\sqrt{3}}{2}' },
+                { val: 1 / 2, latex: '\\frac{1}{2}' }, { val: 1, latex: '1' }, { val: -1, latex: '-1' }
+            ];
+
+            for (const { val, latex } of exactValues) {
+                if (Math.abs(numericValue - val) < tolerance) return latex;
+                if (Math.abs(numericValue + val) < tolerance) return `-${latex}`;
+            }
+
+            const toFraction = (num, limit = 100) => {
+                const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+                for (let d = 1; d <= limit; d++) {
+                    const n = Math.round(num * d);
+                    if (Math.abs(num - n / d) < tolerance) {
+                        const common = gcd(Math.abs(n), d);
+                        if (d / common !== 1) return `${n / common}/${d / common}`;
+                    }
+                }
+                return null;
+            };
+
+            const fraction = toFraction(numericValue);
+            if (fraction) {
+                const parts = fraction.split('/');
+                return `\\frac{${parts[0]}}{${parts[1]}}`;
+            }
+
+            return parseFloat(numericValue.toFixed(8)).toString();
+        };
+
+        const convertAngles = (source) => {
+            const degInput = document.getElementById('conv-degrees');
+            const radInput = document.getElementById('conv-radians');
+            const gradInput = document.getElementById('conv-gradians');
+            const pi = Math.PI;
+
+            const others = {
+                degrees: [radInput, gradInput],
+                radians: [degInput, gradInput],
+                gradians: [degInput, radInput]
+            };
+            others[source].forEach(el => el.oninput = null);
+
+            if (source === 'degrees') {
+                const deg = parseFloat(degInput.value);
+                if (isNaN(deg)) { radInput.value = ''; gradInput.value = ''; return; }
+                radInput.value = (deg * pi / 180).toFixed(5);
+                gradInput.value = (deg * 200 / 180).toFixed(5);
+            } else if (source === 'radians') {
+                const rad = parseFloat(radInput.value);
+                if (isNaN(rad)) { degInput.value = ''; gradInput.value = ''; return; }
+                degInput.value = (rad * 180 / pi).toFixed(5);
+                gradInput.value = (rad * 200 / pi).toFixed(5);
+            } else if (source === 'gradians') {
+                const grad = parseFloat(gradInput.value);
+                if (isNaN(grad)) { degInput.value = ''; radInput.value = ''; return; }
+                degInput.value = (grad * 180 / 200).toFixed(5);
+                radInput.value = (grad * pi / 200).toFixed(5);
+            }
+
+            setTimeout(() => {
+                degInput.oninput = () => convertAngles('degrees');
+                radInput.oninput = () => convertAngles('radians');
+                gradInput.oninput = () => convertAngles('gradians');
+            }, 100);
+        };
+
+        const convertCoords = (source) => {
+            const xInput = document.getElementById('coord-x');
+            const yInput = document.getElementById('coord-y');
+            const rInput = document.getElementById('coord-r');
+            const thetaInput = document.getElementById('coord-theta');
+
+            const others = {
+                rect: [rInput, thetaInput],
+                polar: [xInput, yInput]
+            };
+            others[source].forEach(el => el.oninput = null);
+
+            if (source === 'rect') {
+                const x = parseFloat(xInput.value) || 0;
+                const y = parseFloat(yInput.value) || 0;
+                const r = Math.sqrt(x * x + y * y);
+                const theta = Math.atan2(y, x) * (180 / Math.PI);
+                rInput.value = isNaN(r) ? '' : r.toFixed(4);
+                thetaInput.value = isNaN(theta) ? '' : theta.toFixed(4);
+            } else { // polar
+                const r = parseFloat(rInput.value) || 0;
+                const theta = parseFloat(thetaInput.value) || 0;
+                const thetaRad = theta * (Math.PI / 180);
+                const x = r * Math.cos(thetaRad);
+                const y = r * Math.sin(thetaRad);
+                xInput.value = isNaN(x) ? '' : x.toFixed(4);
+                yInput.value = isNaN(y) ? '' : y.toFixed(4);
+            }
+
+            setTimeout(() => {
+                xInput.oninput = () => convertCoords('rect');
+                yInput.oninput = () => convertCoords('rect');
+                rInput.oninput = () => convertCoords('polar');
+                thetaInput.oninput = () => convertCoords('polar');
+            }, 100);
+        };
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- ⚙️ INICIO DEL NUEVO MOTOR HÍBRIDO ⚙️ ---
+
+            // 1. LA CLASE `Complex`: El cerebro para el cálculo complejo.
+            class Complex {
+                constructor(re = 0, im = 0) {
+                    this.re = re;
+                    this.im = im;
+                }
+
+                // --- Operaciones Básicas ---
+                add(z) { return new Complex(this.re + z.re, this.im + z.im); }
+                sub(z) { return new Complex(this.re - z.re, this.im - z.im); }
+                mul(z) { return new Complex(this.re * z.re - this.im * z.im, this.re * z.im + this.im * z.re); }
+                div(z) {
+                    const den = z.re * z.re + z.im * z.im;
+                    if (den === 0) throw new Error("División por cero");
+                    return new Complex(
+                        (this.re * z.re + this.im * z.im) / den,
+                        (this.im * z.re - this.re * z.im) / den
+                    );
+                }
+
+                // --- Funciones Estáticas (Operan sobre objetos Complex) ---
+                static pow(base, exp) {
+                    if (base.im === 0 && exp.im === 0) { // Real^Real
+                        return new Complex(Math.pow(base.re, exp.re));
+                    }
+                    // Usando la fórmula: z^w = e^(w * log(z))
+                    const logBase = Complex.log(base);
+                    const exponentiation = logBase.mul(exp);
+                    return Complex.exp(exponentiation);
+                }
+                static sqrt(z) { return Complex.pow(z, new Complex(0.5)); }
+                static exp(z) {
+                    const e_re = Math.exp(z.re);
+                    return new Complex(e_re * Math.cos(z.im), e_re * Math.sin(z.im));
+                }
+                static log(z) { // Logaritmo natural
+                    if (z.re === 0 && z.im === 0) throw new Error("Logaritmo de cero no está definido");
+                    const r = Math.sqrt(z.re * z.re + z.im * z.im);
+                    const theta = Math.atan2(z.im, z.re);
+                    return new Complex(Math.log(r), theta);
+                }
+                static log10(z) {
+                    const ln10 = new Complex(Math.log(10));
+                    return Complex.log(z).div(ln10);
+                }
+                static sin(z) { return new Complex(Math.sin(z.re) * Math.cosh(z.im), Math.cos(z.re) * Math.sinh(z.im)); }
+                static cos(z) { return new Complex(Math.cos(z.re) * Math.cosh(z.im), -Math.sin(z.re) * Math.sinh(z.im)); }
+                static tan(z) { return Complex.sin(z).div(Complex.cos(z)); }
+                static sinh(z) { return new Complex(Math.sinh(z.re) * Math.cos(z.im), Math.cosh(z.re) * Math.sin(z.im)); }
+                static cosh(z) { return new Complex(Math.cosh(z.re) * Math.cos(z.im), Math.sinh(z.re) * Math.sin(z.im)); }
+                static tanh(z) { return Complex.sinh(z).div(Complex.cosh(z)); }
+                static abs(z) { return new Complex(Math.sqrt(z.re * z.re + z.im * z.im)); }
+
+                // --- Métodos de instancia y formato ---
+                get modulus() { return Math.sqrt(this.re * this.re + this.im * this.im); }
+                get argument() { return Math.atan2(this.im, this.re); }
+                toRectangular(mode = 'symbolic') {
+                    const isDecimal = mode === 'decimal';
+                    const formatMode = mode === 'symbolic' ? 'fraction' : mode;
+                    const re = isDecimal ? parseFloat(this.re.toPrecision(10)).toString() : formatNumericValueForLatex(this.re, formatMode);
+                    const im = isDecimal ? parseFloat(Math.abs(this.im).toPrecision(10)).toString() : formatNumericValueForLatex(Math.abs(this.im), formatMode);
+                    const sign = this.im < 0 ? '-' : '+';
+                    if (Math.abs(this.im) < 1e-9) return re;
+                    if (Math.abs(this.re) < 1e-9) return (this.im < 0 ? '-' : '') + (im === '1' ? '' : im) + 'i';
+                    return `${re} ${sign} ${(im === '1' ? '' : im)}i`;
+                }
+            }
+
+            // ✅ **CORRECCIÓN:** La lista de funciones se mueve al ámbito del DOMContentLoaded para que sea accesible por todos.
+            const functions = ['sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'sinh', 'cosh', 'tanh', 'asinh', 'acosh', 'atanh', 'log', 'log10', 'ln', 'sqrt', 'cbrt', 'abs', 'exp'];
+
+            // 2. El PARSER: Convierte la expresión en una lista de operaciones (RPN)
+            function parseComplexExpression(expr, angleMode) {
+                const tokens = expr.replace(/\s+/g, '').match(/(\d+\.?\d*|i|pi|e|\+|-|\*|\/|\^|\(|\)|[a-zA-Z_]+[0-9]*)/g);
+                if (!tokens) throw new Error("Expresión inválida");
+
+                const outputQueue = [];
+                const operatorStack = [];
+                const precedence = { '+': 1, '-': 1, '*': 2, '/': 2, '^': 3 };
+
+                for (let i = 0; i < tokens.length; i++) {
+                    let token = tokens[i];
+
+                    if (!isNaN(parseFloat(token))) {
+                        outputQueue.push(new Complex(parseFloat(token)));
+                    } else if (token === 'i') {
+                        outputQueue.push(new Complex(0, 1));
+                    } else if (token === 'pi') {
+                        outputQueue.push(new Complex(Math.PI));
+                    } else if (token === 'e') {
+                        outputQueue.push(new Complex(Math.E));
+                    } else if (functions.includes(token)) {
+                        operatorStack.push(token);
+                    } else if (token === '(') {
+                        operatorStack.push(token);
+                    } else if (token === ')') {
+                        while (operatorStack.length && operatorStack[operatorStack.length - 1] !== '(') {
+                            outputQueue.push(operatorStack.pop());
+                        }
+                        if (operatorStack.length === 0) throw new Error("Paréntesis no coinciden");
+                        operatorStack.pop(); // Pop '('
+                        if (functions.includes(operatorStack[operatorStack.length - 1])) {
+                            outputQueue.push(operatorStack.pop());
+                        }
+                    } else { // Operator
+                        // Handle unary minus
+                        if (token === '-' && (i === 0 || ['(', '+', '-', '*', '/', '^'].includes(tokens[i - 1]))) {
+                            operatorStack.push('unary-');
+                            continue;
+                        }
+                        while (operatorStack.length && precedence[operatorStack[operatorStack.length - 1]] >= precedence[token]) {
+                            outputQueue.push(operatorStack.pop());
+                        }
+                        operatorStack.push(token);
+                    }
+                }
+                while (operatorStack.length) {
+                    const op = operatorStack.pop();
+                    if (op === '(') throw new Error("Paréntesis no coinciden");
+                    outputQueue.push(op);
+                }
+                return evaluateRPN(outputQueue, angleMode);
+            }
+
+            // 3. El EVALUADOR RPN: Resuelve la lista de operaciones
+            function evaluateRPN(rpnQueue, angleMode) {
+                const stack = [];
+                for (const token of rpnQueue) {
+                    if (token instanceof Complex) {
+                        stack.push(token);
+                    } else {
+                        if (token === 'unary-') {
+                            const a = stack.pop();
+                            if (!a) throw new Error("Argumento faltante para unario -");
+                            stack.push(new Complex(-a.re, -a.im));
+                            continue;
+                        }
+
+                        if (functions.includes(token)) {
+                            const a = stack.pop();
+                            if (!a) throw new Error(`Argumento faltante para la función ${token}`);
+                            let arg = a;
+                            if (['sin', 'cos', 'tan'].includes(token)) {
+                                if (a.im === 0) { // Solo convertir si el número es real
+                                    arg = new Complex(toRadians(a.re, angleMode), 0);
+                                }
+                            }
+                            switch (token) {
+                                case 'sin': stack.push(Complex.sin(arg)); break;
+                                case 'cos': stack.push(Complex.cos(arg)); break;
+                                case 'tan': stack.push(Complex.tan(arg)); break;
+                                case 'sinh': stack.push(Complex.sinh(a)); break;
+                                case 'cosh': stack.push(Complex.cosh(a)); break;
+                                case 'tanh': stack.push(Complex.tanh(a)); break;
+                                case 'log': case 'ln': stack.push(Complex.log(a)); break;
+                                case 'log10': stack.push(Complex.log10(a)); break;
+                                case 'sqrt': stack.push(Complex.sqrt(a)); break;
+                                case 'cbrt': stack.push(Complex.pow(a, new Complex(1 / 3, 0))); break;  // ✅ Raíz cúbica
+                                case 'abs': stack.push(Complex.abs(a)); break;
+                                case 'exp': stack.push(Complex.exp(a)); break;
+                                default: throw new Error(`Función no implementada en motor complejo: ${token}`);
+                            }
+                        } else { // Binary operators
+                            const b = stack.pop();
+                            const a = stack.pop();
+                            if (a === undefined || b === undefined) throw new Error(`Argumento faltante para el operador ${token}`);
+                            switch (token) {
+                                case '+': stack.push(a.add(b)); break;
+                                case '-': stack.push(a.sub(b)); break;
+                                case '*': stack.push(a.mul(b)); break;
+                                case '/': stack.push(a.div(b)); break;
+                                case '^': stack.push(Complex.pow(a, b)); break;
+                                default: throw new Error(`Operador desconocido: ${token}`);
+                            }
+                        }
+                    }
+                }
+                if (stack.length !== 1) throw new Error("Expresión inválida o mal formada");
+                return stack[0];
+            }
+
+            // --- FIN DEL NUEVO MOTOR HÍBRIDO ---
+
+            if (typeof nerdamer === 'undefined' || typeof Plotly === 'undefined') {
+                document.body.innerHTML = `<div style="color: red; text-align: center; padding: 2rem; font-family: 'Poppins', sans-serif;"><h1>Error Crítico de Carga</h1><p>No se pudieron cargar las librerías necesarias. Revise su conexión a internet y recargue.</p></div>`;
+                return;
+            }
+
+            nerdamer.register({
+                name: 'log10',
+                numargs: 1,
+                build: function (x) {
+                    return nerdamer('log(x)/log(10)').sub('x', x);
+                }
+            });
+
+            const appState = {
+                lastExpression: '',
+                lastResult: null, // Puede ser un objeto Nerdamer o un objeto Complex
+                displayMode: 'symbolic', // 'symbolic' | 'fraction' | 'decimal'
+                currentAngleMode: 'deg',
+            };
+
+            const ui = {
+                input: document.getElementById('function-input'),
+                output: document.getElementById('output'),
+                error: document.getElementById('error-message'),
+                angleSelector: document.getElementById('angle-mode-selector'),
+                advToggle: document.getElementById('adv-controls-toggle'),
+                advPanel: document.getElementById('advanced-controls-panel'),
+                menuToggle: document.getElementById('menu-toggle'),
+                mainMenu: document.getElementById('main-menu'),
+                keyboardToggleBtn: document.getElementById('toggle-keyboard-btn'),
+                inputMathDisplay: document.getElementById('input-math-display'),
+                historyModal: document.getElementById('history-modal'),
+                historyList: document.getElementById('history-list'),
+                clearHistoryBtn: document.getElementById('clear-history-btn'),
+                infoBtn: document.getElementById('info-btn'),
+                infoModal: document.getElementById('info-modal'),
+                infoModalContent: document.getElementById('info-modal-content')
+            };
+
+            let isKeyboardDisabled = false;
+            const svgIconKeyboardOn = `<svg title="Teclado Habilitado" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" ry="2"></rect><path d="M7 9h.01M11 9h.01M15 9h.01M7 13h.01M11 13h.01M15 13h.01M9 17h6"/></svg>`;
+            const svgIconKeyboardOff = `<svg title="Teclado Deshabilitado" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" ry="2"></rect><path d="M7 9h.01M11 9h.01M15 9h.01M7 13h.01M11 13h.01M15 13h.01M9 17h6"/><line x1="4" y1="4" x2="20" y2="20"/></svg>`;
+            const toggleKeyboard = (forceDisable) => {
+                isKeyboardDisabled = (typeof forceDisable === 'boolean') ? forceDisable : !isKeyboardDisabled;
+                ui.input.readOnly = isKeyboardDisabled;
+                ui.keyboardToggleBtn.classList.toggle('disabled', isKeyboardDisabled);
+                ui.keyboardToggleBtn.innerHTML = isKeyboardDisabled ? svgIconKeyboardOff : svgIconKeyboardOn;
+                if (isKeyboardDisabled) ui.input.blur();
+            };
+            ui.keyboardToggleBtn.addEventListener('click', () => toggleKeyboard());
+            if (window.innerWidth <= 768) toggleKeyboard(true); else toggleKeyboard(false);
+
+            const clearScreen = () => {
+                ui.output.innerHTML = '';
+                ui.error.style.display = 'none';
+                ui.inputMathDisplay.innerHTML = '';
+                ui.infoBtn.style.display = 'none';
+            };
+
+            const showError = (msg) => {
+                clearScreen();
+                ui.error.textContent = msg;
+                ui.error.style.display = 'block';
+                ui.infoBtn.style.display = 'none';
+            };
+
+            const renderMath = (content, element = ui.output) => {
+                if (!content) { element.innerHTML = ''; return; }
+                element.innerHTML = `$${content}$`;
+                if (window.MathJax) {
+                    MathJax.typesetPromise([element]).catch((e) => {
+                        console.error("Error en MathJax:", e);
+                        element.innerHTML = `<span style="font-family: monospace;">${content}</span>`;
+                    });
+                }
+            };
+
+            const renderInputMath = (expr) => {
+                if (!expr) { ui.inputMathDisplay.innerHTML = ''; return; }
+                try {
+                    // ✅ PASO 1: Pre-procesar la expresión para mantener información sobre raíces
+                    // Usamos marcadores especiales que luego convertiremos a LaTeX
+                    let processed = expr;
+
+                    // Guardar las raíces n-ésimas para LaTeX: nroot(n, x) → __NROOT_n_x__
+                    const nrootMap = {};
+                    let nrootCounter = 0;
+                    processed = processed.replace(/nroot\s*\(\s*(\d+)\s*,\s*([^)]+)\)/gi, (match, n, x) => {
+                        const key = `__NROOT${nrootCounter}__`;
+                        nrootMap[key] = { index: n, radicand: x.trim() };
+                        nrootCounter++;
+                        return key;
+                    });
+
+                    // Guardar las raíces cúbicas: cbrt(x) → __CBRT_x__
+                    const cbrtMap = {};
+                    let cbrtCounter = 0;
+                    processed = processed.replace(/cbrt\s*\(\s*([^)]+)\)/gi, (match, x) => {
+                        const key = `__CBRT${cbrtCounter}__`;
+                        cbrtMap[key] = x.trim();
+                        cbrtCounter++;
+                        return key;
+                    });
+
+                    // Reemplazar i complejo temporalmente
+                    processed = processed.replace(/(?<![a-zA-Z])i(?![a-zA-Z])/g, 'sqrt(-1)');
+
+                    // ✅ PASO 2: Obtener LaTeX de nerdamer para la parte que no son raíces n-ésimas
+                    // Reemplazar los marcadores por valores numéricos temporales para que nerdamer no falle
+                    let forNerdamer = processed;
+                    for (const key in nrootMap) {
+                        forNerdamer = forNerdamer.replace(key, '1'); // Placeholder
+                    }
+                    for (const key in cbrtMap) {
+                        forNerdamer = forNerdamer.replace(key, '1'); // Placeholder
+                    }
+
+                    // Si no hay raíces especiales, usar nerdamer directamente
+                    if (nrootCounter === 0 && cbrtCounter === 0) {
+                        let latex = nerdamer(processed).toTeX()
+                            .replace(/\\log/g, '\\ln')
+                            .replace(/\\sqrt\{-1\}/g, 'i');
+                        renderMath(latex, ui.inputMathDisplay);
+                        return;
+                    }
+
+                    // ✅ PASO 3: Construir LaTeX manualmente para expresiones con raíces
+                    // Crear una versión LaTeX de la expresión original
+                    let latexExpr = expr;
+
+                    // Convertir nroot(n, x) → \sqrt[n]{x}
+                    latexExpr = latexExpr.replace(/nroot\s*\(\s*(\d+)\s*,\s*([^)]+)\)/gi, (match, n, x) => {
+                        // Intentar obtener LaTeX del radicando
+                        let radicandLatex = x.trim();
+                        try {
+                            radicandLatex = nerdamer(x.trim()).toTeX();
+                        } catch (e) { }
+                        return `\\sqrt[${n}]{${radicandLatex}}`;
+                    });
+
+                    // Convertir cbrt(x) → \sqrt[3]{x}
+                    latexExpr = latexExpr.replace(/cbrt\s*\(\s*([^)]+)\)/gi, (match, x) => {
+                        let radicandLatex = x.trim();
+                        try {
+                            radicandLatex = nerdamer(x.trim()).toTeX();
+                        } catch (e) { }
+                        return `\\sqrt[3]{${radicandLatex}}`;
+                    });
+
+                    // Convertir sqrt(x) → \sqrt{x}
+                    latexExpr = latexExpr.replace(/sqrt\s*\(\s*([^)]+)\)/gi, (match, x) => {
+                        let radicandLatex = x.trim();
+                        try {
+                            radicandLatex = nerdamer(x.trim()).toTeX();
+                        } catch (e) { }
+                        return `\\sqrt{${radicandLatex}}`;
+                    });
+
+                    // Convertir otras funciones comunes
+                    latexExpr = latexExpr.replace(/sin\s*\(/gi, '\\sin(');
+                    latexExpr = latexExpr.replace(/cos\s*\(/gi, '\\cos(');
+                    latexExpr = latexExpr.replace(/tan\s*\(/gi, '\\tan(');
+                    latexExpr = latexExpr.replace(/log10\s*\(\s*([^)]+)\)/gi, '\\log_{10}($1)');
+                    latexExpr = latexExpr.replace(/ln\s*\(/gi, '\\ln(');
+                    latexExpr = latexExpr.replace(/log\s*\(/gi, '\\ln(');
+                    latexExpr = latexExpr.replace(/\^/g, '^');
+                    latexExpr = latexExpr.replace(/\*/g, ' \\cdot ');
+                    latexExpr = latexExpr.replace(/pi/gi, '\\pi');
+                    latexExpr = latexExpr.replace(/(?<![a-zA-Z])e(?![a-zA-Z])/g, 'e');
+
+                    renderMath(latexExpr, ui.inputMathDisplay);
+                } catch (e) {
+                    // Si falla, intentar mostrar la expresión sin procesar
+                    ui.inputMathDisplay.innerHTML = `<span style="font-family: monospace;">${expr}</span>`;
+                    if (expr.trim() === '') ui.inputMathDisplay.innerHTML = '';
+                }
+            };
+
+            const updateDisplay = () => {
+                if (!appState.lastResult) return;
+                clearScreen();
+                let contentToRender;
+
+                if (appState.lastResult instanceof Complex) {
+                    contentToRender = appState.lastResult.toRectangular(appState.displayMode);
+                    ui.infoBtn.style.display = 'block';
+                } else { // Es un objeto Nerdamer
+                    if (appState.displayMode === 'symbolic') {
+                        // Modo simbólico: Muestra la expresión en LaTeX sin evaluar
+                        contentToRender = appState.lastResult.toTeX().replace(/\\log/g, '\\ln');
+                    } else if (appState.displayMode === 'fraction') {
+                        // Modo fracción: Evalúa y convierte a fracción si es posible
+                        try {
+                            let numericValue = appState.lastResult.evaluate().valueOf();
+                            if (/(?<![a-z])(asin|acos|atan)\(/.test(appState.lastExpression)) {
+                                numericValue = fromRadians(numericValue, appState.currentAngleMode);
+                            }
+                            contentToRender = formatNumericValueForLatex(numericValue, 'fraction');
+                        } catch (e) {
+                            contentToRender = appState.lastResult.toTeX().replace(/\\log/g, '\\ln');
+                        }
+                    } else {
+                        // Modo decimal: Muestra el valor numérico en decimales
+                        try {
+                            let numericValue = appState.lastResult.evaluate().valueOf();
+                            if (/(?<![a-z])(asin|acos|atan)\(/.test(appState.lastExpression)) {
+                                numericValue = fromRadians(numericValue, appState.currentAngleMode);
+                            }
+                            contentToRender = formatNumericValueForLatex(numericValue, 'decimal');
+                        } catch (e) {
+                            contentToRender = appState.lastResult.toTeX().replace(/\\log/g, '\\ln');
+                        }
+                    }
+                }
+                renderMath(contentToRender);
+            };
+
+            const performCalculation = () => {
+                const expression = ui.input.value.trim();
+                if (!expression) {
+                    showError("Introduzca una expresión.");
+                    return;
+                }
+
+                try {
+                    clearScreen();
+                    appState.lastExpression = expression;
+                    appState.displayMode = 'decimal'; // ✅ CAMBIO: Mostrar en decimal por defecto al presionar "="
+
+                    // Decidir qué motor usar
+                    if (/(?<![a-zA-Z])i(?![a-zA-Z])/.test(expression)) {
+                        // MODO COMPLEJO
+                        const result = parseComplexExpression(expression, appState.currentAngleMode);
+                        appState.lastResult = result;
+                    } else {
+                        // MODO REAL (NERDAMER)
+                        let processedExpr = expression.replace(/ln\(/g, 'log(');
+
+                        // ✅ Soporte para raíces enésimas: nroot(n, x) → (x)^(1/n)
+                        processedExpr = processedExpr.replace(/nroot\s*\(\s*(\d+)\s*,\s*([^)]+)\)/gi, (match, n, x) => {
+                            const index = parseInt(n);
+                            const radicand = x.trim();
+                            // Para números negativos con índice impar, manejarlo especialmente
+                            return `((${radicand})^(1/${index}))`;
+                        });
+
+                        // ✅ Soporte para raíz cúbica: cbrt(x) → (x)^(1/3)
+                        processedExpr = processedExpr.replace(/cbrt\s*\(\s*([^)]+)\)/gi, (match, x) => {
+                            return `((${x.trim()})^(1/3))`;
+                        });
+
+                        const trigRegex = /(?<![a-z])(sin|cos|tan)\(([^()]*(\([^()]*\)[^()]*)*)\)/g;
+                        processedExpr = processedExpr.replace(trigRegex, (match, func, content) => {
+                            const angleInRad = toRadians(nerdamer(content).evaluate().valueOf(), appState.currentAngleMode);
+                            return `${func}(${angleInRad})`;
+                        });
+                        appState.lastResult = nerdamer(processedExpr);
+                    }
+
+                    updateDisplay();
+
+                } catch (err) {
+                    showError("Error: " + err.message);
+                }
+            };
+
+            function insertAtCursor(text) {
+                const inputEl = ui.input;
+                const start = inputEl.selectionStart || 0;
+                const end = inputEl.selectionEnd || 0;
+                inputEl.value = inputEl.value.substring(0, start) + text + inputEl.value.substring(end);
+                inputEl.focus();
+                const cursorPos = start + text.length;
+                inputEl.setSelectionRange(cursorPos, cursorPos);
+                renderInputMath(inputEl.value);
+            }
+
+            document.querySelector('.calculator-body').addEventListener('click', (e) => {
+                const button = e.target.closest('button');
+                if (!button || button.id === 'toggle-keyboard-btn') return;
+                const { action, value, modalTarget } = button.dataset;
+                if (value) { insertAtCursor(value); }
+                else if (action) {
+                    switch (action) {
+                        case 'EVAL': performCalculation(); break;
+                        case 'AC':
+                            ui.input.value = '';
+                            appState.lastResult = null;
+                            clearScreen();
+                            break;
+                        case 'DEL':
+                            ui.input.value = ui.input.value.slice(0, -1);
+                            renderInputMath(ui.input.value);
+                            break;
+                        case 'S2D':
+                            if (appState.lastResult) {
+                                // ✅ CAMBIO: Alternar entre decimal ↔ simbólico (fracciones, constantes, etc.)
+                                if (appState.displayMode === 'decimal') {
+                                    appState.displayMode = 'symbolic';
+                                } else {
+                                    appState.displayMode = 'decimal';
+                                }
+                                updateDisplay();
+                            }
+                            break;
+                    }
+                } else if (modalTarget) {
+                    document.getElementById(modalTarget).style.display = 'flex';
+                }
+            });
+
+            document.querySelectorAll('.modal-close').forEach(btn => {
+                btn.addEventListener('click', e => e.target.closest('.modal').style.display = 'none');
+            });
+            window.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal')) e.target.style.display = 'none';
+            });
+
+            ui.angleSelector.addEventListener('click', (e) => {
+                const button = e.target.closest('button[data-mode]');
+                if (!button) return;
+                ui.angleSelector.querySelectorAll('.angle-btn').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                appState.currentAngleMode = button.dataset.mode;
+                if (appState.lastExpression) {
+                    performCalculation();
+                }
+            });
+
+            ui.advToggle.addEventListener('click', () => {
+                const isVisible = ui.advPanel.style.display === 'block';
+                ui.advPanel.style.display = isVisible ? 'none' : 'block';
+                ui.advToggle.textContent = isVisible ? '▼ Funciones Avanzadas ▼' : '▲ Ocultar Funciones ▲';
+            });
+            ui.menuToggle.addEventListener('click', () => ui.mainMenu.classList.toggle('active'));
+            document.getElementById('help-btn').addEventListener('click', () => {
+                document.getElementById('help-modal').style.display = 'flex';
+                ui.mainMenu.classList.remove('active');
+            });
+            document.getElementById('history-btn').addEventListener('click', () => {
+                // La lógica del historial necesitará adaptarse un poco
+                ui.historyModal.style.display = 'flex';
+                ui.mainMenu.classList.remove('active');
+            });
+            document.querySelectorAll('.theme-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.body.className = '';
+                    const theme = button.dataset.theme;
+                    if (theme !== 'default') document.body.classList.add(theme);
+                    localStorage.setItem('calculatorTheme', theme);
+                    ui.mainMenu.classList.remove('active');
+                });
+            });
+            const savedTheme = localStorage.getItem('calculatorTheme') || 'default';
+            if (savedTheme !== 'default') document.body.classList.add(savedTheme);
+            window.addEventListener('click', e => {
+                if (ui.mainMenu && !ui.mainMenu.contains(e.target) && !ui.menuToggle.contains(e.target)) {
+                    ui.mainMenu.classList.remove('active');
+                }
+            });
+            ui.input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); performCalculation(); }
+                else if (e.key === 'Escape') { ui.input.value = ''; clearScreen(); }
+            });
+            ui.input.addEventListener('input', () => renderInputMath(ui.input.value));
+
+            // --- LÓGICA DE MODALES AVANZADOS RESTAURADA ---
+            const renderModalResult = (div, latex) => {
+                div.innerHTML = `$$${latex}$$`;
+                if (window.MathJax) MathJax.typesetPromise([div]);
+            };
+            const renderModalError = (div, msg) => {
+                div.innerHTML = `<p class="text-red-400">${msg}</p>`;
+            };
+            const postprocessLatex = (latex) => {
+                return latex.replace(/\\log/g, '\\ln').replace(/\\sqrt\{-1\}/g, 'i');
+            };
+
+            document.getElementById('algebra-calc-btn').addEventListener('click', () => {
+                const op = document.getElementById('algebra-op').value;
+                const input = document.getElementById('algebra-input').value.trim();
+                const resultDiv = document.getElementById('algebra-result');
+                if (!input) return renderModalError(resultDiv, 'Ingrese una expresión.');
+                try {
+                    let result, latexOutput;
+                    switch (op) {
+                        case 'factor': case 'expand':
+                            result = nerdamer[op](input);
+                            latexOutput = result.toTeX();
+                            break;
+                        case 'solve':
+                            const equation = input.includes('=') ? input : `${input}=0`;
+                            const variables = nerdamer(equation).variables();
+                            if (variables.length === 0) throw new Error('No se encontró una variable para resolver.');
+                            const solutions = nerdamer.solve(equation, variables[0]);
+                            const solutionArray = solutions.toString().replace(/[\[\]]/g, '').split(',');
+                            if (solutionArray.length === 0 || solutionArray[0] === '') {
+                                latexOutput = `\\text{No se encontraron soluciones para } ${variables[0]}`;
+                            } else {
+                                latexOutput = solutionArray.map(sol => `${variables[0]} = ${postprocessLatex(nerdamer(sol).toTeX())}`).join(',\\quad ');
+                            }
+                            break;
+                        case 'gcd': case 'lcm':
+                            const parts = input.split(',').map(s => s.trim());
+                            if (parts.length < 2) throw new Error('Se requieren al menos dos números.');
+                            result = nerdamer[op](...parts);
+                            latexOutput = `${op.toUpperCase()}(${parts.join(', ')}) = ${result.toTeX()}`;
+                            break;
+                        case 'divisors':
+                            const num = parseInt(input);
+                            if (isNaN(num)) throw new Error('La entrada debe ser un número entero.');
+                            const getDivisors = n => {
+                                const absN = Math.abs(n);
+                                const divs = new Set();
+                                for (let i = 1; i <= Math.sqrt(absN); i++) {
+                                    if (absN % i === 0) { divs.add(i); divs.add(absN / i); }
+                                }
+                                return Array.from(divs).sort((a, b) => a - b);
+                            };
+                            latexOutput = `Divisores(${num}) = [${getDivisors(num).join(',\\ ')}]`;
+                            break;
+                        default: throw new Error('Operación no reconocida.');
+                    }
+                    renderModalResult(resultDiv, latexOutput);
+                } catch (e) { renderModalError(resultDiv, `Error: ${e.message}`); }
+            });
+
+            document.getElementById('laplace-calc-btn').addEventListener('click', () => {
+                const func = document.getElementById('laplace-func').value.trim();
+                const resultDiv = document.getElementById('laplace-result');
+                if (!func) return renderModalError(resultDiv, 'Ingrese una función f(t).');
+                try {
+                    if (!nerdamer(func).variables().includes('t')) throw new Error("La función debe ser una expresión en 't'.");
+                    const result = nerdamer.laplace(func, 't', 's');
+                    renderModalResult(resultDiv, `\\mathcal{L}\\{${func}\\} = ${result.toTeX()}`);
+                } catch (e) { renderModalError(resultDiv, `Error: ${e.message}`); }
+            });
+            document.getElementById('limit-calc-btn').addEventListener('click', () => {
+                const func = document.getElementById('limit-func').value.trim();
+                const variable = document.getElementById('limit-var').value || 'x';
+                const point = document.getElementById('limit-point').value.trim();
+                const resultDiv = document.getElementById('limit-result');
+                if (!func || !point) return renderModalError(resultDiv, 'Complete todos los campos.');
+                try {
+                    const result = nerdamer.limit(func, variable, point);
+                    renderModalResult(resultDiv, `\\lim_{${variable} \\to ${point}} (${func}) = ${result.toTeX()}`);
+                } catch (e) { renderModalError(resultDiv, `Error: ${e.message}`); }
+            });
+            document.getElementById('sum-calc-btn').addEventListener('click', () => {
+                const funcRaw = document.getElementById('sum-func').value.trim();
+                const variable = document.getElementById('sum-var').value || 'i';
+                const from = document.getElementById('sum-from').value.trim();
+                const to = document.getElementById('sum-to').value.trim();
+                const isSymbolicMode = document.getElementById('sum-symbolic-mode').checked;
+                const resultDiv = document.getElementById('sum-result');
+
+                if (!funcRaw || !from || !to) return renderModalError(resultDiv, 'Complete todos los campos.');
+
+                // ✅ Limpiar espacios de la expresión
+                const func = funcRaw.replace(/\s+/g, '');
+
+                // ✅ Función para convertir expresión a LaTeX de forma confiable (sin depender de nerdamer)
+                const funcToTeX = (expr) => {
+                    let clean = expr;
+                    // Convertir potencias: i^2 -> i^{2}, i^10 -> i^{10}
+                    clean = clean.replace(/\^(\d+)/g, '^{$1}');
+                    // Convertir ** a ^
+                    clean = clean.replace(/\*\*(\d+)/g, '^{$1}');
+                    // Convertir multiplicación * a \cdot
+                    clean = clean.replace(/\*/g, ' \\cdot ');
+                    return clean;
+                };
+
+                try {
+                    // ✅ Verificar si el límite superior es simbólico (contiene 'n' o no es numérico)
+                    const isSymbolicTo = isNaN(parseInt(to)) || /[a-zA-Z]/.test(to);
+
+                    // ✅ Usar modo simbólico automáticamente si el límite es simbólico
+                    // (independientemente del checkbox, para evitar confusión al usuario)
+                    if (isSymbolicTo) {
+                        // ✅ MODO SIMBÓLICO: Usar fórmulas cerradas conocidas
+                        let symbolicResult = '';
+                        let formula = '';
+                        let resultTeX = '';
+
+                        // Normalizar la función para comparación
+                        const normalizedFunc = func.replace(/\s+/g, '').toLowerCase();
+
+                        // Fórmulas cerradas conocidas
+                        if (normalizedFunc === variable || normalizedFunc === `${variable}^1`) {
+                            // Σi = n(n+1)/2
+                            symbolicResult = '\\frac{n(n+1)}{2}';
+                            resultTeX = symbolicResult;
+                        } else if (normalizedFunc === `${variable}^2` || normalizedFunc === `${variable}**2`) {
+                            // Σi² = n(n+1)(2n+1)/6
+                            symbolicResult = '\\frac{n(n+1)(2n+1)}{6}';
+                            resultTeX = symbolicResult;
+                        } else if (normalizedFunc === `${variable}^3` || normalizedFunc === `${variable}**3`) {
+                            // Σi³ = [n(n+1)/2]²
+                            symbolicResult = '\\left[\\frac{n(n+1)}{2}\\right]^2';
+                            resultTeX = symbolicResult;
+                        } else if (normalizedFunc === `${variable}^4` || normalizedFunc === `${variable}**4`) {
+                            // Σi⁴ = n(n+1)(2n+1)(3n²+3n−1)/30
+                            symbolicResult = '\\frac{n(n+1)(2n+1)(3n^2+3n-1)}{30}';
+                            resultTeX = symbolicResult;
+                        } else if (normalizedFunc === '1') {
+                            // Σ1 = n
+                            symbolicResult = 'n';
+                            resultTeX = symbolicResult;
+                        } else if (normalizedFunc === `2*${variable}` || normalizedFunc === `2${variable}`) {
+                            // Σ2i = 2·n(n+1)/2 = n(n+1)
+                            symbolicResult = 'n(n+1)';
+                            resultTeX = symbolicResult;
+                        } else if (normalizedFunc === `2*${variable}+1` || normalizedFunc === `2${variable}+1` || normalizedFunc === `(2*${variable}+1)`) {
+                            // Suma de primeros n números impares: Σ(2i-1) desde i=1 = n²
+                            // Pero Σ(2i+1) desde i=1 = n² + 2n (diferente)
+                            symbolicResult = 'n^2 + 2n';
+                            resultTeX = 'n^2 + 2n';
+                        } else if (normalizedFunc === `2*${variable}-1` || normalizedFunc === `2${variable}-1` || normalizedFunc === `(2*${variable}-1)`) {
+                            // Σ(2i-1) = n² (suma de números impares desde 1)
+                            symbolicResult = 'n^2';
+                            resultTeX = 'n^2';
+                        } else if (normalizedFunc === `(${variable}+1)` || normalizedFunc === `${variable}+1`) {
+                            // Σ(i+1) = Σi + Σ1 = n(n+1)/2 + n = n(n+3)/2
+                            symbolicResult = '\\frac{n(n+3)}{2}';
+                            resultTeX = symbolicResult;
+                        } else if (normalizedFunc === `(${variable}-1)` || normalizedFunc === `${variable}-1`) {
+                            // Σ(i-1) = Σi - Σ1 = n(n+1)/2 - n = n(n-1)/2
+                            symbolicResult = '\\frac{n(n-1)}{2}';
+                            resultTeX = symbolicResult;
+                        } else {
+                            // Para otras expresiones, intentar calcular con nerdamer
+                            // Pero si falla, mostrar la forma general
+                            try {
+                                // Intentar simplificar con nerdamer
+                                const expandedFunc = nerdamer(func).expand().text();
+
+                                // Analizar términos para descomponer la sumatoria
+                                let termResult = '';
+
+                                // Verificar si es un polinomio en la variable
+                                if (func.includes('^')) {
+                                    const power = parseInt(func.split('^')[1]);
+                                    if (!isNaN(power) && power >= 1 && power <= 4) {
+                                        const knownFormulas = {
+                                            1: '\\frac{n(n+1)}{2}',
+                                            2: '\\frac{n(n+1)(2n+1)}{6}',
+                                            3: '\\left[\\frac{n(n+1)}{2}\\right]^2',
+                                            4: '\\frac{n(n+1)(2n+1)(3n^2+3n-1)}{30}'
+                                        };
+                                        symbolicResult = knownFormulas[power];
+                                        resultTeX = symbolicResult;
+                                    } else {
+                                        throw new Error(`No hay fórmula cerrada conocida para Σ(${func}). Use modo numérico o consulte tablas de sumatorias.`);
+                                    }
+                                } else {
+                                    throw new Error(`No hay fórmula cerrada conocida para Σ(${func}). Use modo numérico o consulte tablas de sumatorias.`);
+                                }
+                            } catch (innerErr) {
+                                throw new Error(`No hay fórmula cerrada conocida para Σ(${func}). Use modo numérico con un valor de n concreto.`);
+                            }
+                        }
+
+                        // Mostrar el resultado simbólico (usando funcToTeX en lugar de nerdamer.toTeX)
+                        renderModalResult(resultDiv, `\\sum_{${variable}=${from}}^{n} \\left(${funcToTeX(func)}\\right) = ${resultTeX}`);
+
+                    } else {
+                        // ✅ MODO NUMÉRICO: Calcular la sumatoria iterativamente
+                        const fromVal = parseInt(from);
+                        const toVal = parseInt(to);
+
+                        if (isNaN(fromVal) || isNaN(toVal)) {
+                            throw new Error('Los límites deben ser números enteros para el modo numérico.');
+                        }
+
+                        if (toVal < fromVal) {
+                            throw new Error('El límite superior debe ser mayor o igual al inferior.');
+                        }
+
+                        if (toVal - fromVal > 10000) {
+                            throw new Error('Rango demasiado grande. El máximo permitido es 10000 términos.');
+                        }
+
+                        // ✅ Calcular la sumatoria numéricamente
+                        // Nota: nerdamer interpreta "i" como unidad imaginaria, así que usamos evaluación propia
+                        let sum = 0;
+
+                        // Crear una función de evaluación que reemplace la variable correctamente
+                        const evaluateExpression = (expr, varName, value) => {
+                            // Reemplazar la variable por el valor numérico
+                            // Usamos un enfoque seguro que convierte la expresión a JavaScript
+                            let jsExpr = expr;
+
+                            // Convertir potencias: x^2 -> Math.pow(x,2)
+                            jsExpr = jsExpr.replace(/(\w+)\^(\d+)/g, 'Math.pow($1,$2)');
+                            jsExpr = jsExpr.replace(/(\w+)\*\*(\d+)/g, 'Math.pow($1,$2)');
+
+                            // Convertir funciones matemáticas
+                            jsExpr = jsExpr.replace(/sqrt\(/g, 'Math.sqrt(');
+                            jsExpr = jsExpr.replace(/sin\(/g, 'Math.sin(');
+                            jsExpr = jsExpr.replace(/cos\(/g, 'Math.cos(');
+                            jsExpr = jsExpr.replace(/tan\(/g, 'Math.tan(');
+                            jsExpr = jsExpr.replace(/log\(/g, 'Math.log(');
+                            jsExpr = jsExpr.replace(/exp\(/g, 'Math.exp(');
+                            jsExpr = jsExpr.replace(/abs\(/g, 'Math.abs(');
+
+                            // Reemplazar la variable por el valor (con límites de palabra para evitar reemplazos parciales)
+                            const varRegex = new RegExp(`\\b${varName}\\b`, 'g');
+                            jsExpr = jsExpr.replace(varRegex, `(${value})`);
+
+                            try {
+                                // Evaluar la expresión JavaScript
+                                return eval(jsExpr);
+                            } catch (e) {
+                                // Si falla, intentar con nerdamer (usando una variable diferente)
+                                const safeExpr = expr.replace(new RegExp(`\\b${varName}\\b`, 'g'), 'x');
+                                const result = nerdamer(safeExpr).sub('x', value).evaluate();
+                                return parseFloat(result.text());
+                            }
+                        };
+
+                        for (let idx = fromVal; idx <= toVal; idx++) {
+                            try {
+                                const termVal = evaluateExpression(func, variable, idx);
+                                if (isFinite(termVal)) {
+                                    sum += termVal;
+                                }
+                            } catch (evalErr) {
+                                console.error('Error evaluando término:', evalErr);
+                                throw new Error(`No se pudo evaluar la expresión para ${variable}=${idx}`);
+                            }
+                        }
+
+                        // Formatear resultado
+                        let resultStr = '';
+                        if (Number.isInteger(sum)) {
+                            resultStr = sum.toLocaleString();
+                        } else {
+                            resultStr = sum.toFixed(6).replace(/\.?0+$/, '');
+                        }
+
+                        // Mostrar resultado numérico (usando funcToTeX en lugar de nerdamer.toTeX)
+                        renderModalResult(resultDiv, `\\sum_{${variable}=${from}}^{${to}} \\left(${funcToTeX(func)}\\right) = ${resultStr}`);
+                    }
+                } catch (e) {
+                    renderModalError(resultDiv, `Error: ${e.message}`);
+                }
+            });
+            document.getElementById('derivative-evaluate').addEventListener('change', (e) => {
+                document.getElementById('derivative-point').style.display = e.target.checked ? 'block' : 'none';
+            });
+            document.getElementById('derivative-calc-btn').addEventListener('click', () => {
+                const func = document.getElementById('derivative-func').value.trim();
+                const variable = document.getElementById('derivative-var').value || 'x';
+                const order = parseInt(document.getElementById('derivative-order').value) || 1;
+                const evaluate = document.getElementById('derivative-evaluate').checked;
+                const point = document.getElementById('derivative-point').value;
+                const resultDiv = document.getElementById('derivative-result');
+                if (!func) return renderModalError(resultDiv, 'Ingrese una función.');
+                try {
+                    const derivative = nerdamer.diff(func, variable, order);
+                    let latex;
+                    const dNotation = order > 1 ? `\\frac{d^{${order}}}{d${variable}^{${order}}}` : `\\frac{d}{d${variable}}`;
+                    if (evaluate && point) {
+                        const numResult = derivative.evaluate({ [variable]: point });
+                        latex = `${dNotation}(${func})\\bigg|_{${variable}=${point}} = ${postprocessLatex(numResult.toTeX())}`;
+                    } else {
+                        latex = `${dNotation}(${func}) = ${postprocessLatex(derivative.toTeX())}`;
+                    }
+                    renderModalResult(resultDiv, latex);
+                } catch (e) { renderModalError(resultDiv, `Error: ${e.message}`); }
+            });
+            document.getElementById('integral-definite').addEventListener('change', (e) => {
+                document.getElementById('integral-limits').style.display = e.target.checked ? 'grid' : 'none';
+            });
+            document.getElementById('integral-calc-btn').addEventListener('click', () => {
+                const func = document.getElementById('integral-func').value.trim();
+                const variable = document.getElementById('integral-var').value || 'x';
+                const isDefinite = document.getElementById('integral-definite').checked;
+                const lower = document.getElementById('integral-lower').value;
+                const upper = document.getElementById('integral-upper').value;
+                const resultDiv = document.getElementById('integral-result');
+                if (!func) return renderModalError(resultDiv, 'Ingrese una función.');
+                try {
+                    let result, latex;
+                    if (isDefinite && lower && upper) {
+                        result = nerdamer.defint(func, lower, upper, variable);
+                        latex = `\\int_{${lower}}^{${upper}} (${func}) \\, d${variable} = ${postprocessLatex(result.toTeX())}`;
+                    } else {
+                        result = nerdamer.integrate(func, variable);
+                        latex = `\\int (${func}) \\, d${variable} = ${postprocessLatex(result.toTeX())} + C`;
+                    }
+                    renderModalResult(resultDiv, latex);
+                } catch (e) { renderModalError(resultDiv, `Error: ${e.message}`); }
+            });
+            // NOTA: El código antiguo de comb-calc-btn fue eliminado porque los elementos 
+            // ya no existen. La nueva funcionalidad usa calcCombinatorics() llamada desde onclick.
+
+            document.getElementById('eq-sys-calc-btn').addEventListener('click', () => {
+                const eqns = document.getElementById('eq-sys-input').value.split('\n').filter(e => e.trim() !== '');
+                const resultDiv = document.getElementById('eq-sys-result');
+                if (eqns.length === 0) return renderModalError(resultDiv, 'Ingrese al menos una ecuación.');
+                try {
+                    const result = nerdamer.solveEquations(eqns);
+                    let html = result.map(sol => `$$${sol[0]} = ${postprocessLatex(nerdamer(sol[1]).toTeX())}$$`).join('');
+                    resultDiv.innerHTML = `<p><strong>Solución:</strong></p>${html}`;
+                    MathJax.typesetPromise([resultDiv]);
+                } catch (e) { renderModalError(resultDiv, `No se pudo resolver: ${e.message}`); }
+            });
+            const matrixContainer = document.getElementById('matrix-input-container');
+            const getMatrixValuesFromModal = () => {
+                const size = parseInt(document.getElementById('matrix-size').value);
+                const inputs = matrixContainer.querySelectorAll('input');
+                const matrix = [];
+                for (let i = 0; i < size; i++) {
+                    const row = [];
+                    for (let j = 0; j < size; j++) {
+                        const val = parseFloat(inputs[i * size + j].value);
+                        if (isNaN(val)) throw new Error('Todas las celdas deben contener números.');
+                        row.push(val);
+                    }
+                    matrix.push(row);
+                }
+                return matrix;
+            };
+            const determinant = (matrix) => {
+                if (matrix.length !== matrix[0].length) throw new Error('La matriz debe ser cuadrada.');
+                if (matrix.length === 1) return matrix[0][0];
+                if (matrix.length === 2) return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+                let det = 0;
+                for (let i = 0; i < matrix[0].length; i++) det += matrix[0][i] * cofactor(matrix, 0, i);
+                return det;
+            };
+            const cofactor = (matrix, row, col) => {
+                const minor = matrix.filter((_, r) => r !== row).map(r => r.filter((_, c) => c !== col));
+                return Math.pow(-1, row + col) * determinant(minor);
+            };
+            const adjugate = (matrix) => {
+                const n = matrix.length;
+                const adj = Array(n).fill().map(() => Array(n).fill(0));
+                for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) adj[j][i] = cofactor(matrix, i, j);
+                return adj;
+            };
+            const inverseMatrix = (matrix) => {
+                const det = determinant(matrix);
+                if (Math.abs(det) < 1e-10) throw new Error('La matriz no tiene inversa.');
+                const adj = adjugate(matrix);
+                return adj.map(row => row.map(val => val / det));
+            };
+            const formatMatrixToLatex = (matrix) => `\\begin{pmatrix} ${matrix.map(row => row.map(val => parseFloat(val.toFixed(4))).join(' & ')).join(' \\\\ ')} \\end{pmatrix}`;
+            const generateMatrixGrid = () => {
+                const size = parseInt(document.getElementById('matrix-size').value);
+                matrixContainer.innerHTML = '';
+                matrixContainer.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+                matrixContainer.classList.add('matrix-grid');
+                for (let i = 0; i < size; i++) {
+                    for (let j = 0; j < size; j++) {
+                        const cell = document.createElement('input');
+                        cell.type = 'number';
+                        cell.className = 'input-styled text-center';
+                        cell.placeholder = `a${i + 1}${j + 1}`;
+                        cell.setAttribute('data-row', i);
+                        cell.setAttribute('data-col', j);
+                        cell.style.width = '100%';
+                        cell.style.textAlign = 'center';
+                        matrixContainer.appendChild(cell);
+                    }
+                }
+            };
+            document.getElementById('matrix-size').addEventListener('change', generateMatrixGrid);
+            document.getElementById('matrix-calc-btn').addEventListener('click', () => {
+                const resultDiv = document.getElementById('matrix-result');
+                try {
+                    const matrix = getMatrixValuesFromModal();
+                    const det = determinant(matrix);
+                    let html = `<p><strong>Determinante:</strong></p>$$|A| = ${parseFloat(det.toFixed(6))}$$`;
+                    if (Math.abs(det) > 1e-10) {
+                        const inv = inverseMatrix(matrix);
+                        html += `<p class="mt-4"><strong>Matriz Inversa:</strong></p>$$A^{-1} = ${formatMatrixToLatex(inv)}$$`;
+                    } else {
+                        html += '<p class="mt-4"><em>La matriz no tiene inversa (determinante ≈ 0).</em></p>';
+                    }
+                    resultDiv.innerHTML = html;
+                    MathJax.typesetPromise([resultDiv]);
+                } catch (e) { renderModalError(resultDiv, `Error: ${e.message}`); }
+            });
+            generateMatrixGrid();
+
+            document.getElementById('edo-type').addEventListener('change', e => {
+                const isFirst = e.target.value === 'first_order';
+                document.getElementById('edo-first-order-fields').style.display = isFirst ? 'block' : 'none';
+                document.getElementById('edo-second-order-fields').style.display = isFirst ? 'none' : 'grid';
+                document.getElementById('edo-yprime0').style.display = 'none';
+            });
+            document.getElementById('edo-initial-conditions').addEventListener('change', (e) => {
+                const show = e.target.checked;
+                document.getElementById('edo-initial-conditions-fields').style.display = show ? 'block' : 'none';
+                if (show && document.getElementById('edo-type').value === 'second_order') {
+                    document.getElementById('edo-yprime0').style.display = 'block';
+                } else {
+                    document.getElementById('edo-yprime0').style.display = 'none';
+                }
+            });
+            document.getElementById('edo-solve-btn').addEventListener('click', () => {
+                const type = document.getElementById('edo-type').value;
+                const resultDiv = document.getElementById('edo-result');
+                resultDiv.innerHTML = '';
+                try {
+                    let latexOutput = '';
+                    if (type === 'first_order') {
+                        const p = document.getElementById('edo-p').value.trim() || '0';
+                        const q = document.getElementById('edo-q').value.trim() || '0';
+                        const integratingFactor = nerdamer(`exp(integrate(${p},x))`).expand();
+                        const integralPart = nerdamer(`integrate((${integratingFactor.text()})*(${q}),x)`);
+                        let solution = nerdamer(`(1/(${integratingFactor.text()}))*(${integralPart.text()}+C)`);
+                        latexOutput = `\\textbf{Sol. General:} & y(x) = ${solution.toTeX()}`;
+                        if (document.getElementById('edo-initial-conditions').checked) {
+                            const x0 = parseFloat(document.getElementById('edo-x0').value), y0 = parseFloat(document.getElementById('edo-y0').value);
+                            if (isNaN(x0) || isNaN(y0)) throw new Error("Condiciones iniciales inválidas.");
+                            const C_val = nerdamer.solve(nerdamer(solution.text()).sub('x', x0).subtract(y0), 'C');
+                            const particularSolution = solution.sub('C', C_val);
+                            latexOutput += `\\\\ \\textbf{Sol. Particular:} & y(x) = ${particularSolution.toTeX()}`;
+                        }
+                    } else {
+                        const a = parseFloat(document.getElementById('edo-a').value), b = parseFloat(document.getElementById('edo-b').value), c = parseFloat(document.getElementById('edo-c').value);
+                        if (isNaN(a) || isNaN(b) || isNaN(c) || a === 0) throw new Error("Coeficientes inválidos.");
+                        const delta = b * b - 4 * a * c;
+                        let yc_general = '';
+                        if (delta > 0) {
+                            const r1 = (-b + Math.sqrt(delta)) / (2 * a), r2 = (-b - Math.sqrt(delta)) / (2 * a);
+                            yc_general = `C_1 e^{${r1.toFixed(3)}x} + C_2 e^{${r2.toFixed(3)}x}`;
+                        } else if (Math.abs(delta) < 1e-9) {
+                            const r1 = -b / (2 * a);
+                            yc_general = `(C_1 + C_2 x) e^{${r1.toFixed(3)}x}`;
+                        } else {
+                            const alpha = -b / (2 * a), beta = Math.sqrt(-delta) / (2 * a);
+                            yc_general = `e^{${alpha.toFixed(3)}x}(C_1 \\cos(${beta.toFixed(3)}x) + C_2 \\sin(${beta.toFixed(3)}x))`;
+                        }
+                        latexOutput = `\\textbf{Sol. General:} & y(x) = ${yc_general}`;
+                    }
+                    renderModalResult(resultDiv, `\\begin{align*} ${latexOutput} \\end{align*}`);
+                } catch (e) { renderModalError(resultDiv, `Error: ${e.message}`); }
+            });
+            // ✅ GRAFICADOR MEJORADO: Estilo GeoGebra con controles de personalización
+            document.getElementById('graph-btn').addEventListener('click', () => {
+                const funcStr = document.getElementById('graph-func').value.trim();
+                const xmin = parseFloat(document.getElementById('graph-xmin').value);
+                const xmax = parseFloat(document.getElementById('graph-xmax').value);
+                const container = document.getElementById('plot-container');
+
+                // Obtener configuración de estilo
+                const lineColor = document.getElementById('graph-color').value;
+                const lineWidth = parseInt(document.getElementById('graph-width').value);
+                const lineStyleSelect = document.getElementById('graph-style').value;
+
+                // Mapear estilos de línea a formato Plotly
+                const dashStyles = {
+                    'solid': 'solid',
+                    'dot': 'dot',
+                    'dash': 'dash',
+                    'dashdot': 'dashdot',
+                    'longdash': 'longdash'
+                };
+
+                if (!funcStr) return container.innerHTML = '<p class="text-red-400">Ingrese una función.</p>';
+                if (xmin >= xmax) return container.innerHTML = '<p class="text-red-400">x mín < x máx.</p>';
+
+                try {
+                    const f = nerdamer(funcStr).buildFunction('x');
+                    const x_vals = [], y_vals = [];
+                    const step = (xmax - xmin) / 500; // Más puntos para mayor suavidad
+
+                    for (let x = xmin; x <= xmax; x += step) {
+                        try {
+                            const y = f(x);
+                            if (isFinite(y) && Math.abs(y) < 1e10) {
+                                x_vals.push(x);
+                                y_vals.push(y);
+                            }
+                        } catch (e) { /* Ignorar puntos singulares */ }
+                    }
+
+                    // Calcular rango Y automático con padding
+                    const yMin = Math.min(...y_vals);
+                    const yMax = Math.max(...y_vals);
+                    const yPadding = (yMax - yMin) * 0.1 || 1;
+
+                    // Configuración del trazo de la función
+                    const trace = {
+                        x: x_vals,
+                        y: y_vals,
+                        mode: 'lines',
+                        name: `f(x) = ${funcStr}`,
+                        line: {
+                            color: lineColor,
+                            width: lineWidth,
+                            dash: dashStyles[lineStyleSelect]
+                        },
+                        hovertemplate: 'x: %{x:.4f}<br>y: %{y:.4f}<extra></extra>'
+                    };
+
+                    // ✅ LAYOUT ESTILO GEOGEBRA (Hoja milimetrada)
+                    const layout = {
+                        paper_bgcolor: '#ffffff', // Fondo blanco como GeoGebra
+                        plot_bgcolor: '#ffffff',  // Área de graficación blanca
+                        font: {
+                            family: 'Arial, sans-serif',
+                            size: 12,
+                            color: '#000000' // Texto negro
+                        },
+                        title: {
+                            text: `<b>f(x) = ${funcStr}</b>`,
+                            font: { size: 14, color: '#333' },
+                            x: 0.5
+                        },
+                        xaxis: {
+                            title: { text: '<b>x</b>', font: { size: 14, color: '#000' } },
+                            color: '#000000',              // Color del eje X negro
+                            linecolor: '#000000',          // Línea del eje negro
+                            linewidth: 2,                  // Grosor del eje
+                            gridcolor: '#cccccc',          // Cuadrícula gris claro (milimetrada)
+                            gridwidth: 1,
+                            zerolinecolor: '#000000',      // Línea del cero negra
+                            zerolinewidth: 2,              // Grosor de la línea del cero
+                            showgrid: true,
+                            showline: true,
+                            showticklabels: true,
+                            tickcolor: '#000000',          // Color de las marcas negro
+                            tickwidth: 1,
+                            ticklen: 5,                    // Longitud de las marcas
+                            tickfont: { size: 11, color: '#000000' },
+                            dtick: Math.ceil((xmax - xmin) / 10), // Intervalo inteligente
+                            minor: {
+                                showgrid: true,
+                                gridcolor: '#e5e5e5',      // Subdivisiones más claras
+                                gridwidth: 0.5
+                            },
+                            range: [xmin - 0.5, xmax + 0.5]
+                        },
+                        yaxis: {
+                            title: { text: '<b>f(x)</b>', font: { size: 14, color: '#000' } },
+                            color: '#000000',
+                            linecolor: '#000000',
+                            linewidth: 2,
+                            gridcolor: '#cccccc',
+                            gridwidth: 1,
+                            zerolinecolor: '#000000',
+                            zerolinewidth: 2,
+                            showgrid: true,
+                            showline: true,
+                            showticklabels: true,
+                            tickcolor: '#000000',
+                            tickwidth: 1,
+                            ticklen: 5,
+                            tickfont: { size: 11, color: '#000000' },
+                            minor: {
+                                showgrid: true,
+                                gridcolor: '#e5e5e5',
+                                gridwidth: 0.5
+                            },
+                            range: [yMin - yPadding, yMax + yPadding]
+                        },
+                        margin: { l: 50, r: 30, b: 50, t: 60 },
+                        hovermode: 'closest',
+                        showlegend: true,
+                        legend: {
+                            x: 0.02,
+                            y: 0.98,
+                            bgcolor: 'rgba(255,255,255,0.8)',
+                            bordercolor: '#ccc',
+                            borderwidth: 1,
+                            font: { size: 11, color: '#333' }
+                        }
+                    };
+
+                    // Configuración interactiva
+                    const config = {
+                        responsive: true,
+                        displayModeBar: true,
+                        modeBarButtonsToAdd: ['zoom2d', 'pan2d', 'resetScale2d'],
+                        displaylogo: false,
+                        toImageButtonOptions: {
+                            format: 'png',
+                            filename: `grafica_${funcStr.replace(/[^a-zA-Z0-9]/g, '_')}`,
+                            height: 600,
+                            width: 800,
+                            scale: 2
+                        }
+                    };
+
+                    Plotly.newPlot(container, [trace], layout, config);
+
+                } catch (e) {
+                    container.innerHTML = `<p class="text-red-400">Error al graficar: ${e.message}</p>`;
+                }
+            });
+
+            // ============================================
+            // ✅ FUNCIONES PARA TECLADO DE ÁLGEBRA
+            // ============================================
+            function toggleAlgebraKeyboard() {
+                const body = document.getElementById('algebra-keyboard-body');
+                const icon = document.getElementById('algebra-keyboard-icon');
+                if (body.classList.contains('show')) {
+                    body.classList.remove('show');
+                    icon.classList.add('collapsed');
+                } else {
+                    body.classList.add('show');
+                    icon.classList.remove('collapsed');
+                }
+            }
+
+            function insertAlgebra(text) {
+                const input = document.getElementById('algebra-input');
+                const start = input.selectionStart;
+                const end = input.selectionEnd;
+                const value = input.value;
+                input.value = value.slice(0, start) + text + value.slice(end);
+                input.focus();
+                input.selectionStart = input.selectionEnd = start + text.length;
+            }
+
+            // Exponer función globalmente
+            window.toggleAlgebraKeyboard = toggleAlgebraKeyboard;
+            window.insertAlgebra = insertAlgebra;
+
+            // ============================================
+            // ✅ FUNCIONES PARA COMBINATORIA AVANZADA
+            // ============================================
+            function factorial(n) {
+                if (n < 0) return NaN;
+                if (n === 0 || n === 1) return 1;
+                let result = 1;
+                for (let i = 2; i <= n; i++) result *= i;
+                return result;
+            }
+
+            function calcCombinatorics(type) {
+                let n, r, result, formula, explanation;
+                const resultDiv = document.getElementById('comb-detailed-result');
+
+                try {
+                    switch (type) {
+                        case 'C': // Combinaciones C(n,r)
+                            n = parseInt(document.getElementById('comb-cnr-n').value);
+                            r = parseInt(document.getElementById('comb-cnr-r').value);
+                            if (r > n) throw new Error('r no puede ser mayor que n');
+                            result = factorial(n) / (factorial(r) * factorial(n - r));
+                            document.getElementById('comb-cnr-result').textContent = `= ${result.toLocaleString()}`;
+                            formula = `C(${n},${r}) = \\frac{${n}!}{${r}!(${n}-${r})!} = \\frac{${factorial(n)}}{${factorial(r)} \\cdot ${factorial(n - r)}}`;
+                            explanation = `<strong>Combinaciones sin repetición:</strong> Formas de elegir ${r} elementos de ${n} sin importar el orden.`;
+                            break;
+
+                        case 'V': // Variaciones V(n,r)
+                            n = parseInt(document.getElementById('comb-vnr-n').value);
+                            r = parseInt(document.getElementById('comb-vnr-r').value);
+                            if (r > n) throw new Error('r no puede ser mayor que n');
+                            result = factorial(n) / factorial(n - r);
+                            document.getElementById('comb-vnr-result').textContent = `= ${result.toLocaleString()}`;
+                            formula = `V(${n},${r}) = \\frac{${n}!}{(${n}-${r})!} = \\frac{${factorial(n)}}{${factorial(n - r)}}`;
+                            explanation = `<strong>Variaciones sin repetición:</strong> Formas de elegir ${r} elementos de ${n} donde el orden importa.`;
+                            break;
+
+                        case 'P': // Permutaciones P(n)
+                            n = parseInt(document.getElementById('comb-pn-n').value);
+                            result = factorial(n);
+                            document.getElementById('comb-pn-result').textContent = `= ${result.toLocaleString()}`;
+                            formula = `P(${n}) = ${n}! = ${result}`;
+                            explanation = `<strong>Permutaciones:</strong> Formas de ordenar ${n} elementos distintos.`;
+                            break;
+
+                        case 'VR': // Variaciones con repetición
+                            n = parseInt(document.getElementById('comb-vr-n').value);
+                            r = parseInt(document.getElementById('comb-vr-r').value);
+                            result = Math.pow(n, r);
+                            document.getElementById('comb-vr-result').textContent = `= ${result.toLocaleString()}`;
+                            formula = `VR(${n},${r}) = ${n}^{${r}} = ${result}`;
+                            explanation = `<strong>Variaciones con repetición:</strong> Formas de elegir ${r} elementos de ${n} con repetición y orden.`;
+                            break;
+
+                        case 'CR': // Combinaciones con repetición
+                            n = parseInt(document.getElementById('comb-cr-n').value);
+                            r = parseInt(document.getElementById('comb-cr-r').value);
+                            result = factorial(n + r - 1) / (factorial(r) * factorial(n - 1));
+                            document.getElementById('comb-cr-result').textContent = `= ${result.toLocaleString()}`;
+                            formula = `CR(${n},${r}) = C(${n}+${r}-1,${r}) = \\frac{${n + r - 1}!}{${r}!${n - 1}!}`;
+                            explanation = `<strong>Combinaciones con repetición:</strong> Formas de elegir ${r} elementos de ${n} con repetición sin orden.`;
+                            break;
+
+                        case 'FACT': // Factorial
+                            n = parseInt(document.getElementById('comb-fact-n').value);
+                            result = factorial(n);
+                            document.getElementById('comb-fact-result').textContent = `= ${result.toLocaleString()}`;
+                            formula = `${n}! = ${result}`;
+                            explanation = `<strong>Factorial:</strong> Producto de todos los enteros positivos menores o iguales a ${n}.`;
+                            break;
+
+                        case 'BINOM': // Coeficiente Binomial
+                            n = parseInt(document.getElementById('comb-binom-n').value);
+                            r = parseInt(document.getElementById('comb-binom-r').value);
+                            if (r > n) throw new Error('r no puede ser mayor que n');
+                            result = factorial(n) / (factorial(r) * factorial(n - r));
+                            document.getElementById('comb-binom-result').textContent = `= ${result.toLocaleString()}`;
+                            formula = `\\binom{${n}}{${r}} = \\frac{${n}!}{${r}!(${n}-${r})!} = ${result}`;
+                            explanation = `<strong>Coeficiente Binomial:</strong> Número de formas de elegir ${r} elementos de ${n} (igual que C(n,r)).`;
+                            break;
+                    }
+
+                    resultDiv.innerHTML = `
+                        <div style="text-align: center; padding: 0.5rem;">
+                            <div style="font-size: 1.5rem; color: var(--accent-color-1); margin-bottom: 0.5rem;">
+                                <strong>Resultado: ${result.toLocaleString()}</strong>
+                            </div>
+                            <div class="math-formula" style="background: rgba(0,0,0,0.2); padding: 0.5rem; border-radius: 8px; margin: 0.5rem 0;">
+                                \\[${formula}\\]
+                            </div>
+                            <p style="font-size: 0.85rem; color: #aaa;">${explanation}</p>
+                        </div>
+                    `;
+                    if (window.MathJax) MathJax.typesetPromise([resultDiv]);
+
+                } catch (e) {
+                    resultDiv.innerHTML = `<p style="color: #ff6b6b; text-align: center;">❌ Error: ${e.message}</p>`;
+                }
+            }
+
+            window.calcCombinatorics = calcCombinatorics;
+
+            // ============================================
+            // ✅ EJEMPLOS PARA SISTEMAS DE ECUACIONES
+            // ============================================
+            function loadExampleSystem(size) {
+                const textarea = document.getElementById('eq-sys-input');
+                const examples = {
+                    2: `2*x + y = 5
+x - 3*y = -8`,
+                    3: `2*x + y - z = 8
+-3*x - y + 2*z = -11
+-2*x + y + 2*z = -3`,
+                    4: `x + y + z + w = 10
+2*x - y + 3*z - w = 5
+x + 2*y - z + 2*w = 8
+3*x + y + z - w = 12`
+                };
+                textarea.value = examples[size] || examples[2];
+            }
+
+            window.loadExampleSystem = loadExampleSystem;
+
+            // ============================================
+            // ✅ OPERACIONES DE MATRICES MEJORADAS
+            // ============================================
+            function calcMatrix(operation) {
+                const resultDiv = document.getElementById('matrix-result');
+                const size = parseInt(document.getElementById('matrix-size').value);
+
+                try {
+                    // Obtener valores de la matriz
+                    const matrix = [];
+                    for (let i = 0; i < size; i++) {
+                        matrix[i] = [];
+                        for (let j = 0; j < size; j++) {
+                            const input = document.querySelector(`input[data-row="${i}"][data-col="${j}"]`);
+                            matrix[i][j] = parseFloat(input?.value || 0);
+                        }
+                    }
+
+                    let result, title;
+
+                    switch (operation) {
+                        case 'det':
+                            result = nerdamer(`determinant(matrix(${matrix.map(r => `[${r.join(',')}]`).join(',')}))`).evaluate().text();
+                            title = 'Determinante';
+                            resultDiv.innerHTML = `<p><strong>${title}:</strong></p><div class="math-formula">\\[\\det(A) = ${result}\\]</div>`;
+                            break;
+
+                        case 'inv':
+                            const matrixStr = `matrix(${matrix.map(r => `[${r.join(',')}]`).join(',')})`;
+                            const inv = nerdamer(`invert(${matrixStr})`);
+                            title = 'Matriz Inversa';
+                            resultDiv.innerHTML = `<p><strong>${title}:</strong></p><div class="math-formula">\\[A^{-1} = ${inv.toTeX()}\\]</div>`;
+                            break;
+
+                        case 'trans':
+                            // Transpuesta manual
+                            const transposed = matrix[0].map((_, i) => matrix.map(row => row[i]));
+                            title = 'Matriz Transpuesta';
+                            const transTeX = `\\begin{pmatrix}${transposed.map(r => r.join(' & ')).join(' \\\\ ')}\\end{pmatrix}`;
+                            resultDiv.innerHTML = `<p><strong>${title}:</strong></p><div class="math-formula">\\[A^T = ${transTeX}\\]</div>`;
+                            break;
+
+                        case 'trace':
+                            // Traza (suma de la diagonal)
+                            let trace = 0;
+                            for (let i = 0; i < size; i++) trace += matrix[i][i];
+                            title = 'Traza';
+                            resultDiv.innerHTML = `<p><strong>${title}:</strong></p><div class="math-formula">\\[\\text{tr}(A) = ${matrix.map((_, i) => `a_{${i + 1}${i + 1}}`).join(' + ')} = ${trace}\\]</div>`;
+                            break;
+
+                        case 'eigen':
+                            // ✅ CÁLCULO REAL DE VALORES PROPIOS (EIGENVALUES)
+                            title = 'Valores Propios (Eigenvalues)';
+
+                            if (size === 2) {
+                                // Para matriz 2x2: det(A - λI) = λ² - (a+d)λ + (ad-bc) = 0
+                                // A = [[a, b], [c, d]]
+                                const a = matrix[0][0], b = matrix[0][1];
+                                const c = matrix[1][0], d = matrix[1][1];
+
+                                const traza = a + d;  // Traza = suma diagonal
+                                const det = a * d - b * c;  // Determinante
+
+                                // Polinomio característico: λ² - traza·λ + det = 0
+                                // Discriminante: Δ = traza² - 4·det
+                                const discriminante = traza * traza - 4 * det;
+
+                                let eigenHTML = '';
+
+                                if (discriminante >= 0) {
+                                    // Valores propios reales
+                                    const lambda1 = (traza + Math.sqrt(discriminante)) / 2;
+                                    const lambda2 = (traza - Math.sqrt(discriminante)) / 2;
+
+                                    eigenHTML = `
+                                        <p><strong>${title}:</strong></p>
+                                        <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 0.5rem;">Polinomio característico: det(A - λI) = 0</p>
+                                        <div class="math-formula">\\[\\lambda^2 - ${traza}\\lambda + ${det} = 0\\]</div>
+                                        <p style="margin-top: 1rem;"><strong>Soluciones (valores propios reales):</strong></p>
+                                        <div class="math-formula">\\[\\lambda_1 = ${lambda1.toFixed(4).replace(/\.?0+$/, '')}\\]</div>
+                                        <div class="math-formula">\\[\\lambda_2 = ${lambda2.toFixed(4).replace(/\.?0+$/, '')}\\]</div>
+                                    `;
+                                } else {
+                                    // Valores propios complejos
+                                    const parteReal = traza / 2;
+                                    const parteImaginaria = Math.sqrt(-discriminante) / 2;
+
+                                    eigenHTML = `
+                                        <p><strong>${title}:</strong></p>
+                                        <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 0.5rem;">Polinomio característico: det(A - λI) = 0</p>
+                                        <div class="math-formula">\\[\\lambda^2 - ${traza}\\lambda + ${det} = 0\\]</div>
+                                        <p style="margin-top: 1rem;"><strong>Soluciones (valores propios complejos):</strong></p>
+                                        <div class="math-formula">\\[\\lambda_1 = ${parteReal.toFixed(4).replace(/\.?0+$/, '')} + ${parteImaginaria.toFixed(4).replace(/\.?0+$/, '')}i\\]</div>
+                                        <div class="math-formula">\\[\\lambda_2 = ${parteReal.toFixed(4).replace(/\.?0+$/, '')} - ${parteImaginaria.toFixed(4).replace(/\.?0+$/, '')}i\\]</div>
+                                    `;
+                                }
+
+                                resultDiv.innerHTML = eigenHTML;
+
+                            } else if (size === 3) {
+                                // Para matriz 3x3: usar el polinomio característico cúbico
+                                // det(A - λI) = -λ³ + tr(A)λ² - (1/2)[tr(A)² - tr(A²)]λ + det(A) = 0
+
+                                const a11 = matrix[0][0], a12 = matrix[0][1], a13 = matrix[0][2];
+                                const a21 = matrix[1][0], a22 = matrix[1][1], a23 = matrix[1][2];
+                                const a31 = matrix[2][0], a32 = matrix[2][1], a33 = matrix[2][2];
+
+                                // Coeficientes del polinomio característico: λ³ - c₂λ² + c₁λ - c₀ = 0
+                                const traza = a11 + a22 + a33;  // c₂
+
+                                // c₁ = suma de menores principales 2x2
+                                const c1 = (a11 * a22 - a12 * a21) + (a11 * a33 - a13 * a31) + (a22 * a33 - a23 * a32);
+
+                                // c₀ = determinante
+                                const det3x3 = a11 * (a22 * a33 - a23 * a32) - a12 * (a21 * a33 - a23 * a31) + a13 * (a21 * a32 - a22 * a31);
+
+                                // Resolver λ³ - traza·λ² + c1·λ - det = 0 usando método de Cardano
+                                // Primero, convertir a forma deprimida: t³ + pt + q = 0 donde λ = t + traza/3
+                                const a_coef = 1;
+                                const b_coef = -traza;
+                                const c_coef = c1;
+                                const d_coef = -det3x3;
+
+                                // Sustitución: λ = t - b/(3a) = t + traza/3
+                                const p = (3 * a_coef * c_coef - b_coef * b_coef) / (3 * a_coef * a_coef);
+                                const q = (2 * b_coef * b_coef * b_coef - 9 * a_coef * b_coef * c_coef + 27 * a_coef * a_coef * d_coef) / (27 * a_coef * a_coef * a_coef);
+
+                                const discriminante3 = (q * q / 4) + (p * p * p / 27);
+                                const shift = traza / 3;
+
+                                let eigenvalues = [];
+
+                                if (Math.abs(discriminante3) < 1e-10) {
+                                    // Una raíz real triple o una doble y una simple
+                                    if (Math.abs(p) < 1e-10 && Math.abs(q) < 1e-10) {
+                                        eigenvalues = [shift, shift, shift];
+                                    } else {
+                                        const t1 = 3 * q / p;
+                                        const t2 = -3 * q / (2 * p);
+                                        eigenvalues = [t1 + shift, t2 + shift, t2 + shift];
+                                    }
+                                } else if (discriminante3 > 0) {
+                                    // Una raíz real y dos complejas conjugadas
+                                    const sqrtD = Math.sqrt(discriminante3);
+                                    const u = Math.cbrt(-q / 2 + sqrtD);
+                                    const v = Math.cbrt(-q / 2 - sqrtD);
+                                    const t1 = u + v;
+
+                                    const realPart = -(u + v) / 2 + shift;
+                                    const imagPart = (u - v) * Math.sqrt(3) / 2;
+
+                                    eigenvalues = [
+                                        { real: t1 + shift, imag: 0 },
+                                        { real: realPart, imag: imagPart },
+                                        { real: realPart, imag: -imagPart }
+                                    ];
+                                } else {
+                                    // Tres raíces reales distintas (caso trigonométrico)
+                                    const r = Math.sqrt(-p * p * p / 27);
+                                    const theta = Math.acos(-q / (2 * r));
+                                    const cubeRoot = 2 * Math.cbrt(r);
+
+                                    eigenvalues = [
+                                        cubeRoot * Math.cos(theta / 3) + shift,
+                                        cubeRoot * Math.cos((theta + 2 * Math.PI) / 3) + shift,
+                                        cubeRoot * Math.cos((theta + 4 * Math.PI) / 3) + shift
+                                    ];
+                                }
+
+                                // Generar HTML con los resultados
+                                let eigenHTML = `
+                                    <p><strong>${title}:</strong></p>
+                                    <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 0.5rem;">Polinomio característico: det(A - λI) = 0</p>
+                                    <div class="math-formula">\\[\\lambda^3 - ${traza.toFixed(2)}\\lambda^2 + ${c1.toFixed(2)}\\lambda - ${det3x3.toFixed(2)} = 0\\]</div>
+                                    <p style="margin-top: 1rem;"><strong>Soluciones (valores propios):</strong></p>
+                                `;
+
+                                eigenvalues.forEach((ev, idx) => {
+                                    if (typeof ev === 'number') {
+                                        eigenHTML += `<div class="math-formula">\\[\\lambda_${idx + 1} = ${ev.toFixed(4).replace(/\\.?0+$/, '')}\\]</div>`;
+                                    } else {
+                                        if (Math.abs(ev.imag) < 1e-10) {
+                                            eigenHTML += `<div class="math-formula">\\[\\lambda_${idx + 1} = ${ev.real.toFixed(4).replace(/\\.?0+$/, '')}\\]</div>`;
+                                        } else {
+                                            const sign = ev.imag >= 0 ? '+' : '-';
+                                            eigenHTML += `<div class="math-formula">\\[\\lambda_${idx + 1} = ${ev.real.toFixed(4).replace(/\\.?0+$/, '')} ${sign} ${Math.abs(ev.imag).toFixed(4).replace(/\\.?0+$/, '')}i\\]</div>`;
+                                        }
+                                    }
+                                });
+
+                                resultDiv.innerHTML = eigenHTML;
+
+                            } else {
+                                // Para matrices mayores, usar aproximación numérica o mensaje
+                                resultDiv.innerHTML = `
+                                    <p><strong>${title}:</strong></p>
+                                    <p style="font-size: 0.9rem; color: #aaa;">Para matrices ${size}×${size}, el cálculo de valores propios requiere métodos numéricos avanzados.</p>
+                                    <p style="font-size: 0.85rem; color: var(--accent-color-1); margin-top: 1rem;">💡 Sugerencia: Use MATLAB, Octave, Python (NumPy) o Wolfram Alpha para matrices grandes.</p>
+                                `;
+                            }
+                            break;
+                    }
+
+                    if (window.MathJax) MathJax.typesetPromise([resultDiv]);
+
+                } catch (e) {
+                    resultDiv.innerHTML = `<p style="color: #ff6b6b;">❌ Error: ${e.message}</p>`;
+                }
+            }
+
+            window.calcMatrix = calcMatrix;
+
+            // ============================================
+            // ✅ FUNCIONES PARA SUMATORIAS SIMBÓLICAS
+            // ============================================
+            function toggleSumMode() {
+                const isSymbolic = document.getElementById('sum-symbolic-mode').checked;
+                const toInput = document.getElementById('sum-to');
+                if (isSymbolic) {
+                    toInput.placeholder = 'n (simbólico)';
+                    toInput.value = 'n';
+                } else {
+                    toInput.placeholder = '10';
+                    toInput.value = '';
+                }
+            }
+
+            function loadSumExample(func, from, to) {
+                document.getElementById('sum-func').value = func;
+                document.getElementById('sum-from').value = from;
+                document.getElementById('sum-to').value = to;
+                document.getElementById('sum-var').value = 'i';
+                document.getElementById('sum-symbolic-mode').checked = (to === 'n');
+            }
+
+            window.toggleSumMode = toggleSumMode;
+            window.loadSumExample = loadSumExample;
+
+            // ============================================
+            // ✅ FUNCIONES PARA RAÍCES ENÉSIMAS
+            // ============================================
+            function loadNthRootExample(index, radicand) {
+                document.getElementById('nthroot-index').value = index;
+                document.getElementById('nthroot-radicand').value = radicand;
+            }
+
+            window.loadNthRootExample = loadNthRootExample;
+
+            // Event listener para el botón de calcular raíz
+            document.getElementById('nthroot-calc-btn').addEventListener('click', () => {
+                const indexInput = document.getElementById('nthroot-index');
+                const radicandInput = document.getElementById('nthroot-radicand');
+                const resultDiv = document.getElementById('nthroot-result');
+
+                const n = parseInt(indexInput.value);
+                const xStr = radicandInput.value.trim();
+
+                if (!xStr || isNaN(n) || n < 2) {
+                    resultDiv.innerHTML = `<p class="text-red-400">Por favor ingrese un índice válido (≥2) y un radicando.</p>`;
+                    return;
+                }
+
+                try {
+                    // Evaluar el radicando (puede ser una expresión como 8, -27, 2^4, etc.)
+                    let x;
+                    try {
+                        x = eval(xStr.replace(/\^/g, '**'));
+                    } catch (e) {
+                        x = parseFloat(xStr);
+                    }
+
+                    if (isNaN(x)) {
+                        throw new Error('El radicando no es un número válido.');
+                    }
+
+                    let result;
+                    let isComplex = false;
+                    let realPart = 0;
+                    let imagPart = 0;
+
+                    // Calcular la raíz n-ésima
+                    if (x >= 0) {
+                        // Raíz de número positivo: siempre tiene solución real
+                        result = Math.pow(x, 1 / n);
+                    } else {
+                        // Raíz de número negativo
+                        if (n % 2 === 1) {
+                            // Índice impar: tiene solución real negativa
+                            result = -Math.pow(Math.abs(x), 1 / n);
+                        } else {
+                            // Índice par: solución compleja (la raíz principal)
+                            isComplex = true;
+                            const r = Math.pow(Math.abs(x), 1 / n);
+                            const theta = Math.PI / n;  // Ángulo principal
+                            realPart = r * Math.cos(theta);
+                            imagPart = r * Math.sin(theta);
+                        }
+                    }
+
+                    // Crear el símbolo de raíz según el índice
+                    const rootSymbols = {
+                        2: '\\sqrt',
+                        3: '\\sqrt[3]',
+                        4: '\\sqrt[4]',
+                        5: '\\sqrt[5]'
+                    };
+                    const rootSymbol = rootSymbols[n] || `\\sqrt[${n}]`;
+
+                    // Formatear el resultado
+                    let resultHTML = '';
+
+                    if (isComplex) {
+                        // Resultado complejo
+                        const sign = imagPart >= 0 ? '+' : '-';
+                        resultHTML = `
+                            <p style="margin-bottom: 0.5rem;"><strong>Resultado (raíz principal):</strong></p>
+                            <div class="math-formula" style="font-size: 1.3rem;">
+                                \\[${rootSymbol}{${x}} = ${realPart.toFixed(6).replace(/\.?0+$/, '')} ${sign} ${Math.abs(imagPart).toFixed(6).replace(/\.?0+$/, '')}i\\]
+                            </div>
+                            <p style="font-size: 0.85rem; color: #aaa; margin-top: 1rem;">
+                                ⚠️ Las raíces de índice par de números negativos producen resultados complejos.<br>
+                                La raíz real no existe (no hay número real cuya potencia ${n} sea ${x}).
+                            </p>
+                        `;
+                    } else {
+                        // Resultado real
+                        // Verificar si el resultado es exacto (entero)
+                        const isExact = Math.abs(result - Math.round(result)) < 1e-10;
+                        const displayResult = isExact
+                            ? Math.round(result).toString()
+                            : result.toFixed(8).replace(/\.?0+$/, '');
+
+                        // Verificación
+                        const verification = Math.pow(Math.round(result), n);
+                        const isVerified = isExact && Math.abs(verification - x) < 1e-10;
+
+                        resultHTML = `
+                            <p style="margin-bottom: 0.5rem;"><strong>Resultado:</strong></p>
+                            <div class="math-formula" style="font-size: 1.3rem;">
+                                \\[${rootSymbol}{${x}} = ${displayResult}\\]
+                            </div>
+                        `;
+
+                        if (isVerified) {
+                            resultHTML += `
+                                <p style="font-size: 0.85rem; color: var(--eq-key-color); margin-top: 0.5rem;">
+                                    ✅ Verificación: ${Math.round(result)}^{${n}} = ${x}
+                                </p>
+                            `;
+                        } else if (!isExact) {
+                            resultHTML += `
+                                <p style="font-size: 0.85rem; color: #aaa; margin-top: 0.5rem;">
+                                    📐 Este es un número irracional (aproximación decimal).
+                                </p>
+                            `;
+                        }
+                    }
+
+                    // Mostrar equivalencia con potencia fraccionaria
+                    resultHTML += `
+                        <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(52, 152, 219, 0.1); border-radius: 8px; border-left: 3px solid var(--accent-color-1);">
+                            <p style="font-size: 0.8rem; color: var(--accent-color-1);">
+                                <strong>💡 Equivalencia:</strong> 
+                                ${rootSymbol}{${x}} = (${x})^{1/${n}}
+                            </p>
+                        </div>
+                    `;
+
+                    resultDiv.innerHTML = resultHTML;
+                    if (window.MathJax) MathJax.typesetPromise([resultDiv]);
+
+                } catch (e) {
+                    resultDiv.innerHTML = `<p class="text-red-400">❌ Error: ${e.message}</p>`;
+                }
+            });
+
+            // ✅ Botón para insertar raíz en el display de la calculadora
+            document.getElementById('nthroot-insert-btn').addEventListener('click', () => {
+                const n = parseInt(document.getElementById('nthroot-index').value);
+                const x = document.getElementById('nthroot-radicand').value.trim();
+
+                if (!x || isNaN(n) || n < 2) {
+                    alert('Por favor ingrese un índice válido (≥2) y un radicando.');
+                    return;
+                }
+
+                // Crear la expresión según el índice
+                let expression;
+                if (n === 2) {
+                    expression = `sqrt(${x})`;
+                } else if (n === 3) {
+                    expression = `cbrt(${x})`;
+                } else {
+                    expression = `nroot(${n}, ${x})`;
+                }
+
+                // Insertar en el input de la calculadora
+                const inputEl = document.getElementById('function-input');
+                const start = inputEl.selectionStart || inputEl.value.length;
+                const end = inputEl.selectionEnd || inputEl.value.length;
+                inputEl.value = inputEl.value.substring(0, start) + expression + inputEl.value.substring(end);
+                inputEl.focus();
+
+                // Cerrar el modal
+                document.getElementById('nthroot-modal').style.display = 'none';
+
+                // Actualizar la visualización matemática del input
+                if (typeof renderInputMath === 'function') {
+                    renderInputMath(inputEl.value);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

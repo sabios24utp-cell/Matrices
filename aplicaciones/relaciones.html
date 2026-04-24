@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Relaciones entre Conjuntos</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Math.js: Para evaluar expresiones matemáticas de forma segura -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.min.js"></script>
+    
+    <!-- MathJax: Para renderizar fórmulas LaTeX -->
+    <script>
+        MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+          },
+          svg: {
+            fontCache: 'global'
+          }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    
+    <!-- Estilos personalizados y tipografía -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: all 0.3s ease-in-out;
+        }
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .operator-btn {
+            @apply bg-gray-200 hover:bg-gray-300 text-gray-700 font-mono text-lg py-1 px-3 rounded-md transition-all duration-200 flex justify-center items-center;
+        }
+        .tab-btn {
+            @apply py-2 px-4 font-semibold text-gray-600 rounded-t-lg border-b-2 border-transparent;
+        }
+        .tab-btn.active {
+            @apply text-blue-600 border-blue-600 bg-blue-50;
+        }
+        .modal {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease;
+        }
+        input[type="color"] {
+            -webkit-appearance: none; -moz-appearance: none; appearance: none;
+            width: 40px; height: 40px; padding: 0;
+            border: 2px solid #e5e7eb; border-radius: 8px;
+            cursor: pointer; transition: transform 0.2s;
+        }
+        input[type="color"]:hover { transform: scale(1.1); }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; border-radius: 6px; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 6px; }
+        .prose-custom ul > li::before { content: "✓"; color: #2563eb; font-weight: bold; margin-right: 0.5em; }
+        .prose-custom ul { padding-left: 0; list-style: none; }
+        #tooltip {
+            position: absolute;
+            display: none;
+            background-color: #1f2937;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            z-index: 100;
+            pointer-events: none; /* Evita que el tooltip interfiera con el mouse */
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Contenedor Principal -->
+    <div class="container mx-auto p-4 md:p-8">
+
+        <!-- Cabecera -->
+        <header class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl md:text-4xl font-bold text-gray-700">Analizador de Relaciones</h1>
+            <div class="flex items-center gap-3">
+                 <button id="manual-btn" class="btn bg-orange-500 hover:bg-orange-600 text-white rounded-full p-3 shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                </button>
+                 <button id="theme-btn" class="btn bg-purple-500 hover:bg-purple-600 text-white rounded-full p-3 shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-palette"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.47-1.125-.29-.289-.47-.652-.47-1.062 0-.437.18-.835.47-1.125.29-.289-.47-.652-.47-1.062 0-.437-.18-.835-.47-1.125-.29-.289-.47-.652-.47-1.062 0-.437.18-.835-.47-1.125.29-.29.47-.653.47-1.063A1.688 1.688 0 0 0 12 2z"/></svg>
+                </button>
+                <button id="help-btn" class="btn bg-blue-500 hover:bg-blue-600 text-white rounded-full p-3 shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-help-circle"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Panel de Controles -->
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-1 space-y-6">
+                <div class="card p-6">
+                    <h2 class="text-xl font-semibold mb-4">1. Defina los Conjuntos</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="setA" class="block text-sm font-medium text-gray-600 mb-1">Conjunto A</label>
+                            <textarea id="setA" rows="3" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Ej: 1, 2, 3, [5,8)]"></textarea>
+                        </div>
+                        <div>
+                            <label for="setB" class="block text-sm font-medium text-gray-600 mb-1">Conjunto B</label>
+                            <textarea id="setB" rows="3" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Ej: a, b, c, d"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <h2 class="text-xl font-semibold mb-4">2. Defina la Relación $R$</h2>
+                    <!-- Pestañas para seleccionar el modo de entrada -->
+                    <div class="border-b border-gray-200 mb-4">
+                        <nav class="-mb-px flex space-x-2" aria-label="Tabs">
+                            <button id="tab-rule" class="tab-btn active">Por Regla</button>
+                            <button id="tab-pairs" class="tab-btn">Por Pares</button>
+                        </nav>
+                    </div>
+
+                    <!-- Contenido de la pestaña "Por Regla" -->
+                    <div id="content-rule">
+                        <p class="text-sm text-gray-500 mb-2">Use 'a' para elementos de A y 'b' para elementos de B.</p>
+                        <input type="text" id="relation-rule" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Ej: a > b">
+                        <div id="operator-panel" class="grid grid-cols-4 gap-2 mt-3">
+                            <button class="operator-btn" data-op="<" data-tooltip="Menor que">&lt;</button>
+                            <button class="operator-btn" data-op="<=" data-tooltip="Menor o igual que">&le;</button>
+                            <button class="operator-btn" data-op=">" data-tooltip="Mayor que">&gt;</button>
+                            <button class="operator-btn" data-op=">=" data-tooltip="Mayor o igual que">&ge;</button>
+                            <button class="operator-btn" data-op="==" data-tooltip="Igual a">==</button>
+                            <button class="operator-btn" data-op="!=" data-tooltip="Distinto de">!=</button>
+                            <button class="operator-btn" data-op=" and " data-tooltip="Y lógico (and)">&#x2227;</button>
+                            <button class="operator-btn" data-op=" or " data-tooltip="O lógico (or)">&#x2228;</button>
+                            <button class="operator-btn" data-op="+" data-tooltip="Suma">+</button>
+                            <button class="operator-btn" data-op="-" data-tooltip="Resta">-</button>
+                            <button class="operator-btn" data-op="*" data-tooltip="Multiplicación">*</button>
+                            <button class="operator-btn" data-op="/" data-tooltip="División">/</button>
+                            <button class="operator-btn" data-op="^" data-tooltip="Potencia">^</button>
+                            <button class="operator-btn" data-op="%" data-tooltip="Módulo (resto)">%</button>
+                            <button class="operator-btn" data-op="abs()" data-tooltip="Valor Absoluto">|x|</button>
+                            <button class="operator-btn" data-op="floor()" data-tooltip="Parte Entera (floor)">&#x230a;x&#x230b;</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Contenido de la pestaña "Por Pares" -->
+                    <div id="content-pairs" class="hidden">
+                        <p class="text-sm text-gray-500 mb-2">Ingrese los pares ordenados separados por comas.</p>
+                        <textarea id="relation-pairs" rows="4" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" placeholder="Ej: (1,a), (2,b), (3,c)"></textarea>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <h2 class="text-xl font-semibold mb-4">3. O cargue un ejemplo</h2>
+                    <select id="examples" class="w-full p-2 border border-gray-300 rounded-md">
+                        <option value="default" selected disabled>Seleccione un ejemplo...</option>
+                    </select>
+                </div>
+                
+                <div class="flex gap-4">
+                    <button id="generate-btn" class="w-full btn bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg shadow-md text-lg">
+                        Analizar
+                    </button>
+                    <button id="reset-btn" class="w-1/3 btn bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg shadow-md text-lg">
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Panel de Resultados -->
+            <div id="results-panel" class="lg:col-span-2 card p-6 min-h-[400px] hidden flex flex-col">
+                 <h2 class="text-2xl font-bold mb-4 text-center flex-shrink-0">Resultados del Análisis</h2>
+                 <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4" role="alert"></div>
+                 <div id="results-content" class="space-y-6 flex-grow overflow-auto p-1">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2">Diagrama Sagital de la Relación $R$</h3>
+                        <div id="diagram-container" class="w-full p-2 border border-gray-200 rounded-lg bg-gray-50 flex justify-center items-center min-h-[300px]"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2">Análisis de Propiedades</h3>
+                        <div id="analysis-container" class="space-y-2 text-base"></div>
+                    </div>
+                 </div>
+            </div>
+        </main>
+
+        <footer class="text-center mt-8 text-sm text-gray-500">
+            <p>Creado por Msc Néstor Fabio Montoya con la colaboración de Gemini AI.</p>
+        </footer>
+    </div>
+
+    <!-- Modales -->
+    <div id="help-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 invisible opacity-0"></div>
+    <div id="theme-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 invisible opacity-0"></div>
+    <div id="manual-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 invisible opacity-0"></div>
+    <div id="tooltip"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        const AppState = {
+            currentAnalysis: null,
+            inputMode: 'rule', // 'rule' or 'pairs'
+            themeColors: { ovalFill: 'rgba(239, 246, 255, 0.7)', ovalStroke: '#60a5fa', arrow: '#2563eb', pointA: '#3b82f6', pointB: '#3b82f6' },
+            defaultThemeColors: { ovalFill: 'rgba(239, 246, 255, 0.7)', ovalStroke: '#60a5fa', arrow: '#2563eb', pointA: '#3b82f6', pointB: '#3b82f6' }
+        };
+
+        const dom = {
+            setA: document.getElementById('setA'), setB: document.getElementById('setB'), 
+            relationRule: document.getElementById('relation-rule'),
+            relationPairs: document.getElementById('relation-pairs'),
+            examples: document.getElementById('examples'), generateBtn: document.getElementById('generate-btn'), resetBtn: document.getElementById('reset-btn'),
+            operatorPanel: document.getElementById('operator-panel'), resultsPanel: document.getElementById('results-panel'),
+            resultsContent: document.getElementById('results-content'), errorMessage: document.getElementById('error-message'),
+            diagramContainer: document.getElementById('diagram-container'), analysisContainer: document.getElementById('analysis-container'),
+            helpModalContainer: document.getElementById('help-modal'), themeModalContainer: document.getElementById('theme-modal'), manualModalContainer: document.getElementById('manual-modal'),
+            helpBtn: document.getElementById('help-btn'), themeBtn: document.getElementById('theme-btn'), manualBtn: document.getElementById('manual-btn'),
+            tooltip: document.getElementById('tooltip'),
+            tabRule: document.getElementById('tab-rule'), tabPairs: document.getElementById('tab-pairs'),
+            contentRule: document.getElementById('content-rule'), contentPairs: document.getElementById('content-pairs'),
+        };
+
+        const svgNS = "http://www.w3.org/2000/svg";
+
+        // --- Pestañas de modo de entrada ---
+        function setInputMode(mode) {
+            AppState.inputMode = mode;
+            if (mode === 'rule') {
+                dom.tabRule.classList.add('active');
+                dom.tabPairs.classList.remove('active');
+                dom.contentRule.classList.remove('hidden');
+                dom.contentPairs.classList.add('hidden');
+            } else {
+                dom.tabRule.classList.remove('active');
+                dom.tabPairs.classList.add('active');
+                dom.contentRule.classList.add('hidden');
+                dom.contentPairs.classList.remove('hidden');
+            }
+        }
+        dom.tabRule.addEventListener('click', () => setInputMode('rule'));
+        dom.tabPairs.addEventListener('click', () => setInputMode('pairs'));
+
+        // --- Lógica de Modales ---
+        function createModal(container, title, contentHtml, maxWidth = 'max-w-2xl') {
+            container.innerHTML = `<div class="modal-content bg-white rounded-lg shadow-2xl p-6 md:p-8 w-full ${maxWidth} transform scale-95"><div class="flex justify-between items-center border-b pb-3 mb-4"><h2 class="text-2xl font-bold text-gray-800">${title}</h2><button class="close-modal-btn text-gray-500 hover:text-gray-800 text-3xl">&times;</button></div>${contentHtml}</div>`;
+            const closeModalBtn = container.querySelector('.close-modal-btn');
+            const modalContent = container.querySelector('.modal-content');
+            const open = () => { container.classList.remove('invisible', 'opacity-0'); modalContent.classList.remove('scale-95'); };
+            const close = () => { modalContent.classList.add('scale-95'); container.classList.add('invisible', 'opacity-0'); };
+            closeModalBtn.addEventListener('click', close);
+            container.addEventListener('click', (e) => { if (e.target === container) close(); });
+            return { open, close };
+        }
+
+        const helpModal = createModal(dom.helpModalContainer, 'Guía de Uso', `<div class="prose max-w-none"><h4>¿Cómo funciona?</h4><ol><li><b>Defina los Conjuntos:</b> Ingrese los elementos separados por comas. Puede incluir números, texto y también intervalos numéricos como <code>[1, 5]</code>.</li><li><b>Defina la Relación:</b> Elija una pestaña. Puede escribir una <b>regla</b> matemática (ej: <code>a > b</code>) o ingresar <b>pares ordenados</b> directamente (ej: <code>(1,a), (2,b)</code>).</li><li><b>Use los Ejemplos:</b> Seleccione uno de los ejemplos para cargar datos predefinidos.</li><li><b>Personalice:</b> Use el botón de la paleta de colores para cambiar la apariencia del diagrama.</li><li><b>Analice y Limpie:</b> Presione "Analizar" para ver los resultados. Use "Limpiar" para reiniciar.</li></ol></div>`);
+        const themeModal = createModal(dom.themeModalContainer, 'Personalizar Colores', `<div class="space-y-4"><div class="grid grid-cols-2 sm:grid-cols-3 gap-4"><div class="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg"><label for="ovalFill" class="text-sm font-medium">Relleno Óvalos</label><input type="color" id="ovalFill"></div><div class="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg"><label for="ovalStroke" class="text-sm font-medium">Borde Óvalos</label><input type="color" id="ovalStroke"></div><div class="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg"><label for="arrowColor" class="text-sm font-medium">Flechas</label><input type="color" id="arrowColor"></div><div class="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg"><label for="pointAColor" class="text-sm font-medium">Puntos A</label><input type="color" id="pointAColor"></div><div class="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg"><label for="pointBColor" class="text-sm font-medium">Puntos B</label><input type="color" id="pointBColor"></div></div><div class="flex justify-end gap-4 mt-4"><button id="restore-theme-btn" class="btn bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg">Restaurar</button></div></div>`, 'max-w-md');
+        const manualModal = createModal(dom.manualModalContainer, 'Manual de Funciones (Modo Regla)', `<div class="prose-custom max-w-none"><p class="text-base">Puede usar las siguientes operaciones y funciones en la definición de la relación:</p><div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 mt-4"><div><h5 class="font-semibold text-blue-600">Operadores Aritméticos</h5><ul><li><code>+</code> , <code>-</code> , <code>*</code> , <code>/</code> , <code>%</code> (módulo), <code>^</code> (potencia)</li></ul><h5 class="font-semibold text-blue-600 mt-4">Operadores de Comparación</h5><ul><li><code>==</code> , <code>!=</code> , <code><</code> , <code><=</code> , <code>></code> , <code>>=</code></li></ul></div><div><h5 class="font-semibold text-purple-600">Operadores Lógicos</h5><ul><li><code>and</code> (Y lógico: $\\wedge$)</li><li><code>or</code> (O lógico: $\\vee$)</li><li><code>not</code> (Negación)</li></ul><h5 class="font-semibold text-purple-600 mt-4">Funciones</h5><ul><li>Valor Absoluto: $$\\left| x \\right|$$ se escribe <code>abs(x)</code></li><li>Parte Entera: $$\\left[\\kern-0.15em\\left[ x \\right]\\kern-0.15em\\right]$$ se escribe <code>floor(x)</code></li><li>Longitud de Texto: <code>string.size(a)</code></li></ul></div></div></div>`);
+
+        dom.helpBtn.addEventListener('click', helpModal.open);
+        dom.themeBtn.addEventListener('click', themeModal.open);
+        dom.manualBtn.addEventListener('click', () => {
+            manualModal.open();
+            setTimeout(() => MathJax.typesetPromise(), 100);
+        });
+
+        // --- Lógica de Tema/Colores ---
+        const themeInputs = { fill: document.getElementById('ovalFill'), stroke: document.getElementById('ovalStroke'), arrow: document.getElementById('arrowColor'), pointA: document.getElementById('pointAColor'), pointB: document.getElementById('pointBColor') };
+        Object.keys(themeInputs).forEach(key => {
+            const colorKey = key === 'fill' ? 'ovalFill' : key === 'stroke' ? 'ovalStroke' : key === 'arrow' ? 'arrow' : key;
+            themeInputs[key].value = AppState.themeColors[colorKey];
+            themeInputs[key].addEventListener('input', (e) => { AppState.themeColors[colorKey] = e.target.value; redrawDiagram(); });
+        });
+        document.getElementById('restore-theme-btn').addEventListener('click', () => {
+            AppState.themeColors = { ...AppState.defaultThemeColors };
+            Object.keys(themeInputs).forEach(key => {
+                const colorKey = key === 'fill' ? 'ovalFill' : key === 'stroke' ? 'ovalStroke' : key === 'arrow' ? 'arrow' : key;
+                themeInputs[key].value = AppState.themeColors[colorKey];
+            });
+            redrawDiagram();
+        });
+
+        // --- Lógica de Ejemplos ---
+        const examples = [
+            { name: "Relación por Pares Ordenados", A: "1, 2, 3, 4", B: "a, b, c, d", type: "pairs", R: "(1,a), (2,b), (2,c), (4,d)" },
+            { name: "Función Identidad", A: "1,2,3,4", B: "1,2,3,4", type: "rule", R: "a == b" },
+            { name: "Función Sucesor", A: "1,2,3,4", B: "2,3,4,5", type: "rule", R: "b == a+1" },
+            { name: "Relación 'Menor que'", A: "1,2,3", B: "1,2,3,4", type: "rule", R: "a < b" },
+            { name: "Relación 'Divide a'", A: "2,3,4", B: "4,6,8,9,12", type: "rule", R: "b % a == 0" },
+            { name: "Función Cuadrática", A: "-2,-1,0,1,2", B: "0,1,4,9", type: "rule", R: "b == a^2" },
+            { name: "Función Parte Entera", A: "1.1, 2.7, 3.5, 4.9", B: "1,2,3,4", type: "rule", R: "b == floor(a)" },
+            { name: "Relación de Longitud (Texto)", A: "a, b, sol, mar", B: "1, 3", type: "rule", R: "string.size(a) == b" }
+        ];
+
+        examples.forEach(ex => {
+            const option = document.createElement('option');
+            option.value = JSON.stringify(ex);
+            option.textContent = ex.name;
+            dom.examples.appendChild(option);
+        });
+
+        dom.examples.addEventListener('change', (e) => {
+            if (e.target.value === "default") return;
+            const ex = JSON.parse(e.target.value);
+            dom.setA.value = ex.A; 
+            dom.setB.value = ex.B;
+            if (ex.type === 'pairs') {
+                setInputMode('pairs');
+                dom.relationPairs.value = ex.R;
+                dom.relationRule.value = '';
+            } else {
+                setInputMode('rule');
+                dom.relationRule.value = ex.R;
+                dom.relationPairs.value = '';
+            }
+        });
+        
+        // --- Panel de Operadores y Tooltip ---
+        dom.operatorPanel.addEventListener('mouseover', (e) => {
+            const button = e.target.closest('button');
+            if (button && button.dataset.tooltip) {
+                dom.tooltip.textContent = button.dataset.tooltip;
+                dom.tooltip.style.display = 'block';
+            }
+        });
+        dom.operatorPanel.addEventListener('mouseout', () => {
+            dom.tooltip.style.display = 'none';
+        });
+        dom.operatorPanel.addEventListener('mousemove', (e) => {
+            dom.tooltip.style.left = `${e.pageX + 15}px`;
+            dom.tooltip.style.top = `${e.pageY + 15}px`;
+        });
+
+        dom.operatorPanel.addEventListener('click', (e) => {
+            const button = e.target.closest('button');
+            if (button) {
+                const operator = button.dataset.op;
+                const input = dom.relationRule; const start = input.selectionStart; const end = input.selectionEnd;
+                input.value = input.value.substring(0, start) + operator + input.value.substring(end);
+                input.focus();
+                if (operator.includes('()')) {
+                    input.selectionStart = input.selectionEnd = start + operator.length - 1;
+                } else {
+                    input.selectionStart = input.selectionEnd = start + operator.length;
+                }
+            }
+        });
+        
+        // --- Botones Principales (Analizar, Limpiar) ---
+        dom.resetBtn.addEventListener('click', () => {
+            dom.setA.value = ''; dom.setB.value = ''; dom.relationRule.value = ''; dom.relationPairs.value = '';
+            dom.examples.value = 'default'; dom.resultsPanel.classList.add('hidden');
+            dom.errorMessage.classList.add('hidden'); dom.diagramContainer.innerHTML = '';
+            dom.analysisContainer.innerHTML = ''; AppState.currentAnalysis = null;
+            setInputMode('rule');
+        });
+
+        dom.generateBtn.addEventListener('click', () => {
+            try {
+                dom.setA.value = expandAllIntervals(dom.setA.value);
+                dom.setB.value = expandAllIntervals(dom.setB.value);
+
+                const setA = parseSet(dom.setA.value);
+                const setB = parseSet(dom.setB.value);
+                
+                if (setA.size === 0 || setB.size === 0) throw new Error("Por favor, defina ambos conjuntos.");
+                if (setA.size > 20 || setB.size > 20) throw new Error("Para fines didácticos, los conjuntos no deben tener más de 20 elementos.");
+                
+                let relation;
+                if (AppState.inputMode === 'rule') {
+                    const relationString = transformChainedInequalities(dom.relationRule.value);
+                    if (!relationString) throw new Error("Por favor, defina la regla de la relación.");
+                    relation = calculateRelationByRule(setA, setB, relationString);
+                } else {
+                    const pairsString = dom.relationPairs.value;
+                    if (!pairsString) throw new Error("Por favor, ingrese los pares ordenados de la relación.");
+                    relation = parseRelationByPairs(pairsString, setA, setB);
+                }
+
+                dom.resultsPanel.classList.remove('hidden');
+                dom.resultsContent.classList.remove('hidden');
+                dom.errorMessage.classList.add('hidden');
+
+                const analysis = analyzeProperties(relation, setA, setB);
+                AppState.currentAnalysis = { analysis, setA, setB };
+                
+                drawSagittalDiagram(dom.diagramContainer, setA, setB, analysis.pairs, analysis.isAequalsB, AppState.themeColors);
+                displayAnalysis(dom.analysisContainer, analysis);
+                
+                MathJax.typesetPromise();
+            } catch (error) {
+                dom.resultsPanel.classList.remove('hidden');
+                dom.resultsContent.classList.add('hidden');
+                dom.errorMessage.classList.remove('hidden');
+                dom.errorMessage.textContent = `Error: ${error.message}`;
+                console.error(error);
+                AppState.currentAnalysis = null;
+            }
+        });
+
+        // --- Lógica de Procesamiento de Datos ---
+        dom.setA.addEventListener('input', expandIntervalsInPlace);
+        dom.setB.addEventListener('input', expandIntervalsInPlace);
+
+        function redrawDiagram() {
+            if (AppState.currentAnalysis) {
+                const { analysis, setA, setB } = AppState.currentAnalysis;
+                drawSagittalDiagram(dom.diagramContainer, setA, setB, analysis.pairs, analysis.isAequalsB, AppState.themeColors);
+            }
+        }
+
+        function expandAllIntervals(text) {
+            const parts = text.split(',');
+            const expandedParts = parts.map(part => {
+                const trimmedPart = part.trim();
+                const intervalRegex = /^([(\[])\s*(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)\s*([)\]])$/;
+                const match = trimmedPart.match(intervalRegex);
+                if (match) {
+                    let [, startBracket, startNum, endNum, endBracket] = match;
+                    let start = parseFloat(startNum); let end = parseFloat(endNum);
+                    if (start > end) return trimmedPart;
+                    if (startBracket === '(') start = Math.floor(start) + 1; else start = Math.ceil(start);
+                    if (endBracket === ')') end = Math.ceil(end) - 1; else end = Math.floor(end);
+                    const expandedNumbers = [];
+                    for (let i = start; i <= end; i++) expandedNumbers.push(i);
+                    return expandedNumbers.join(', ');
+                }
+                return trimmedPart;
+            });
+            return expandedParts.join(', ');
+        }
+
+        function expandIntervalsInPlace(event) {
+            const textarea = event.target;
+            const value = textarea.value;
+            const lastChar = value[textarea.selectionStart - 1];
+            if (lastChar === ')' || lastChar === ']') {
+                textarea.value = expandAllIntervals(value);
+            }
+        }
+
+        function convertToTypedValue(str) {
+            const trimmed = str.trim();
+            if (trimmed === '') return null; // o manejar como error
+            return isNaN(Number(trimmed)) ? trimmed : Number(trimmed);
+        }
+
+        function parseSet(text) {
+            const finalSet = new Set();
+            if (!text.trim()) return finalSet;
+            const elements = text.split(',');
+            for (const el of elements) {
+                const typedValue = convertToTypedValue(el);
+                if (typedValue !== null) finalSet.add(typedValue);
+            }
+            return finalSet;
+        }
+        
+        function transformChainedInequalities(expr) {
+            const chainedRegex = /(.+?)\s*(<=|<|>=|>|==|!=)\s*(.+?)\s*(<=|<|>=|>|==|!=)\s*(.+)/;
+            const match = expr.match(chainedRegex);
+            if (match) {
+                const [, expr1, op1, expr2, op2, expr3] = match;
+                if (!expr2.match(/[+\-*/\^()]/)) return `(${expr1} ${op1} ${expr2}) and (${expr2} ${op2} ${expr3})`;
+            }
+            return expr;
+        }
+
+        function calculateRelationByRule(setA, setB, relationString) {
+            const pairs = [];
+            let compiledExpression;
+            try {
+                compiledExpression = math.parse(relationString).compile();
+            } catch (e) { throw new Error(`La expresión de la relación es inválida: ${e.message}`); }
+            const scopeFunctions = { string: { size: (s) => String(s).length }, floor: math.floor, ceil: math.ceil, round: math.round, abs: math.abs };
+            for (const a of setA) {
+                for (const b of setB) {
+                    try {
+                        if (compiledExpression.evaluate({ a, b, ...scopeFunctions })) pairs.push([a, b]);
+                    } catch (e) { /* Ignora errores de tipo */ }
+                }
+            }
+            return { pairs };
+        }
+
+        function parseRelationByPairs(pairsString, setA, setB) {
+            const pairs = [];
+            const pairRegex = /\(\s*([^,]+?)\s*,\s*([^)]+?)\s*\)/g;
+            let match;
+            while ((match = pairRegex.exec(pairsString)) !== null) {
+                const elA = convertToTypedValue(match[1]);
+                const elB = convertToTypedValue(match[2]);
+
+                if (elA === null || elB === null) {
+                    throw new Error(`Par inválido encontrado: "${match[0]}". Los elementos no pueden estar vacíos.`);
+                }
+                if (!setA.has(elA)) {
+                    throw new Error(`El par (${elA},${elB}) es inválido porque el elemento '${elA}' no se encuentra en el Conjunto A.`);
+                }
+                if (!setB.has(elB)) {
+                     throw new Error(`El par (${elA},${elB}) es inválido porque el elemento '${elB}' no se encuentra en el Conjunto B.`);
+                }
+                pairs.push([elA, elB]);
+            }
+            if (pairs.length === 0 && pairsString.trim() !== '') {
+                throw new Error("No se encontraron pares válidos. Asegúrese de que el formato sea (a,b), (c,d), ...");
+            }
+            return { pairs };
+        }
+
+        function analyzeProperties(relationData, setA, setB) {
+            const { pairs } = relationData;
+            const domain = new Set(pairs.map(p => p[0])); const range = new Set(pairs.map(p => p[1]));
+            const arrayA = [...setA]; const isAequalsB = setA.size === setB.size && arrayA.every(val => setB.has(val));
+            const isReflexive = isAequalsB && arrayA.every(a => pairs.some(p => p[0] === a && p[1] === a));
+            const isSymmetric = isAequalsB && pairs.every(p => pairs.some(q => q[0] === p[1] && q[1] === p[0]));
+            const isAntiSymmetric = isAequalsB && pairs.every(p => (p[0] === p[1]) || !pairs.some(q => q[0] === p[1] && q[1] === p[0]));
+            const isTransitive = isAequalsB && pairs.every(p1 => pairs.filter(p2 => p2[0] === p1[1]).every(p2 => pairs.some(p3 => p3[0] === p1[0] && p3[1] === p2[1])));
+            const elementsInDomainCount = {}; arrayA.forEach(a => { elementsInDomainCount[a] = 0; });
+            pairs.forEach(p => { if (elementsInDomainCount.hasOwnProperty(p[0])) elementsInDomainCount[p[0]]++; });
+            const isFunction = arrayA.every(a => elementsInDomainCount[a] <= 1) && domain.size === setA.size;
+            let isInjective = false, isSurjective = false, isBijective = false;
+            if (isFunction) {
+                const rangeValues = pairs.map(p => p[1]);
+                isInjective = new Set(rangeValues).size === arrayA.length;
+                isSurjective = setB.size === range.size && [...setB].every(b => range.has(b));
+                isBijective = isInjective && isSurjective;
+            }
+            return { pairs, domain, range, isAequalsB, isReflexive, isSymmetric, isTransitive, isAntiSymmetric, isEquivalence: isAequalsB && isReflexive && isSymmetric && isTransitive, isPartialOrder: isAequalsB && isReflexive && isAntiSymmetric && isTransitive, isFunction, isInjective, isSurjective, isBijective };
+        }
+
+        // --- Lógica de Dibujo y Visualización ---
+        function drawSagittalDiagram(container, setA, setB, pairs, isAequalsB, colors) {
+            container.innerHTML = '';
+            const svg = document.createElementNS(svgNS, "svg");
+            const sortFn = (a, b) => (typeof a === 'number' && typeof b === 'number') ? a - b : String(a).localeCompare(String(b));
+            const arrayA = [...setA].sort(sortFn); const arrayB = [...setB].sort(sortFn);
+            const maxElements = Math.max(arrayA.length, arrayB.length, 1);
+            const elementHeight = 40; const topPadding = 50; const bottomPadding = 20;
+            const svgHeight = maxElements * elementHeight + topPadding + bottomPadding;
+            svg.setAttribute('width', '100%'); svg.setAttribute('height', svgHeight);
+            svg.setAttribute('viewBox', `0 0 500 ${svgHeight}`);
+            container.appendChild(svg);
+            const diagramHeight = svgHeight - topPadding - bottomPadding;
+            const centerY = topPadding + diagramHeight / 2;
+            const aCoords = getElementCoords(arrayA, 125, centerY, diagramHeight);
+            const bCoords = getElementCoords(arrayB, 375, centerY, diagramHeight);
+            
+            drawMainRelationArrow(svg, 160, 25, 340, 25);
+            drawText(svg, 'A', 125, 25, 'middle', 'bold', 18);
+            drawText(svg, 'B', 375, 25, 'middle', 'bold', 18);
+
+            drawOval(svg, 125, centerY, 60, diagramHeight / 2 + 20, colors);
+            drawOval(svg, 375, centerY, 60, diagramHeight / 2 + 20, colors);
+            
+            aCoords.forEach(c => { drawText(svg, c.el, c.x - 20, c.y, 'end'); drawPoint(svg, c.x, c.y, colors.pointA); });
+            bCoords.forEach(c => { drawText(svg, c.el, c.x + 20, c.y, 'start'); drawPoint(svg, c.x, c.y, colors.pointB); });
+            
+            pairs.forEach(([elA, elB]) => {
+                const start = aCoords.find(c => c.el === elA);
+                const end = bCoords.find(c => c.el === elB);
+                if (start && end) drawArrow(svg, start.x, start.y, end.x, end.y, elA === elB && isAequalsB, colors);
+            });
+        }
+        
+        function getElementCoords(elements, cx, cy, height) {
+            if (elements.length === 0) return [];
+            const step = elements.length > 1 ? height / (elements.length - 1) : 0;
+            const startY = cy - height / 2;
+            return elements.map((el, i) => ({ el, x: cx, y: startY + i * step }));
+        }
+
+        function drawOval(svg, cx, cy, rx, ry, colors) {
+            const oval = document.createElementNS(svgNS, "ellipse");
+            oval.setAttribute('cx', cx); oval.setAttribute('cy', cy);
+            oval.setAttribute('rx', rx); oval.setAttribute('ry', ry);
+            oval.setAttribute('fill', colors.ovalFill); oval.setAttribute('stroke', colors.ovalStroke);
+            oval.setAttribute('stroke-width', '2'); svg.appendChild(oval);
+        }
+
+        function drawText(svg, text, x, y, anchor = 'middle', weight = 'normal', size = 14) {
+            const textEl = document.createElementNS(svgNS, "text");
+            textEl.setAttribute('x', x); textEl.setAttribute('y', y);
+            textEl.setAttribute('text-anchor', anchor);
+            textEl.setAttribute('dominant-baseline', 'middle');
+            textEl.setAttribute('font-family', 'Inter, sans-serif');
+            textEl.setAttribute('font-size', `${size}px`);
+            textEl.setAttribute('font-weight', weight);
+            textEl.setAttribute('fill', '#374151'); textEl.textContent = text;
+            svg.appendChild(textEl);
+        }
+        
+        function drawPoint(svg, cx, cy, color){
+            const circle = document.createElementNS(svgNS, "circle");
+            circle.setAttribute('cx', cx); circle.setAttribute('cy', cy);
+            circle.setAttribute('r', 3); circle.setAttribute('fill', color);
+            svg.appendChild(circle);
+        }
+
+        function drawMainRelationArrow(svg, x1, y1, x2, y2) {
+            const color = '#ef4444'; // Red color for main arrow
+            const arrowId = 'main-arrowhead';
+            if (!svg.querySelector('#' + arrowId)) {
+                const defs = svg.querySelector('defs') || document.createElementNS(svgNS, "defs");
+                const marker = document.createElementNS(svgNS, "marker");
+                marker.setAttribute('id', arrowId);
+                marker.setAttribute('viewBox', '0 -5 10 10'); marker.setAttribute('refX', 8); marker.setAttribute('refY', 0);
+                marker.setAttribute('markerWidth', 6); marker.setAttribute('markerHeight', 6);
+                marker.setAttribute('orient', 'auto');
+                const path = document.createElementNS(svgNS, "path");
+                path.setAttribute('d', 'M0,-5L10,0L0,5'); path.setAttribute('fill', color);
+                marker.appendChild(path); defs.appendChild(marker);
+                if (!svg.querySelector('defs')) svg.prepend(defs);
+            }
+            const line = document.createElementNS(svgNS, "path");
+            line.setAttribute('d', `M ${x1},${y1} L ${x2},${y2}`);
+            line.setAttribute('stroke', color); line.setAttribute('stroke-width', '2.5');
+            line.setAttribute('marker-end', `url(#${arrowId})`); svg.appendChild(line);
+            drawText(svg, 'R', (x1 + x2) / 2, y1 - 10, 'middle', 'bold', 16);
+        }
+
+        function drawArrow(svg, x1, y1, x2, y2, isLoop, colors) {
+            const arrowId = 'arrowhead-' + colors.arrow.replace(/[^a-zA-Z0-9]/g, '');
+            if (!svg.querySelector('#' + arrowId)) {
+                const defs = svg.querySelector('defs') || document.createElementNS(svgNS, "defs");
+                const marker = document.createElementNS(svgNS, "marker");
+                marker.setAttribute('id', arrowId);
+                marker.setAttribute('viewBox', '0 -5 10 10'); marker.setAttribute('refX', 8); marker.setAttribute('refY', 0);
+                marker.setAttribute('markerWidth', 5); marker.setAttribute('markerHeight', 5);
+                marker.setAttribute('orient', 'auto');
+                const path = document.createElementNS(svgNS, "path");
+                path.setAttribute('d', 'M0,-5L10,0L0,5'); path.setAttribute('fill', colors.arrow);
+                marker.appendChild(path); defs.appendChild(marker);
+                if (!svg.querySelector('defs')) svg.prepend(defs);
+            }
+            const line = document.createElementNS(svgNS, "path");
+            let d = isLoop ? `M ${x1 + 5}, ${y1} C ${x1 + 40}, ${y1 - 40} ${x1 + 40}, ${y1 + 40} ${x1 + 5}, ${y1}`
+                           : `M ${x1},${y1} Q ${(x1 + x2) / 2 + (y2 - y1) * 0.2},${(y1 + y2) / 2 - (x2 - x1) * 0.2} ${x2},${y2}`;
+            line.setAttribute('d', d); line.setAttribute('stroke', colors.arrow);
+            line.setAttribute('stroke-width', '1.5'); line.setAttribute('fill', 'none');
+            line.setAttribute('marker-end', `url(#${arrowId})`); svg.appendChild(line);
+        }
+
+        function displayAnalysis(container, analysis) {
+            const { pairs, domain, range, isAequalsB, isReflexive, isSymmetric, isTransitive, isAntiSymmetric, isEquivalence, isPartialOrder, isFunction, isInjective, isSurjective, isBijective } = analysis;
+            const formatSet = (s) => `\\{${[...s].sort((a,b) => {
+                const aIsNum = typeof a === 'number';
+                const bIsNum = typeof b === 'number';
+                if (aIsNum && bIsNum) return a - b;
+                if (aIsNum) return -1;
+                if (bIsNum) return 1;
+                return String(a).localeCompare(String(b));
+            }).join(', ')}\\}`;
+            const formatBool = (b) => b ? '<span class="font-semibold text-green-600">Sí</span>' : '<span class="font-semibold text-red-600">No</span>';
+            const why = (b, reason) => b ? `<span class="text-xs text-gray-500 ml-2">(${reason})</span>` : '';
+            const note = (shouldShow, text) => shouldShow ? '' : `<span class="text-xs text-gray-500 ml-2">(${text})</span>`;
+            let html = `<p><b>Pares ordenados $R$:</b> ${pairs.length > 0 ? pairs.map(p => `(${p[0]}, ${p[1]})`).join(', ') : '$\\{\\}$ (Conjunto vacío)'}</p><p><b>Dominio de $R$:</b> $Dom(R) = ${formatSet(domain)}$</p><p><b>Rango de $R$:</b> $Ran(R) = ${formatSet(range)}$</p><hr class="my-4"><h4 class="text-lg font-semibold">Propiedades de la Relación ${note(isAequalsB, 'Solo aplicable si A=B')}</h4><ul class="list-disc list-inside space-y-1"><li><b>Reflexiva:</b> ${formatBool(isReflexive)} ${why(isReflexive, 'Todo elemento de A se relaciona consigo mismo')}</li><li><b>Simétrica:</b> ${formatBool(isSymmetric)} ${why(isSymmetric, 'Si $(a,b) \\in R$, entonces $(b,a) \\in R$')}</li><li><b>Antisimétrica:</b> ${formatBool(isAntiSymmetric)} ${why(isAntiSymmetric, 'Si $(a,b) \\in R$ y $(b,a) \\in R$, entonces $a=b$')}</li><li><b>Transitiva:</b> ${formatBool(isTransitive)} ${why(isTransitive, 'Si $(a,b) \\in R$ y $(b,c) \\in R$, entonces $(a,c) \\in R$')}</li></ul><p class="mt-2"><b>Relación de Equivalencia:</b> ${formatBool(isEquivalence)} ${why(isEquivalence, 'Es reflexiva, simétrica y transitiva')}</p><p><b>Relación de Orden Parcial:</b> ${formatBool(isPartialOrder)} ${why(isPartialOrder, 'Es reflexiva, antisimétrica y transitiva')}</p><hr class="my-4"><h4 class="text-lg font-semibold">Análisis de Función</h4><p><b>¿Es una función de A en B?</b> ${formatBool(isFunction)} ${why(isFunction, 'A cada elemento del dominio le corresponde un único elemento del rango')}</li></ul>`;
+            if (isFunction) {
+                html += `<ul class="list-disc list-inside space-y-1 mt-2"><li><b>Inyectiva (uno a uno):</b> ${formatBool(isInjective)} ${why(isInjective, 'Elementos distintos de A tienen imágenes distintas en B')}</li><li><b>Sobreyectiva (sobre):</b> ${formatBool(isSurjective)} ${why(isSurjective, 'Todo elemento de B es imagen de al menos un elemento de A')}</li><li><b>Biyectiva:</b> ${formatBool(isBijective)} ${why(isBijective, 'Es inyectiva y sobreyectiva')}</li></ul>`;
+            }
+            container.innerHTML = html;
+        }
+    });
+    </script>
+</body>
+</html>

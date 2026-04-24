@@ -1,0 +1,3011 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuaderno Interactivo de Matemáticas · Plantilla Maestra</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script defer src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' },
+            startup: { typeset: false }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-svg.js"></script>
+    <style>
+        :root {
+            --bg-body: #eef2f6;
+            --paper-color: #ffffff;
+            --paper-line: #d4e5f7;
+            --primary: #0077b6;
+            --primary-dark: #023e8a;
+            --secondary: #00b4d8;
+            --accent: #f77f00;
+            --success: #2a9d8f;
+            --warning: #e63946;
+            --text-main: #1d3557;
+            --text-muted: #457b9d;
+            --shadow-dark: 6px 6px 16px rgba(163, 177, 198, 0.3);
+            --clay-shadow: 8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        body.dark-mode {
+            --bg-body: #1a1a2e;
+            --paper-color: #16213e;
+            --paper-line: #1f4068;
+            --text-main: #e2e2e2;
+            --text-muted: #94a3b8;
+            --shadow-dark: 4px 4px 10px rgba(0, 0, 0, 0.5);
+            --clay-shadow: 6px 6px 12px rgba(0, 0, 0, 0.4), -6px -6px 12px rgba(50, 50, 70, 0.3);
+            --glass-bg: rgba(40, 40, 60, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: background 0.4s;
+        }
+
+        #app-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            perspective: 2000px;
+            padding: 10px;
+            gap: 15px;
+        }
+
+        .book-wrapper {
+            width: 96%;
+            max-width: 1400px;
+            height: 85vh;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .book {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            background: transparent;
+            position: relative;
+        }
+
+        .page {
+            flex: 1;
+            background: var(--paper-color);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-image: linear-gradient(var(--paper-line) 1px, transparent 1px), linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .page-left {
+            border-radius: 12px 0 0 12px;
+            box-shadow: inset -15px 0 25px -10px rgba(0, 0, 0, 0.1), var(--shadow-dark);
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .page-right {
+            border-radius: 0 12px 12px 0;
+            box-shadow: inset 15px 0 25px -10px rgba(0, 0, 0, 0.1), var(--shadow-dark);
+            border-left: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .page-content {
+            padding: 35px 45px;
+            overflow-y: auto;
+            height: 100%;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+
+        .page-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .page-content::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        .binding-spine {
+            position: absolute;
+            left: 50%;
+            top: 30px;
+            bottom: 30px;
+            width: 40px;
+            transform: translateX(-50%);
+            z-index: 20;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+        }
+
+        .metal-ring {
+            width: 100%;
+            height: 12px;
+            background: linear-gradient(90deg, #888 0%, #eee 40%, #ddd 60%, #555 100%);
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .metal-ring::before,
+        .metal-ring::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            bottom: 2px;
+            width: 5px;
+            background: #2c3e50;
+            border-radius: 50%;
+            opacity: 0.9;
+        }
+
+        .metal-ring::before {
+            left: -3px;
+        }
+
+        .metal-ring::after {
+            right: -3px;
+        }
+
+        .holes-strip {
+            position: absolute;
+            top: 30px;
+            bottom: 30px;
+            width: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        .page-left .holes-strip {
+            right: 6px;
+            align-items: flex-end;
+        }
+
+        .page-right .holes-strip {
+            left: 6px;
+            align-items: flex-start;
+        }
+
+        .paper-hole {
+            width: 10px;
+            height: 10px;
+            background: #2c3e50;
+            border-radius: 50%;
+            box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.6);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            color: var(--text-main);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            position: relative;
+            display: inline-block;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.6rem;
+            margin-top: 0;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 60%;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        h3 {
+            color: var(--primary-dark);
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+
+        h4 {
+            color: var(--secondary);
+            font-size: 1.05rem;
+            margin-top: 15px;
+        }
+
+        p,
+        li {
+            line-height: 1.7;
+            font-size: 0.98rem;
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        strong {
+            color: var(--primary-dark);
+        }
+
+        em {
+            color: var(--secondary);
+        }
+
+        .clay-card {
+            background: var(--paper-color);
+            border-radius: 16px;
+            padding: 18px;
+            margin: 12px 0;
+            box-shadow: var(--clay-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .clay-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 12px 0;
+        }
+
+        .def-box {
+            border-left: 5px solid var(--secondary);
+            background: rgba(0, 180, 216, 0.08);
+            padding: 15px;
+            border-radius: 0 12px 12px 0;
+            margin: 15px 0;
+        }
+
+        .def-title {
+            font-weight: 800;
+            color: var(--secondary);
+            display: block;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .concept-box {
+            border-left: 5px solid var(--primary);
+            background: rgba(0, 119, 182, 0.08);
+            padding: 15px;
+            border-radius: 0 12px 12px 0;
+            margin: 15px 0;
+        }
+
+        .example-box {
+            border-left: 5px solid var(--success);
+            background: rgba(42, 157, 143, 0.08);
+            padding: 15px;
+            border-radius: 0 12px 12px 0;
+            margin: 15px 0;
+        }
+
+        .example-title {
+            font-weight: 800;
+            color: var(--success);
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .warning-box {
+            border-left: 5px solid var(--warning);
+            background: rgba(230, 57, 70, 0.08);
+            padding: 15px;
+            border-radius: 0 12px 12px 0;
+            margin: 15px 0;
+        }
+
+        .formula-box {
+            background: linear-gradient(135deg, rgba(0, 180, 216, 0.1), rgba(0, 119, 182, 0.1));
+            border: 2px solid var(--secondary);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            margin: 15px 0;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        tr:hover {
+            background: rgba(0, 119, 182, 0.05);
+        }
+
+        .nav-dock {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            padding: 10px 25px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            border: var(--glass-border);
+            flex-shrink: 0;
+        }
+
+        .btn-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-body);
+            color: var(--primary);
+            font-size: 1.1rem;
+            box-shadow: var(--clay-shadow);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-circle:hover:not(:disabled) {
+            transform: scale(1.1);
+            color: var(--accent);
+        }
+
+        .btn-circle:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .page-badge {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            background: var(--primary);
+            color: white;
+            padding: 6px 18px;
+            border-radius: 20px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-size: 0.9rem;
+        }
+
+        .cover-page {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #0a1628 0%, #0d2137 25%, #0b3d5c 50%, #0077b6 75%, #00a8cc 100%);
+            color: white;
+            margin: -35px -45px;
+            width: calc(100% + 90px);
+            height: calc(100% + 70px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover-page::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(0, 180, 216, 0.08) 60deg, transparent 120deg, rgba(72, 202, 228, 0.06) 180deg, transparent 240deg, rgba(0, 119, 182, 0.08) 300deg, transparent 360deg);
+            animation: coverRotate 20s linear infinite;
+            pointer-events: none;
+        }
+
+        .cover-page::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 30% 20%, rgba(0, 180, 216, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(72, 202, 228, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        @keyframes coverRotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: translateY(-20px) scale(1.1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0.4;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 0.15;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% center;
+            }
+
+            100% {
+                background-position: 200% center;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cover-particles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .cover-particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .cover-particle:nth-child(1) {
+            width: 4px;
+            height: 4px;
+            top: 15%;
+            left: 10%;
+            animation-delay: 0s;
+            animation-duration: 5s;
+        }
+
+        .cover-particle:nth-child(2) {
+            width: 6px;
+            height: 6px;
+            top: 25%;
+            left: 80%;
+            animation-delay: 1s;
+            animation-duration: 7s;
+        }
+
+        .cover-particle:nth-child(3) {
+            width: 3px;
+            height: 3px;
+            top: 60%;
+            left: 15%;
+            animation-delay: 2s;
+            animation-duration: 6s;
+        }
+
+        .cover-particle:nth-child(4) {
+            width: 5px;
+            height: 5px;
+            top: 70%;
+            left: 75%;
+            animation-delay: 0.5s;
+            animation-duration: 8s;
+        }
+
+        .cover-particle:nth-child(5) {
+            width: 3px;
+            height: 3px;
+            top: 40%;
+            left: 90%;
+            animation-delay: 3s;
+            animation-duration: 5.5s;
+        }
+
+        .cover-particle:nth-child(6) {
+            width: 4px;
+            height: 4px;
+            top: 85%;
+            left: 45%;
+            animation-delay: 1.5s;
+            animation-duration: 6.5s;
+        }
+
+        .cover-particle:nth-child(7) {
+            width: 5px;
+            height: 5px;
+            top: 10%;
+            left: 50%;
+            animation-delay: 2.5s;
+            animation-duration: 7.5s;
+        }
+
+        .cover-particle:nth-child(8) {
+            width: 3px;
+            height: 3px;
+            top: 50%;
+            left: 30%;
+            animation-delay: 4s;
+            animation-duration: 5s;
+        }
+
+        .cover-orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            animation: pulse-ring 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .cover-orbit:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            animation-delay: 0s;
+        }
+
+        .cover-orbit:nth-child(2) {
+            width: 340px;
+            height: 340px;
+            animation-delay: 1.5s;
+        }
+
+        .cover-orbit:nth-child(3) {
+            width: 480px;
+            height: 480px;
+            animation-delay: 3s;
+        }
+
+        .cover-content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .cover-page h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            margin: 10px 0 5px;
+            letter-spacing: 6px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 60px rgba(0, 180, 216, 0.3);
+            background: linear-gradient(135deg, #ffffff 0%, #48cae4 50%, #ffffff 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 4s ease-in-out infinite;
+        }
+
+        .cover-page h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 5px 0;
+            letter-spacing: 2px;
+            color: white;
+        }
+
+        .cover-page h2::after {
+            display: none;
+        }
+
+        .cover-icon-wrapper {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        .cover-icon {
+            font-size: 2.5rem;
+            opacity: 0.95;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .cover-subtitle {
+            font-size: 0.85rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .cover-badge {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.08));
+            backdrop-filter: blur(10px);
+            padding: 12px 32px;
+            border-radius: 50px;
+            margin-top: 20px;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .cover-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .cover-separator {
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            border-radius: 2px;
+            margin: 10px 0;
+        }
+
+        .cover-footer {
+            margin-top: 25px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+            letter-spacing: 1px;
+        }
+
+        .footer {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            font-weight: 600;
+            flex-shrink: 0;
+            padding: 2px 0;
+        }
+
+        .num-page {
+            position: absolute;
+            bottom: 10px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        .page-left .num-page {
+            left: 20px;
+        }
+
+        .page-right .num-page {
+            right: 20px;
+        }
+
+        .icon-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .icon-list li {
+            padding: 8px 0;
+            padding-left: 28px;
+            position: relative;
+        }
+
+        .icon-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--paper-color);
+            border-radius: 16px;
+            padding: 25px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .index-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 8px;
+        }
+
+        .index-item {
+            padding: 10px 12px;
+            background: rgba(0, 119, 182, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            font-size: 0.9rem;
+        }
+
+        .index-item:hover {
+            background: rgba(0, 119, 182, 0.15);
+            border-left-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .ggb-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #fff;
+            border-radius: 8px;
+        }
+
+        .ggb-canvas {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            display: block;
+        }
+
+        .ggb-toolbar {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 5px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+
+        .ggb-btn {
+            background: none;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .ggb-btn:hover {
+            background: #f0f0f0;
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .ggb-info {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: #666;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #mobile-fab {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .book-wrapper {
+                width: 100%;
+                height: 75vh;
+            }
+
+            .page-right {
+                display: none;
+            }
+
+            .page-left {
+                width: 100%;
+                border-radius: 12px;
+                border: none;
+                box-shadow: var(--clay-shadow);
+            }
+
+            .binding-spine {
+                display: none;
+            }
+
+            .cover-page {
+                margin: -20px -20px;
+                width: calc(100% + 40px);
+                height: calc(100% + 40px);
+            }
+
+            .cover-page h1 {
+                font-size: 2.2rem;
+                letter-spacing: 4px;
+            }
+
+            .cover-icon-wrapper {
+                width: 70px;
+                height: 70px;
+            }
+
+            .cover-icon {
+                font-size: 2rem;
+            }
+
+            .nav-dock {
+                padding: 8px 15px;
+                width: 95%;
+                justify-content: space-between;
+                gap: 8px;
+                flex-shrink: 0;
+            }
+
+            .btn-circle {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .page-badge {
+                font-size: 0.8rem;
+                padding: 5px 12px;
+            }
+
+            .page-content {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 1.4rem;
+            }
+
+            .footer {
+                font-size: 0.7rem;
+                padding: 2px 0;
+            }
+
+            #mobile-fab {
+                display: flex;
+                position: fixed;
+                top: 15px;
+                right: 15px;
+                z-index: 200;
+                background: var(--accent);
+                color: white;
+                border: none;
+                padding: 10px 18px;
+                border-radius: 30px;
+                font-weight: bold;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                align-items: center;
+                gap: 8px;
+                cursor: pointer;
+            }
+        }
+
+        .interactive-controls {
+            background: rgba(0, 119, 182, 0.05);
+            border-radius: 12px;
+            padding: 12px;
+            margin: 10px 0;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            flex-wrap: wrap;
+        }
+
+        .control-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            min-width: 80px;
+            color: var(--primary-dark);
+        }
+
+        .control-slider {
+            flex: 1;
+            min-width: 100px;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .control-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .control-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .control-value {
+            background: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .result-display {
+            background: linear-gradient(135deg, var(--success), var(--primary));
+            color: white;
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .result-display .result-title {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .result-display .result-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        .resizable-diagram {
+            resize: both;
+            overflow: auto;
+            min-height: 220px;
+            max-height: 65vh;
+        }
+
+        .ggb-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #fafbfc 0%, #f0f2f5 100%);
+        }
+
+        .ggb-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            cursor: grab;
+            border-radius: 10px;
+        }
+
+        .ggb-canvas:active {
+            cursor: grabbing;
+        }
+
+        .ggb-toolbar {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(0, 119, 182, 0.15);
+        }
+
+        body.dark-mode .ggb-toolbar {
+            background: rgba(22, 33, 62, 0.94);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .ggb-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(145deg, #ffffff, #e8ecf1);
+            color: #0077b6;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 2px 2px 6px rgba(163, 177, 198, 0.35), -2px -2px 6px rgba(255, 255, 255, 0.8);
+            transition: all 0.2s ease;
+        }
+
+        body.dark-mode .ggb-btn {
+            background: linear-gradient(145deg, #1f4068, #16213e);
+            color: #48cae4;
+        }
+
+        .ggb-btn:hover {
+            transform: scale(1.08);
+            color: var(--accent);
+        }
+
+        .ggb-btn:active {
+            transform: scale(0.95);
+        }
+
+        .ggb-info {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-size: 0.72rem;
+            color: rgba(29, 53, 87, 0.6);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 4px 8px;
+            border-radius: 6px;
+            pointer-events: none;
+            font-weight: 600;
+        }
+
+        body.dark-mode .ggb-info {
+            background: rgba(22, 33, 62, 0.8);
+            color: rgba(226, 226, 226, 0.6);
+        }
+    </style>
+</head>
+
+<body>
+    <button class="btn-circle" onclick="toggleTheme()"
+        style="position:fixed; top:20px; left:20px; z-index:200; width:40px; height:40px;">
+        <i class="fas fa-moon" id="theme-icon"></i>
+    </button>
+    <button class="btn-circle" onclick="showIndex()"
+        style="position:fixed; top:20px; left:70px; z-index:200; width:40px; height:40px;" title="Índice">
+        <i class="fas fa-list"></i>
+    </button>
+    <button id="mobile-fab" onclick="toggleMobileSide()">
+        <i class="fas fa-columns"></i> <span id="fab-text">Ver Der.</span>
+    </button>
+    <div id="app-container">
+        <div class="book-wrapper">
+            <div class="book" id="book-el">
+                <div class="binding-spine" id="spine"></div>
+                <div class="page page-left" id="p-left">
+                    <div class="holes-strip" id="holes-l"></div>
+                    <div class="page-content" id="c-left"></div>
+                    <span class="num-page" id="num-left"></span>
+                </div>
+                <div class="page page-right" id="p-right">
+                    <div class="holes-strip" id="holes-r"></div>
+                    <div class="page-content" id="c-right"></div>
+                    <span class="num-page" id="num-right"></span>
+                </div>
+            </div>
+        </div>
+        <div class="nav-dock">
+            <button class="btn-circle" onclick="goToPage(0)" title="Inicio"><i class="fas fa-home"></i></button>
+            <button class="btn-circle" onclick="prevPage()" id="btn-prev"><i class="fas fa-chevron-left"></i></button>
+            <div class="page-badge" id="page-num">PORTADA</div>
+            <button class="btn-circle" onclick="nextPage()" id="btn-next"><i class="fas fa-chevron-right"></i></button>
+            <button class="btn-circle" onclick="showIndex()" title="Índice"><i class="fas fa-th-list"></i></button>
+        </div>
+        <div class="footer">Creado por Msc. Néstor Fabio Montoya Palacios</div>
+    </div>
+    <div id="index-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="hideIndex()"><i class="fas fa-times"></i></button>
+            <h2 style="margin-bottom:20px;">📚 Índice del Cuaderno</h2>
+            <div id="index-list" class="index-grid"></div>
+        </div>
+    </div>
+    <script>
+        // ═══════════════════════════════════════════════════════════════════════
+        // 📘 PLANTILLA MAESTRA — Cuaderno Interactivo de Matemáticas
+        // ═══════════════════════════════════════════════════════════════════════
+        // Esta plantilla contiene 6 páginas DEMO que ejemplifican cada tipo de
+        // componente reutilizable:
+        //   0. Portada (cover)
+        //   1. Concepto + tabla
+        //   2. Definición + fórmula (MathJax) + ejemplo
+        //   3. Interactivo con sliders (placeholder)
+        //   4. Ejemplo paso a paso
+        //   5. Créditos
+        //
+        // 🎨 Reemplaza el contenido HTML de cada `left.html` y `right.html`
+        //     manteniendo las clases CSS: def-box, concept-box, formula-box,
+        //     example-box, warning-box, glass-panel, clay-card, interactive-controls,
+        //     result-display, matrix-container, resizable-diagram.
+        //
+        // 📐 MathJax soporta $...$ inline y $$...$$ display. Escapa \\ en JS strings.
+        // ═══════════════════════════════════════════════════════════════════════
+        const BOOK_DATA = [
+            { title: "Portada", left: { type: 'cover', html: '<div class="cover-page"><div class="cover-particles"><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div></div><div class="cover-orbit"></div><div class="cover-orbit"></div><div class="cover-orbit"></div><div class="cover-content"><div class="cover-icon-wrapper"><div class="cover-icon"><i class="fa-solid fa-square-root-variable"></i></div></div><div class="cover-subtitle">Cuaderno Interactivo de</div><h1>MATEMÁTICAS</h1><div class="cover-separator"></div><div class="cover-badge"><i class="fas fa-infinity" style="margin-right:8px;"></i>Plantilla Maestra</div><p class="cover-footer">Álgebra · Geometría · Cálculo · Estadística</p></div></div>' }, right: { html: '<h2 style="text-align:center;margin-bottom:15px;"><i class="fas fa-list-ol"></i> Índice de Contenidos</h2><div class="concept-box" style="padding:10px;font-size:0.85rem;"><p><strong>1.</strong> Introducción al tema</p><p><strong>2.</strong> Definiciones y notación</p><p><strong>3.</strong> Simulador interactivo</p><p><strong>4.</strong> Ejemplo paso a paso</p><p><strong>5.</strong> Créditos</p></div><div class="warning-box" style="margin-top:10px"><strong><i class="fa-solid fa-wand-magic-sparkles"></i> Plantilla reutilizable</strong><p>Duplica este archivo y reemplaza cada página con tu contenido matemático específico: álgebra, trigonometría, cálculo, estadística, etc.</p></div><div class="glass-panel" style="text-align:center;margin-top:10px;"><p style="font-style:italic;font-size:0.9rem;">"Las matemáticas son el alfabeto con el cual Dios ha escrito el universo."</p><p style="font-size:0.8rem;">— Aristóteles</p></div>' } },
+
+            { title: "1. Introducción al tema", left: { html: '<h2>1. Introducción al tema</h2><div class="def-box"><span class="def-title"><i class="fa-solid fa-lightbulb"></i> ¿De qué trata este cuaderno?</span><p>Reemplaza este párrafo con una <strong>introducción motivadora</strong> al tema matemático que estás desarrollando: un contexto histórico, una pregunta problematizadora o una aplicación real del conocimiento.</p></div><h3>Objetivos de aprendizaje</h3><ul><li><strong>Comprender</strong> el concepto central.</li><li><strong>Aplicar</strong> la notación y las propiedades básicas.</li><li><strong>Resolver</strong> ejercicios tipo.</li><li><strong>Conectar</strong> el tema con otras áreas (ciencias, tecnología, arte).</li></ul><div class="warning-box"><strong><i class="fa-solid fa-seedling"></i> Consejo pedagógico:</strong><p>Inicia con un ejemplo concreto antes de formalizar. La intuición precede al rigor.</p></div>' }, right: { html: '<h3>Contexto histórico</h3><div class="clay-card" style="font-size:0.9rem;"><p>Utiliza este panel para contar la <strong>historia del tema</strong>: ¿quién lo inventó o descubrió?, ¿qué problema resolvía?, ¿cómo se relaciona con otras ramas de las matemáticas?</p><p>Los estudiantes recuerdan mejor los conceptos cuando los asocian con historias y personas.</p></div><div class="glass-panel" style="text-align:center;margin-top:10px;"><p style="font-style:italic;"><i class="fa-solid fa-quote-left"></i> La matemática es la reina de las ciencias, y la teoría de los números es la reina de las matemáticas.</p><p style="font-size:0.8rem;">— Carl Friedrich Gauss</p></div>' } },
+
+            { title: "2. Definición y notación", left: { html: '<h2>2. Definición formal</h2><div class="def-box"><span class="def-title"><i class="fa-solid fa-pen-nib"></i> Definición</span><p>Escribe aquí la <strong>definición rigurosa</strong> del objeto matemático principal: función, ecuación, transformación, distribución, etc.</p></div><h3>Notación estándar</h3><div class="formula-box">$f : A \\longrightarrow B,\\quad x \\longmapsto f(x)$</div><div class="concept-box"><h4>Símbolos que se usarán en este cuaderno</h4><table><thead><tr><th>Símbolo</th><th>Significado</th></tr></thead><tbody><tr><td>$\\mathbb{N}$</td><td>Naturales</td></tr><tr><td>$\\mathbb{Z}$</td><td>Enteros</td></tr><tr><td>$\\mathbb{Q}$</td><td>Racionales</td></tr><tr><td>$\\mathbb{R}$</td><td>Reales</td></tr><tr><td>$\\mathbb{C}$</td><td>Complejos</td></tr></tbody></table></div>' }, right: { html: '<h3>Ejemplo introductorio</h3><div class="example-box"><span class="example-title"><i class="fa-solid fa-star"></i> Ejemplo 2.1</span><p>Aquí va un ejemplo <strong>corto y claro</strong> que ilustre la definición.</p><p>Datos: $a = 3$, $b = 5$.</p><p>Aplicación:</p><p>$$f(a, b) = a^2 + b^2 = 9 + 25 = 34$$</p></div><div class="warning-box"><strong><i class="fa-solid fa-triangle-exclamation"></i> Errores comunes:</strong><ul><li>Confundir la notación de función con la de conjunto.</li><li>Olvidar el dominio de definición.</li><li>No verificar condiciones de validez.</li></ul></div>' } },
+
+            { title: "3. Simulador interactivo", left: { html: '<h2>3. Simulador interactivo</h2><div class="concept-box"><p>Usa los deslizadores para <strong>explorar</strong> cómo cambian los parámetros del objeto matemático.</p></div><div class="interactive-controls"><div class="control-row"><span class="control-label">a =</span><input type="range" class="control-slider" id="plt-a" min="-5" max="5" value="1" step="0.1"><span class="control-value" id="plt-a-val">1</span></div><div class="control-row"><span class="control-label">b =</span><input type="range" class="control-slider" id="plt-b" min="-5" max="5" value="0" step="0.1"><span class="control-value" id="plt-b-val">0</span></div><div class="control-row"><span class="control-label">c =</span><input type="range" class="control-slider" id="plt-c" min="-5" max="5" value="0" step="0.1"><span class="control-value" id="plt-c-val">0</span></div></div><div class="result-display"><div class="result-title">Expresión resultante</div><div class="result-value">y = <span id="plt-expr">x</span></div></div><div class="warning-box" style="margin-top:8px"><strong><i class="fa-solid fa-code"></i> Para docentes:</strong><p>Enlaza estos deslizadores a una gráfica en Canvas/SVG o incrusta un <code>&lt;iframe&gt;</code> de GeoGebra/Desmos. La plantilla deja el contenedor <code>#plot-area</code> listo a la derecha.</p></div>' }, right: { html: '<div class="resizable-diagram"><div id="plot-area" class="glass-panel" style="width:100%;height:100%;min-height:280px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);"><div style="text-align:center"><i class="fa-solid fa-chart-line" style="font-size:3rem;opacity:0.4"></i><p style="margin-top:10px;font-style:italic">Área reservada para el gráfico interactivo</p><p style="font-size:0.8rem">Coloca aquí tu canvas, SVG o iframe de GeoGebra/Desmos</p></div></div></div><div class="concept-box"><h4>Observaciones dirigidas</h4><ol><li>¿Qué ocurre si $a = 0$?</li><li>¿Cómo afecta $b$ a la gráfica?</li><li>¿Qué valor de $c$ la hace tangente al eje X?</li></ol></div>' } },
+
+            { title: "4. Ejemplo paso a paso", left: { html: '<h2>4. Ejemplo resuelto</h2><div class="def-box"><span class="def-title"><i class="fa-solid fa-clipboard-list"></i> Problema</span><p>Plantea aquí un <strong>problema tipo ICFES / Saber 11 / PreUniversitario</strong>. Debe ser claro, con datos numéricos concretos y una pregunta específica.</p></div><h3>Paso 1 — Identificar los datos</h3><div class="concept-box"><ul><li>Dato 1: <strong>valor</strong></li><li>Dato 2: <strong>valor</strong></li><li>Incógnita: <em>lo que se quiere calcular</em></li></ul></div><h3>Paso 2 — Plantear el modelo matemático</h3><div class="formula-box">$\\text{modelo} : \\quad y = m x + b$</div>' }, right: { html: '<h3>Paso 3 — Sustituir y despejar</h3><div class="formula-box">$y = 2(5) + 3 = 13$</div><h3>Paso 4 — Verificar</h3><div class="concept-box"><p>Reemplaza en la ecuación original y comprueba consistencia dimensional/lógica.</p></div><div class="example-box" style="border-left:5px solid var(--primary)"><strong><i class="fa-solid fa-circle-check"></i> Respuesta:</strong><p style="font-size:1.3rem;text-align:center;color:var(--primary);margin-top:8px"><strong>$y = 13$</strong></p></div><div class="warning-box"><strong><i class="fa-solid fa-graduation-cap"></i> Competencia evaluada:</strong><p>Interpretación, modelación y resolución de problemas (matriz ICFES: <em>comunicación, razonamiento, resolución</em>).</p></div>' } },
+
+            { title: "Créditos", left: { html: '<h2><i class="fa-solid fa-book"></i> Referencias</h2><div class="clay-card"><ul><li>Stewart, J. — <em>Cálculo de una variable</em></li><li>Leithold, L. — <em>El Cálculo</em></li><li>Spivak, M. — <em>Calculus</em></li><li>Apostol, T. — <em>Calculus</em></li><li>Zill, D. — <em>Ecuaciones diferenciales</em></li><li>Grossman, S. — <em>Álgebra lineal</em></li><li>Khan Academy, GeoGebra, Desmos, WolframAlpha</li></ul></div><div class="glass-panel"><p><strong>Msc. Néstor Fabio Montoya Palacios</strong></p><p style="font-size:0.85rem;color:var(--text-muted)">Magíster en Enseñanza de la Física · Docente de Matemáticas y Física<br>Colegio María Auxiliadora · Cartago, Valle del Cauca, Colombia</p></div>' }, right: { html: '<div style="display:flex;flex-direction:column;justify-content:center;height:100%;text-align:center;"><div style="font-size:4rem;color:var(--primary);"><i class="fa-solid fa-infinity"></i></div><h2 style="border:none;color:var(--primary);">¡Gracias por estudiar!</h2><p style="font-style:italic;max-width:320px;margin:0 auto">"La matemática es el arte de dar el mismo nombre a cosas distintas."<br>— Henri Poincaré</p><div class="warning-box" style="margin-top:18px;text-align:left"><strong><i class="fa-solid fa-wand-magic-sparkles"></i> Para crear un cuaderno nuevo:</strong><ol style="font-size:0.85rem;margin-left:14px"><li>Duplica este archivo con un nombre descriptivo.</li><li>Reemplaza cada página del array <code>BOOK_DATA</code>.</li><li>Añade el enlace en <code>js/config.js</code>, categoría correspondiente.</li><li>Sube versión <code>SITE_VERSION</code> en <code>index.html</code>.</li></ol></div></div>' } }
+        ];
+
+        window.currentPage = 0;
+        let mobileView = 'left';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initSpine();
+            render();
+            handleResize();
+            window.addEventListener('resize', handleResize);
+            document.addEventListener('keydown', e => {
+                if (e.key === 'ArrowRight') nextPage();
+                if (e.key === 'ArrowLeft') prevPage();
+                if (e.key === 'Escape') hideIndex();
+            });
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('theme-icon').className = 'fas fa-sun';
+            }
+        });
+
+        function initSpine() {
+            const s = document.getElementById('spine');
+            const hL = document.getElementById('holes-l');
+            const hR = document.getElementById('holes-r');
+            if (!s) return;
+            s.innerHTML = '';
+            hL.innerHTML = '';
+            hR.innerHTML = '';
+            for (let i = 0; i < 15; i++) {
+                s.innerHTML += '<div class="metal-ring"></div>';
+                hL.innerHTML += '<div class="paper-hole"></div>';
+                hR.innerHTML += '<div class="paper-hole"></div>';
+            }
+        }
+
+        function render() {
+            const d = BOOK_DATA[window.currentPage];
+            document.getElementById('c-left').innerHTML = d.left.html;
+            document.getElementById('c-right').innerHTML = d.right.html;
+            document.getElementById('page-num').innerText = window.currentPage === 0 ? "PORTADA" : `HOJA ${window.currentPage} / ${BOOK_DATA.length - 1}`;
+            document.getElementById('btn-prev').disabled = window.currentPage === 0;
+            document.getElementById('btn-next').disabled = window.currentPage === BOOK_DATA.length - 1;
+            document.getElementById('num-left').innerText = window.currentPage > 0 ? window.currentPage * 2 : '';
+            document.getElementById('num-right').innerText = window.currentPage * 2 + 1;
+            if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise().catch(() => { });
+            handleResize();
+            setTimeout(() => initDiagrams(), 100);
+        }
+
+        window.nextPage = function () { if (window.currentPage < BOOK_DATA.length - 1) { window.currentPage++; animatePage(1); } };
+        window.prevPage = function () { if (window.currentPage > 0) { window.currentPage--; animatePage(-1); } };
+        window.goToPage = n => { window.currentPage = n; render(); };
+
+        function animatePage(dir) {
+            const b = document.getElementById('book-el');
+            b.style.transform = `rotateY(${dir * -4}deg) scale(0.98)`;
+            setTimeout(() => { render(); b.style.transform = 'rotateY(0) scale(1)'; }, 250);
+        }
+
+        window.showIndex = () => {
+            const m = document.getElementById('index-modal');
+            const l = document.getElementById('index-list');
+            l.innerHTML = '';
+            BOOK_DATA.forEach((p, i) => {
+                const it = document.createElement('div');
+                it.className = 'index-item';
+                it.innerHTML = `<strong>${i}.</strong> ${p.title}`;
+                it.onclick = () => { goToPage(i); hideIndex(); };
+                l.appendChild(it);
+            });
+            m.classList.add('active');
+        };
+
+        window.hideIndex = () => document.getElementById('index-modal').classList.remove('active');
+
+        window.toggleTheme = () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            document.getElementById('theme-icon').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        };
+
+        function handleResize() {
+            const isMob = window.innerWidth <= 900;
+            const l = document.getElementById('p-left');
+            const r = document.getElementById('p-right');
+            if (isMob) {
+                if (mobileView === 'left') {
+                    l.style.display = 'flex'; r.style.display = 'none';
+                    document.getElementById('fab-text').textContent = 'Ver Der.';
+                } else {
+                    l.style.display = 'none'; r.style.display = 'flex';
+                    document.getElementById('fab-text').textContent = 'Ver Izq.';
+                }
+            } else {
+                l.style.display = 'flex'; r.style.display = 'flex';
+            }
+        }
+
+        window.toggleMobileSide = () => { mobileView = mobileView === 'left' ? 'right' : 'left'; handleResize(); };
+
+        // ============ DIAGRAM FUNCTIONS ============
+        // Esta función se llama tras cada cambio de página (setTimeout en render).
+        // En la plantilla maestra está VACÍA a propósito — cuando construyas un
+        // cuaderno concreto, engancha aquí tus renderizadores (canvas/SVG) mediante
+        // `if (document.getElementById('mi-diagrama')) miRenderizador();` para que
+        // el código sea robusto a páginas sin diagrama.
+        function initDiagrams() {
+            // Placeholder genérico: si la página 3 del template tiene #plot-area,
+            // puedes engancharle un render simple aquí. Ejemplo comentado:
+            // const el = document.getElementById('plot-area');
+            // if (el) renderMiPlot(el);
+
+            // Todas las llamadas de física se removieron (MRU, vectores, trenes,
+            // Osa Mayor, Cruz del Sur, sistema solar). Las funciones asociadas
+            // quedan definidas más abajo como referencia; puedes borrarlas o
+            // reutilizar su patrón (Canvas + grid + interactividad con sliders).
+        }
+
+        // ============ EXAMPLE DIAGRAM FUNCTIONS ============
+        function drawEj313Graph(ctx, w, h, state) {
+            // Draw Grid
+            drawGeoGebraGrid(ctx, w, h, state);
+
+            // Origin in canvas coords
+            // We need to define functions x(t)
+            // But we work in CANVAS coords for drawing lines
+            // Let's use world coords loop for plotting or simpler logic for lines
+
+            const sx = state.scaleX;
+            const sy = state.scaleY;
+            const cx = w / 2 + state.offsetX;
+            const cy = h / 2 + state.offsetY;
+
+            // Helper to get canvas point from (t, x)
+            const getPt = (t, x) => ({
+                x: cx + t * sx,
+                y: cy - x * sy
+            });
+
+            // Train A: x = 20t. t in [0, 12]
+            const pA_start = getPt(0, 0);
+            const pA_end = getPt(12, 240);
+
+            ctx.beginPath();
+            ctx.moveTo(pA_start.x, pA_start.y);
+            // Plot points? No, it's linear. Just strict lines.
+            ctx.lineTo(pA_end.x, pA_end.y);
+            ctx.strokeStyle = '#0077b6';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Train B: x = 300 - 10t. t in [0, 12]
+            const pB_start = getPt(0, 300);
+            const pB_end = getPt(12, 300 - 120); // 180
+
+            ctx.beginPath();
+            ctx.moveTo(pB_start.x, pB_start.y);
+            ctx.lineTo(pB_end.x, pB_end.y);
+            ctx.strokeStyle = '#2a9d8f';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Intersection: t=10, x=200
+            const pInt = getPt(10, 200);
+            ctx.fillStyle = '#e63946';
+            ctx.beginPath();
+            ctx.arc(pInt.x, pInt.y, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Labels
+            ctx.font = 'bold 12px Nunito';
+            ctx.fillStyle = '#0077b6';
+            ctx.fillText('xA = 20t', pInt.x - 60, pInt.y + 30);
+
+            ctx.fillStyle = '#2a9d8f';
+            ctx.fillText('xB = 300 - 10t', pInt.x + 10, pInt.y - 15);
+
+            ctx.fillStyle = '#e63946';
+            ctx.fillText('P (10h, 200km)', pInt.x + 10, pInt.y + 5);
+
+            // Axis Labels override
+            ctx.fillStyle = '#333';
+            ctx.textAlign = 'right';
+            ctx.fillText('Tiempo (h)', w - 10, cy - 8);
+            ctx.textAlign = 'left';
+            ctx.fillText('Posición (km)', cx + 8, 15);
+        }
+
+        function drawEjSalidaGraph(ctx, w, h, state) {
+            drawGeoGebraGrid(ctx, w, h, state);
+
+            const sx = state.scaleX;
+            const sy = state.scaleY;
+            const cx = w / 2 + state.offsetX;
+            const cy = h / 2 + state.offsetY;
+            const getPt = (t, x) => ({ x: cx + t * sx, y: cy - x * sy });
+
+            // Movil A: x = 20t (Starts t=0). Plot up to t=25
+            const pA0 = getPt(0, 0);
+            const pAf = getPt(22, 440);
+
+            ctx.strokeStyle = '#0077b6';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(pA0.x, pA0.y);
+            ctx.lineTo(pAf.x, pAf.y);
+            ctx.stroke();
+
+            // Movil B: x = 200 + 10t.
+            const pB0 = getPt(0, 200);
+            const pBf = getPt(22, 200 + 220); // 420
+
+            ctx.strokeStyle = '#2a9d8f';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(pB0.x, pB0.y);
+            ctx.lineTo(pBf.x, pBf.y);
+            ctx.stroke();
+
+            // Intersection: t=20, x=400
+            const pInt = getPt(20, 400);
+            ctx.fillStyle = '#e63946';
+            ctx.beginPath();
+            ctx.arc(pInt.x, pInt.y, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Labels
+            ctx.font = 'bold 12px Nunito';
+            ctx.fillStyle = '#0077b6';
+            ctx.fillText('xA = 20t', pInt.x - 80, pInt.y + 40);
+
+            ctx.fillStyle = '#2a9d8f';
+            ctx.fillText('xB = 200 + 10t', pA0.x + 10, pB0.y - 10); // near start
+
+            ctx.fillStyle = '#e63946';
+            ctx.fillText('P (20h, 400km)', pInt.x - 100, pInt.y - 10);
+
+            // Axis Labels override
+            ctx.fillStyle = '#333';
+            ctx.textAlign = 'right';
+            ctx.fillText('Tiempo (h)', w - 10, cy - 8);
+            ctx.textAlign = 'left';
+            ctx.fillText('Posición (km)', cx + 8, 15);
+        }
+
+        function initSolarSystemAnimation(id) {
+            const c = document.getElementById(id);
+            if (!c) return;
+            c.innerHTML = '';
+            const cv = document.createElement('canvas');
+            const r = c.getBoundingClientRect();
+            cv.width = r.width || 300;
+            cv.height = r.height || 220;
+            cv.style.width = '100%';
+            cv.style.height = '100%';
+            c.appendChild(cv);
+            const ctx = cv.getContext('2d');
+
+            let angleEarth = 0;
+            let angleMoon = 0;
+            const w = cv.width, h = cv.height;
+            const sunX = w / 2, sunY = h / 2;
+            const earthOrbitR = Math.min(w, h) * 0.35;
+            const moonOrbitR = 25;
+
+            // Generate stars once
+            const stars = [];
+            for (let i = 0; i < 50; i++) {
+                stars.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    size: Math.random() * 1.5,
+                    alpha: Math.random()
+                });
+            }
+
+            function animate() {
+                if (!document.getElementById(id)) return; // Stop if removed
+
+                ctx.fillStyle = '#1a1a2e'; // Deep space blue
+                ctx.fillRect(0, 0, w, h);
+
+                // Draw Stars
+                ctx.fillStyle = '#ffffff';
+                stars.forEach(s => {
+                    ctx.globalAlpha = 0.5 + 0.5 * Math.sin(Date.now() * 0.005 + s.x);
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.globalAlpha = 1.0;
+
+                // Sun Glow
+                const grd = ctx.createRadialGradient(sunX, sunY, 10, sunX, sunY, 50);
+                grd.addColorStop(0, '#fca311');
+                grd.addColorStop(0.4, 'rgba(252, 163, 17, 0.4)');
+                grd.addColorStop(1, 'rgba(252, 163, 17, 0)');
+                ctx.fillStyle = grd;
+                ctx.beginPath();
+                ctx.arc(sunX, sunY, 50, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Sun Body
+                ctx.fillStyle = '#ffb703';
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#fb8500';
+                ctx.beginPath();
+                ctx.arc(sunX, sunY, 15, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // Orbit path (faint)
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(sunX, sunY, earthOrbitR, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Earth Position
+                const ex = sunX + earthOrbitR * Math.cos(angleEarth);
+                const ey = sunY + earthOrbitR * Math.sin(angleEarth);
+
+                // Earth Orbit Path (Moon's path around Earth)
+                /*
+                ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+                ctx.beginPath();
+                ctx.arc(ex, ey, moonOrbitR, 0, Math.PI*2);
+                ctx.stroke();
+                */
+
+                // Moon Position
+                const mx = ex + moonOrbitR * Math.cos(angleMoon);
+                const my = ey + moonOrbitR * Math.sin(angleMoon);
+
+                // Draw Moon
+                ctx.fillStyle = '#e5e5e5';
+                ctx.beginPath();
+                ctx.arc(mx, my, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Draw Earth
+                ctx.fillStyle = '#4cc9f0'; // Ocean
+                ctx.beginPath();
+                ctx.arc(ex, ey, 8, 0, Math.PI * 2);
+                ctx.fill();
+                // Continents (simple)
+                ctx.fillStyle = '#48cae4';
+                ctx.beginPath();
+                ctx.arc(ex - 2, ey - 2, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Labels
+                ctx.fillStyle = '#fff';
+                ctx.font = '10px Nunito';
+                ctx.textAlign = 'center';
+                ctx.fillText('Sol', sunX, sunY + 30);
+                ctx.fillText('Tierra', ex, ey + 20);
+
+                // Update angles
+                angleEarth += 0.005; // Slow earth orbit
+                angleMoon += 0.03;   // Faster moon orbit
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
+        // ============ CONSTELLATION DRAWING FUNCTIONS ============
+        function drawOsaMayor(ctx, w, h) {
+            // Dark sky background
+            ctx.fillStyle = '#0d1b2a';
+            ctx.fillRect(0, 0, w, h);
+
+            // Star positions (scaled to canvas)
+            const scale = Math.min(w / 600, h / 400);
+            const ox = (w - 400 * scale) / 2;
+            const oy = (h - 250 * scale) / 2;
+
+            const estrellas = {
+                alkaid: { x: ox + 380 * scale, y: oy + 100 * scale, nombre: "Alkaid" },
+                mizar: { x: ox + 320 * scale, y: oy + 85 * scale, nombre: "Mizar" },
+                alioth: { x: ox + 265 * scale, y: oy + 95 * scale, nombre: "Alioth" },
+                megrez: { x: ox + 210 * scale, y: oy + 105 * scale, nombre: "Megrez" },
+                phecda: { x: ox + 210 * scale, y: oy + 170 * scale, nombre: "Phecda" },
+                merak: { x: ox + 110 * scale, y: oy + 170 * scale, nombre: "Merak" },
+                dubhe: { x: ox + 110 * scale, y: oy + 90 * scale, nombre: "Dubhe" },
+                polaris: { x: ox + 30 * scale, y: oy + 30 * scale, nombre: "★ Polaris" }
+            };
+
+            // Connect stars
+            function conectar(est1, est2, alpha = 0.5) {
+                ctx.beginPath();
+                ctx.moveTo(est1.x, est1.y);
+                ctx.lineTo(est2.x, est2.y);
+                ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+
+            // Draw constellation lines
+            conectar(estrellas.alkaid, estrellas.mizar);
+            conectar(estrellas.mizar, estrellas.alioth);
+            conectar(estrellas.alioth, estrellas.megrez);
+            conectar(estrellas.megrez, estrellas.phecda);
+            conectar(estrellas.phecda, estrellas.merak);
+            conectar(estrellas.merak, estrellas.dubhe);
+            conectar(estrellas.dubhe, estrellas.megrez);
+
+            // Arrow from Merak-Dubhe to Polaris (dashed)
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = 'rgba(255, 215, 0, 0.7)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(estrellas.dubhe.x, estrellas.dubhe.y);
+            ctx.lineTo(estrellas.polaris.x, estrellas.polaris.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw stars
+            function dibujarEstrella(estrella, radio = 4, color = "#ffffff") {
+                ctx.beginPath();
+                ctx.arc(estrella.x, estrella.y, radio, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = color;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = "#8a9ab0";
+                ctx.font = '10px Nunito';
+                ctx.fillText(estrella.nombre, estrella.x + 8, estrella.y - 6);
+            }
+
+            for (let key in estrellas) {
+                if (key === 'polaris') {
+                    dibujarEstrella(estrellas[key], 6, '#ffd700'); // Golden for Polaris
+                } else {
+                    dibujarEstrella(estrellas[key], 4);
+                }
+            }
+
+            // Label
+            ctx.font = 'bold 11px Nunito';
+            ctx.fillStyle = '#4a90d9';
+            ctx.fillText('→ Norte', estrellas.polaris.x - 10, estrellas.polaris.y - 20);
+        }
+
+        function drawCruzDelSur(ctx, w, h) {
+            // Dark sky background with gradient
+            const grd = ctx.createRadialGradient(w / 2, h, 0, w / 2, h, h);
+            grd.addColorStop(0, '#1b2735');
+            grd.addColorStop(1, '#050510');
+            ctx.fillStyle = grd;
+            ctx.fillRect(0, 0, w, h);
+
+            // Star positions
+            const cx = w / 2;
+            const scale = Math.min(w / 500, h / 500);
+
+            const cruz = {
+                gacrux: { x: cx, y: 50 * scale, r: 6, color: "#ffcc99", nombre: "Gacrux" },
+                acrux: { x: cx, y: h - 60 * scale, r: 7, color: "#ccffff", nombre: "Acrux" },
+                mimosa: { x: cx - 80 * scale, y: h / 2 - 20, r: 6, color: "#ddeeff", nombre: "Mimosa" },
+                imai: { x: cx + 70 * scale, y: h / 2 - 40, r: 5, color: "#ffffff", nombre: "Imai" },
+                ginan: { x: cx + 30 * scale, y: h - 100 * scale, r: 3, color: "#aaaaaa", nombre: "Ginan" }
+            };
+
+            // Connect stars
+            ctx.beginPath();
+            ctx.moveTo(cruz.gacrux.x, cruz.gacrux.y);
+            ctx.lineTo(cruz.acrux.x, cruz.acrux.y);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(cruz.mimosa.x, cruz.mimosa.y);
+            ctx.lineTo(cruz.imai.x, cruz.imai.y);
+            ctx.stroke();
+
+            // Draw stars
+            for (let key in cruz) {
+                const est = cruz[key];
+                ctx.beginPath();
+                ctx.arc(est.x, est.y, est.r, 0, Math.PI * 2);
+                ctx.fillStyle = est.color;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = est.color;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#8888aa';
+                ctx.font = '10px Nunito';
+                ctx.fillText(est.nombre, est.x + 12, est.y + 4);
+            }
+
+            // Arrow to South Pole
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = 'rgba(255, 100, 100, 0.6)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(cruz.acrux.x, cruz.acrux.y);
+            ctx.lineTo(cx, h - 20);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.font = 'bold 10px Nunito';
+            ctx.fillStyle = '#ff6666';
+            ctx.fillText('↓ Polo Sur', cx - 25, h - 8);
+        }
+
+        // Reference system with GeoGebra-style grid
+        function drawReferenceSystemGGB(ctx, w, h) {
+            const state = { scale: 30, offsetX: 0, offsetY: 0 };
+            drawGeoGebraGrid(ctx, w, h, state);
+
+            const cx = w / 2, cy = h / 2;
+
+            // Origin marker
+            ctx.fillStyle = '#e63946';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = 'bold 11px Nunito';
+            ctx.fillStyle = '#333';
+            ctx.fillText('O', cx - 15, cy + 18);
+        }
+
+        function initInteractiveGGB(id, drawFn, options = {}) {
+            // Delay slightly to ensure DOM is ready
+            setTimeout(() => {
+                const ggb = createGeoGebraCanvas(id, { scale: 30, ...options });
+                if (ggb) {
+                    ggb.state.drawCallback = () => drawFn(ggb.canvas.getContext('2d'), ggb.canvas.width, ggb.canvas.height, ggb.state);
+                    ggb.state.drawCallback();
+                }
+            }, 100);
+        }
+
+        function toCanvas(x, y, state, w, h) {
+            const cx = w / 2 + state.offsetX;
+            const cy = h / 2 + state.offsetY;
+            return {
+                x: cx + x * state.scaleX,
+                y: cy - y * state.scaleY
+            };
+        }
+
+        function drawSimpleDiagram(id, fn) {
+            const c = document.getElementById(id);
+            if (!c) return;
+            c.innerHTML = '';
+            const cv = document.createElement('canvas');
+            const r = c.getBoundingClientRect();
+            cv.width = r.width || 300;
+            cv.height = r.height || 200;
+            cv.style.width = '100%';
+            cv.style.height = '100%';
+            c.appendChild(cv);
+            fn(cv.getContext('2d'), cv.width, cv.height);
+        }
+
+        function drawGrid(ctx, w, h, ox, oy, scale = 30) {
+            ctx.strokeStyle = '#e8e8e8';
+            ctx.lineWidth = 0.5;
+            for (let i = ox % scale; i < w; i += scale) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, h); ctx.stroke(); }
+            for (let i = oy % scale; i < h; i += scale) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(w, i); ctx.stroke(); }
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(0, oy); ctx.lineTo(w, oy); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(ox, 0); ctx.lineTo(ox, h); ctx.stroke();
+            ctx.fillStyle = '#666';
+            ctx.beginPath(); ctx.moveTo(w - 10, oy - 5); ctx.lineTo(w, oy); ctx.lineTo(w - 10, oy + 5); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(ox - 5, 10); ctx.lineTo(ox, 0); ctx.lineTo(ox + 5, 10); ctx.fill();
+            ctx.font = 'bold 12px Nunito';
+            ctx.fillText('X', w - 15, oy + 18);
+            ctx.fillText('Y', ox + 10, 15);
+        }
+
+        // ========== GeoGebra-like Canvas System ==========
+        const canvasStates = {};
+
+        function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+
+        function ensureCanvasSize(canvas, container) {
+            const rect = container.getBoundingClientRect();
+            const w = rect.width || 300;
+            const h = rect.height || 240;
+            if (canvas.width !== w || canvas.height !== h) {
+                canvas.width = w;
+                canvas.height = h;
+                return true;
+            }
+            return false;
+        }
+
+        function createGeoGebraCanvas(containerId, options = {}) {
+            const container = document.getElementById(containerId);
+            if (!container) return null;
+
+            // Check if state exists
+            let state = canvasStates[containerId];
+
+            // If state exists, BUT container is empty (DOM was wiped), we need to re-init DOM
+            const needsDomInit = !container.querySelector('.ggb-wrapper');
+
+            // Initialize state if it doesn't exist
+            if (!state) {
+                // Scales can be independent. Default to isotropic 30.
+                const baseScale = options.scale ?? 30;
+                state = {
+                    scaleX: options.scaleX ?? baseScale,
+                    scaleY: options.scaleY ?? baseScale,
+                    offsetX: options.offsetX ?? 0,
+                    offsetY: options.offsetY ?? 0,
+                    forceStep: options.forceStep,
+                    isDragging: false,
+                    hasUserInteracted: false, // Track if user has moved the view
+                    lastX: 0,
+                    lastY: 0,
+                    minScale: 0.1,
+                    maxScale: 200,
+                    drawCallback: null,
+                };
+                canvasStates[containerId] = state;
+            }
+
+            // If DOM is already set up and we have state, just return existing refs (unless passed container is different, which shouldn't happen by ID)
+            // Actually, querying by ID gets the current DOM node.
+            // If needsDomInit is false, it means we are good.
+            if (!needsDomInit && state.container === container && state.canvas) {
+                return { container: state.container, canvas: state.canvas, state };
+            }
+
+            // --- DOM INITIALIZATION ---
+            container.innerHTML = `
+                <div class="ggb-wrapper">
+                    <canvas class="ggb-canvas"></canvas>
+                    <div class="ggb-toolbar">
+                        <button class="ggb-btn" data-action="zoomin" title="ACERCAR (Zoom In)"><i class="fas fa-search-plus"></i></button>
+                        <button class="ggb-btn" data-action="zoomout" title="ALEJAR (Zoom Out)"><i class="fas fa-search-minus"></i></button>
+                        <button class="ggb-btn" data-action="drag" title="Arrastrar"><i class="fas fa-hand-paper"></i></button>
+                        <button class="ggb-btn" data-action="reset" title="Restablecer"><i class="fas fa-sync-alt"></i></button>
+                    </div>
+                </div>`;
+
+            const canvas = container.querySelector('.ggb-canvas');
+
+            // Update state refs
+            state.container = container;
+            state.canvas = canvas;
+
+            ensureCanvasSize(canvas, container);
+
+            // Toolbar buttons
+            container.querySelectorAll('.ggb-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    const action = btn.dataset.action;
+                    if (action === 'zoomin') {
+                        state.scaleX = Math.min(state.maxScale, state.scaleX * 1.2);
+                        state.scaleY = Math.min(state.maxScale, state.scaleY * 1.2);
+                        state.hasUserInteracted = true;
+                    }
+                    if (action === 'zoomout') {
+                        state.scaleX = Math.max(state.minScale, state.scaleX * 0.8);
+                        state.scaleY = Math.max(state.minScale, state.scaleY * 0.8);
+                        state.hasUserInteracted = true;
+                    }
+                    if (action === 'reset') {
+                        state.scaleX = options.scaleX ?? (options.scale ?? 30);
+                        state.scaleY = options.scaleY ?? (options.scale ?? 30);
+                        state.offsetX = 0;
+                        state.offsetY = 0;
+                        state.hasUserInteracted = false; // Reset interaction state
+                    }
+                    state.drawCallback && state.drawCallback();
+                });
+            });
+
+            // Mouse drag
+            const down = (e) => {
+                state.isDragging = true;
+                state.hasUserInteracted = true;
+                state.lastX = e.clientX; state.lastY = e.clientY;
+                canvas.style.cursor = 'grabbing';
+            };
+            const move = (e) => {
+                if (!state.isDragging) return;
+                const dx = e.clientX - state.lastX;
+                const dy = e.clientY - state.lastY;
+                state.offsetX += dx;
+                state.offsetY += dy;
+                state.lastX = e.clientX; state.lastY = e.clientY;
+                state.drawCallback && state.drawCallback();
+            };
+            const up = () => { state.isDragging = false; canvas.style.cursor = 'grab'; };
+
+            canvas.addEventListener('mousedown', down);
+            window.addEventListener('mousemove', move);
+            window.addEventListener('mouseup', up);
+
+            // Touch support
+            let lastTouchDist = 0;
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    state.isDragging = true;
+                    state.hasUserInteracted = true;
+                    state.lastX = e.touches[0].clientX;
+                    state.lastY = e.touches[0].clientY;
+                }
+            }, { passive: true });
+
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (e.touches.length === 1 && state.isDragging) {
+                    const dx = e.touches[0].clientX - state.lastX;
+                    const dy = e.touches[0].clientY - state.lastY;
+                    state.offsetX += dx;
+                    state.offsetY += dy;
+                    state.lastX = e.touches[0].clientX;
+                    state.lastY = e.touches[0].clientY;
+                    state.drawCallback && state.drawCallback();
+                } else if (e.touches.length === 2) {
+                    // Zoom with pinch
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    const dist = Math.hypot(dx, dy);
+                    if (lastTouchDist > 0) {
+                        const factor = dist / lastTouchDist;
+                        state.scaleX = clamp(state.scaleX * factor, state.minScale, state.maxScale);
+                        state.scaleY = clamp(state.scaleY * factor, state.minScale, state.maxScale);
+                        state.hasUserInteracted = true;
+                        state.drawCallback && state.drawCallback();
+                    }
+                    lastTouchDist = dist;
+                }
+            }, { passive: false });
+
+            canvas.addEventListener('touchend', () => { state.isDragging = false; lastTouchDist = 0; });
+
+            // Mouse wheel zoom
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = Math.sign(e.deltaY);
+                // Exponential zoom for clearer scaling feel
+                const factor = delta > 0 ? 0.9 : 1.1;
+                state.scaleX = clamp(state.scaleX * factor, state.minScale, state.maxScale);
+                state.scaleY = clamp(state.scaleY * factor, state.minScale, state.maxScale);
+                state.hasUserInteracted = true;
+                state.drawCallback && state.drawCallback();
+            }, { passive: false });
+
+            // Resize observer
+            const ro = new ResizeObserver(() => {
+                const changed = ensureCanvasSize(canvas, container);
+                if (changed) state.drawCallback && state.drawCallback();
+            });
+            ro.observe(container);
+
+            return { container, canvas, state };
+        }
+
+        function drawGeoGebraGrid(ctx, w, h, state) {
+            const sx = state.scaleX ?? state.scale;
+            const sy = state.scaleY ?? state.scale;
+            const cx = w / 2 + state.offsetX;
+            const cy = h / 2 + state.offsetY;
+
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+
+            // Adaptive step calculation
+            const getStep = (scale) => {
+                if (state.forceStep) return state.forceStep;
+                const minPixels = 50; // Balanced spacing
+                const raw = minPixels / scale;
+                let mag = Math.pow(10, Math.floor(Math.log10(raw)));
+                let res = raw / mag;
+
+                if (res > 5) return 10 * mag;
+                if (res > 2) return 5 * mag;
+                if (res > 1) return 2 * mag;
+                return mag;
+            };
+
+            const stepX = getStep(sx);
+            const stepY = getStep(sy);
+
+            // Calculate Grid Ranges
+            const xMin = (0 - cx) / sx;
+            const xMax = (w - cx) / sx;
+            const startX = Math.floor(xMin / stepX) * stepX;
+            const endX = Math.ceil(xMax / stepX) * stepX;
+
+            const yMin = (cy - h) / sy;
+            const yMax = cy / sy;
+            const startY = Math.floor(Math.min(yMin, yMax) / stepY) * stepY;
+            const endY = Math.ceil(Math.max(yMin, yMax) / stepY) * stepY;
+
+            // Draw Sub-Grid (Minor Lines) - Lighter
+            const subStepX = stepX / 5;
+            const subStepY = stepY / 5;
+            // Only draw minor if enough pixel space (>5px)
+            if (subStepX * sx > 6 && subStepY * sy > 6) {
+                const startXSub = Math.floor(xMin / subStepX) * subStepX;
+                const endXSub = Math.ceil(xMax / subStepX) * subStepX;
+                const startYSub = Math.floor(Math.min(yMin, yMax) / subStepY) * subStepY;
+                const endYSub = Math.ceil(Math.max(yMin, yMax) / subStepY) * subStepY;
+
+                ctx.lineWidth = 0.5;
+                ctx.strokeStyle = '#f0f0f0';
+                ctx.beginPath();
+                for (let x = startXSub; x <= endXSub; x += subStepX) {
+                    const px = cx + x * sx;
+                    ctx.moveTo(px, 0); ctx.lineTo(px, h);
+                }
+                for (let y = startYSub; y <= endYSub; y += subStepY) {
+                    const py = cy - y * sy;
+                    ctx.moveTo(0, py); ctx.lineTo(w, py);
+                }
+                ctx.stroke();
+            }
+
+            // Draw Major Grid Lines (Solid)
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#d3d3d3'; // Gray like millimeter paper
+            ctx.setLineDash([]); // Solid
+
+            ctx.beginPath();
+            // Vertical Lines
+            for (let x = startX; x <= endX; x += stepX) {
+                const px = cx + x * sx;
+                ctx.moveTo(px, 0);
+                ctx.lineTo(px, h);
+            }
+            // Horizontal Lines
+            for (let y = startY; y <= endY; y += stepY) {
+                const py = cy - y * sy;
+                ctx.moveTo(0, py);
+                ctx.lineTo(w, py);
+            }
+            ctx.stroke();
+
+            // Axes
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            // X Axis (y=0)
+            if (cy >= -2 && cy <= h + 2) {
+                ctx.moveTo(0, cy);
+                ctx.lineTo(w, cy);
+            }
+            // Y Axis (x=0)
+            if (cx >= -2 && cx <= w + 2) {
+                ctx.moveTo(cx, 0);
+                ctx.lineTo(cx, h);
+            }
+            ctx.stroke();
+
+            // Labels
+            ctx.fillStyle = '#666';
+            ctx.font = 'bold 10px Nunito';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+
+            // X Labels
+            for (let x = startX; x <= endX; x += stepX) {
+                if (Math.abs(x) < stepX / 100) continue; // Skip origin
+                const px = cx + x * sx;
+                // Keep label visible near axis but constrained to canvas
+                const py = Math.min(h - 15, Math.max(5, cy + 6));
+                ctx.fillText(parseFloat(x.toPrecision(10)).toString(), px, py);
+                // Tick mark
+                ctx.beginPath(); ctx.moveTo(px, cy - 3); ctx.lineTo(px, cy + 3); ctx.stroke();
+            }
+
+            // Y Labels
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            for (let y = startY; y <= endY; y += stepY) {
+                if (Math.abs(y) < stepY / 100) continue; // Skip origin
+                const py = cy - y * sy;
+                const px = Math.min(w - 5, Math.max(25, cx - 8));
+                ctx.fillText(parseFloat(y.toPrecision(10)).toString(), px, py);
+                // Tick mark
+                ctx.beginPath(); ctx.moveTo(cx - 3, py); ctx.lineTo(cx + 3, py); ctx.stroke();
+            }
+
+            // Origin Label
+            if (cx > -20 && cx < w + 20 && cy > -20 && cy < h + 20) {
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'top';
+                ctx.fillText("0", Math.max(10, cx - 4), Math.max(10, cy + 4));
+            }
+
+            // Arrows
+            ctx.fillStyle = '#2b2d42';
+            ctx.beginPath(); ctx.moveTo(w - 10, cy - 6); ctx.lineTo(w, cy); ctx.lineTo(w - 10, cy + 6); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(cx - 6, 10); ctx.lineTo(cx, 0); ctx.lineTo(cx + 6, 10); ctx.fill();
+        }
+
+        // Numbering
+        ctx.font = '11px Nunito';
+
+
+
+        function drawVector(ctx, x1, y1, x2, y2, color = '#0077b6', label = '', lw = 2.5) {
+            const hl = 12;
+            const a = Math.atan2(y2 - y1, x2 - x1);
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = lw;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(x2 - hl * Math.cos(a - Math.PI / 6), y2 - hl * Math.sin(a - Math.PI / 6));
+            ctx.lineTo(x2 - hl * Math.cos(a + Math.PI / 6), y2 - hl * Math.sin(a + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+            if (label) {
+                ctx.font = 'bold 13px Nunito';
+                const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+                ctx.fillText(label, mx + 12 * Math.cos(a + Math.PI / 2), my + 12 * Math.sin(a + Math.PI / 2));
+            }
+        }
+
+        function drawReferenceSystem(ctx, w, h) {
+            const ox = w / 2, oy = h / 2;
+            drawGrid(ctx, w, h, ox, oy, 30);
+            ctx.fillStyle = '#0077b6';
+            ctx.font = 'bold 11px Nunito';
+            ctx.textAlign = 'center';
+            for (let i = -3; i <= 3; i++) {
+                if (i !== 0) {
+                    ctx.fillText(i, ox + i * 30, oy + 16);
+                    ctx.fillText(i, ox - 10, oy - i * 30 + 4);
+                }
+            }
+            ctx.fillStyle = '#e63946';
+            ctx.beginPath();
+            ctx.arc(ox, oy, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#333';
+            ctx.fillText('O', ox - 15, oy + 18);
+        }
+
+        function drawTrajectories(ctx, w, h) {
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(0, 0, w, h);
+
+            // Rectilinear
+            ctx.strokeStyle = '#0077b6';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(20, h - 40);
+            ctx.lineTo(w - 20, h - 40);
+            ctx.stroke();
+            ctx.fillStyle = '#0077b6';
+            ctx.font = '10px Nunito';
+            ctx.fillText('Rectilínea', w / 2 - 25, h - 25);
+
+            // Circular
+            ctx.strokeStyle = '#00b4d8';
+            ctx.beginPath();
+            ctx.arc(w / 2, h / 2 - 20, 35, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.fillStyle = '#00b4d8';
+            ctx.fillText('Circular', w / 2 - 20, h / 2 + 30);
+
+            // Parabolic
+            ctx.strokeStyle = '#2a9d8f';
+            ctx.beginPath();
+            for (let x = 20; x < 120; x++) {
+                const y = 30 + 0.01 * Math.pow(x - 70, 2);
+                if (x === 20) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.fillStyle = '#2a9d8f';
+            ctx.fillText('Parabólica', 50, 70);
+
+            // Elliptical (New)
+            ctx.strokeStyle = '#9d4edd';
+            ctx.beginPath();
+            ctx.ellipse(w - 60, 60, 40, 25, Math.PI / 4, 0, 2 * Math.PI);
+            ctx.stroke();
+            ctx.fillStyle = '#9d4edd';
+            ctx.fillText('Elíptica', w - 80, 100);
+        }
+
+        function drawPositionAxis(ctx, w, h) {
+            const oy = h / 2;
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(20, oy);
+            ctx.lineTo(w - 20, oy);
+            ctx.stroke();
+            ctx.fillStyle = '#666';
+            ctx.beginPath();
+            ctx.moveTo(w - 20, oy - 6);
+            ctx.lineTo(w - 10, oy);
+            ctx.lineTo(w - 20, oy + 6);
+            ctx.fill();
+            ctx.font = 'bold 12px Nunito';
+            ctx.fillText('X', w - 25, oy - 10);
+            for (let i = -3; i <= 4; i++) {
+                const x = w / 2 + i * 40;
+                ctx.beginPath();
+                ctx.moveTo(x, oy - 5);
+                ctx.lineTo(x, oy + 5);
+                ctx.stroke();
+                ctx.fillText(i * 10, x - 8, oy + 20);
+            }
+            ctx.fillStyle = '#e63946';
+            ctx.beginPath();
+            ctx.arc(w / 2, oy, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#0077b6';
+            ctx.beginPath();
+            ctx.arc(w / 2 + 80, oy, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = 'bold 11px Nunito';
+            ctx.fillStyle = '#e63946';
+            ctx.fillText('O', w / 2 - 3, oy - 15);
+            ctx.fillStyle = '#0077b6';
+            ctx.fillText('P', w / 2 + 77, oy - 15);
+        }
+
+        function drawRectilinear(ctx, w, h) {
+            const oy = h / 2 + 20;
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(30, oy);
+            ctx.lineTo(w - 30, oy);
+            ctx.stroke();
+            ctx.fillStyle = '#666';
+            ctx.beginPath();
+            ctx.moveTo(w - 30, oy - 5);
+            ctx.lineTo(w - 20, oy);
+            ctx.lineTo(w - 30, oy + 5);
+            ctx.fill();
+            ctx.font = 'bold 12px Nunito';
+            ctx.fillText('X', w - 35, oy - 10);
+
+            // Draw cars facing RIGHT using canvas transform
+            ctx.font = '24px Nunito';
+            const carPositions = [60, 120, 180];
+            for (const carX of carPositions) {
+                ctx.save();
+                ctx.translate(carX + 12, oy - 5);
+                ctx.scale(-1, 1);
+                ctx.fillText('🚗', -12, 0);
+                ctx.restore();
+            }
+
+            ctx.strokeStyle = '#0077b6';
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(85, oy - 30);
+            ctx.lineTo(85, oy + 20);
+            ctx.moveTo(145, oy - 30);
+            ctx.lineTo(145, oy + 20);
+            ctx.moveTo(205, oy - 30);
+            ctx.lineTo(205, oy + 20);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.font = '10px Nunito';
+            ctx.fillStyle = '#666';
+            ctx.fillText('t₁', 82, oy + 35);
+            ctx.fillText('t₂', 142, oy + 35);
+            ctx.fillText('t₃', 202, oy + 35);
+        }
+
+        function drawVelInstant(ctx, w, h, state) {
+            drawGeoGebraGrid(ctx, w, h, state);
+
+            // Trayectoria sinusoidal: y = 2*sin(0.4*x)
+            ctx.strokeStyle = '#00b4d8';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+
+            // Dibujar curva en coordenadas del mundo
+            const sx = state.scaleX ?? state.scale;
+            const sy = state.scaleY ?? state.scale;
+
+            // Optimization: check bounds of X
+            const minX = - (w / 2 + state.offsetX) / sx;
+            const maxX = (w - (w / 2 + state.offsetX)) / sx;
+
+            for (let px = 0; px < w; px += 2) {
+                // Invertir transform: pixel -> mundo
+                const wx = (px - (w / 2 + state.offsetX)) / sx;
+                const wy = 2.5 * Math.sin(0.5 * wx); // Amplitud 2.5, Frec 0.5
+
+                // Manually toCanvas to mix independent scales
+                const cx = w / 2 + state.offsetX + wx * sx;
+                const cy = h / 2 + state.offsetY - wy * sy;
+
+                if (px === 0) ctx.moveTo(cx, cy);
+                else ctx.lineTo(cx, cy);
+            }
+            ctx.stroke();
+
+            // Etiqueta
+            const lblPos = toCanvas(4, -1, state, w, h);
+            ctx.font = 'italic 12px Nunito';
+            ctx.fillStyle = '#00b4d8';
+            ctx.fillText('Trayectoria', lblPos.x, lblPos.y);
+
+            // Punto P en x = 1.5
+            const px_world = 1.5;
+            const py_world = 2.5 * Math.sin(0.5 * px_world);
+            const pCanvas = toCanvas(px_world, py_world, state, w, h);
+
+            // Derivada: y' = 2.5 * 0.5 * cos(0.5 * x) = 1.25 * cos(0.5 * x)
+            // Note: Slope in world coordinates!
+            const slope = 1.25 * Math.cos(0.5 * px_world);
+            const angle = Math.atan(slope); // Ángulo matemático
+
+            // Vector tangente
+            const vLen = 2.5; // Longitud en unidades mundo
+            const vx = vLen * Math.cos(angle);
+            const vy = vLen * Math.sin(angle);
+            // Caution: visual slope depends on aspect ratio if sx != sy! 
+            // But 'tangent vector' usually means physical velocity if axes are physical x, y. 
+            // If it's a graph x vs t, the visual tangent is different. 
+            // Assuming this is spatial trajectory y(x), then tangent is properly directed.
+            // However, with anisotropic scaling, the visual angle changes.
+            // We draw the vector (vx, vy) in world coords relative to P
+            const vEndCanvas = toCanvas(px_world + vx, py_world + vy, state, w, h);
+
+            // Línea tangente punteada extendida
+            ctx.strokeStyle = '#aaa';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            const tStart = toCanvas(px_world - 3, py_world - 3 * slope, state, w, h);
+            const tEnd = toCanvas(px_world + 3, py_world + 3 * slope, state, w, h);
+            ctx.moveTo(tStart.x, tStart.y);
+            ctx.lineTo(tEnd.x, tEnd.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Dibujar vector
+            drawArrow(ctx, pCanvas.x, pCanvas.y, vEndCanvas.x, vEndCanvas.y, '#e63946', 3);
+
+            // Etiqueta vector
+            ctx.font = 'bold 14px Nunito';
+            ctx.fillStyle = '#e63946';
+            ctx.fillText('v⃗', vEndCanvas.x + 8, vEndCanvas.y - 5);
+
+            // Punto P
+            ctx.fillStyle = '#0077b6';
+            ctx.beginPath();
+            ctx.arc(pCanvas.x, pCanvas.y, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = 'bold 12px Nunito';
+            ctx.fillStyle = '#0077b6';
+            ctx.fillText('P', pCanvas.x - 18, pCanvas.y + 15);
+        }
+
+        function drawArrow(ctx, x1, y1, x2, y2, color, width) {
+            const headlen = 12;
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = width;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(x2 - headlen * Math.cos(angle - Math.PI / 6), y2 - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(x2 - headlen * Math.cos(angle + Math.PI / 6), y2 - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.fill();
+        }
+
+        function drawAcceleration(ctx, w, h) {
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, w, h);
+
+            // Center origin with more space
+            const ox = w / 2 - 30, oy = h / 2 + 10;
+
+            // Title
+            ctx.font = 'bold 13px Nunito';
+            ctx.fillStyle = '#333';
+            ctx.textAlign = 'center';
+            ctx.fillText('Cambio vectorial de velocidad', w / 2, 18);
+            ctx.textAlign = 'left';
+
+            // Draw v1 vector (initial velocity) - LARGER
+            const v1Len = 70;
+            const v1Angle = -Math.PI / 4; // 45 degrees up
+            const v1x = ox + v1Len * Math.cos(v1Angle);
+            const v1y = oy + v1Len * Math.sin(v1Angle);
+            drawVector(ctx, ox, oy, v1x, v1y, '#0077b6', '', 3);
+            ctx.font = 'bold 14px Nunito';
+            ctx.fillStyle = '#0077b6';
+            ctx.fillText('v⃗₁', v1x + 8, v1y - 5);
+
+            // Draw v2 vector (final velocity) - from same origin LARGER
+            const v2Len = 90;
+            const v2Angle = Math.PI / 8; // slight angle down
+            const v2x = ox + v2Len * Math.cos(v2Angle);
+            const v2y = oy + v2Len * Math.sin(v2Angle);
+            drawVector(ctx, ox, oy, v2x, v2y, '#00b4d8', '', 3);
+            ctx.fillStyle = '#00b4d8';
+            ctx.fillText('v⃗₂', v2x + 8, v2y + 15);
+
+            // Draw Δv = v2 - v1 (from tip of v1 to tip of v2) - LARGER
+            drawVector(ctx, v1x, v1y, v2x, v2y, '#e63946', '', 3);
+            ctx.fillStyle = '#e63946';
+            ctx.font = 'bold 13px Nunito';
+            const labelX = (v1x + v2x) / 2;
+            const labelY = (v1y + v2y) / 2;
+            ctx.fillText('Δv⃗ = v⃗₂ - v⃗₁', labelX + 15, labelY - 5);
+
+            // Draw origin point
+            ctx.fillStyle = '#333';
+            ctx.beginPath();
+            ctx.arc(ox, oy, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = 'bold 12px Nunito';
+            ctx.fillText('O', ox - 18, oy + 5);
+
+            // Add time labels with better visibility
+            ctx.font = '11px Nunito';
+            ctx.fillStyle = '#0077b6';
+            ctx.fillText('en t₁', v1x - 25, v1y - 15);
+            ctx.fillStyle = '#00b4d8';
+            ctx.fillText('en t₂', v2x + 10, v2y + 5);
+
+            // Formula note - larger
+            ctx.font = 'bold 12px Nunito';
+            ctx.fillStyle = '#666';
+            ctx.textAlign = 'center';
+            ctx.fillText('a⃗ₘ = Δv⃗ / Δt', w / 2, h - 12);
+            ctx.textAlign = 'left';
+        }
+
+        function drawMRUBasic(ctx, w, h) {
+            const oy = h / 2 + 10;
+            const x0 = 60, xf = w - 80;
+
+            // Draw axis line with arrow
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(20, oy);
+            ctx.lineTo(w - 20, oy);
+            ctx.stroke();
+            // Arrow at end
+            ctx.fillStyle = '#666';
+            ctx.beginPath();
+            ctx.moveTo(w - 20, oy);
+            ctx.lineTo(w - 30, oy - 5);
+            ctx.lineTo(w - 30, oy + 5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.font = 'bold 12px Nunito';
+            ctx.fillText('x', w - 18, oy - 10);
+
+            // Initial position marker
+            ctx.strokeStyle = '#0077b6';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x0, oy - 15);
+            ctx.lineTo(x0, oy + 15);
+            ctx.stroke();
+            ctx.font = 'bold 11px Nunito';
+            ctx.fillStyle = '#0077b6';
+            ctx.fillText('x₀', x0 - 7, oy + 30);
+
+            // Final position marker
+            ctx.strokeStyle = '#00b4d8';
+            ctx.beginPath();
+            ctx.moveTo(xf, oy - 15);
+            ctx.lineTo(xf, oy + 15);
+            ctx.stroke();
+            ctx.fillStyle = '#00b4d8';
+            ctx.fillText('x', xf - 5, oy + 30);
+
+            // Draw displacement vector (Δx)
+            drawVector(ctx, x0, oy - 30, xf, oy - 30, '#e63946', '', 2.5);
+            ctx.font = 'bold 12px Nunito';
+            ctx.fillStyle = '#e63946';
+            ctx.fillText('Δx = x - x₀', (x0 + xf) / 2 - 30, oy - 40);
+
+            // Car emoji at initial position - FLIPPED to face right
+            ctx.save();
+            ctx.translate(x0 + 30, oy - 3);
+            ctx.scale(-1, 1);
+            ctx.font = '22px Nunito';
+            ctx.fillText('🚗', -12, 0);
+            ctx.restore();
+
+            // Velocity vector above car
+            drawVector(ctx, x0 + 50, oy - 8, x0 + 95, oy - 8, '#0077b6', '', 2);
+            ctx.font = 'bold 11px Nunito';
+            ctx.fillStyle = '#0077b6';
+            ctx.fillText('v⃗ = cte', x0 + 100, oy - 5);
+
+            // Note about acceleration
+            ctx.font = '11px Nunito';
+            ctx.fillStyle = '#666';
+            ctx.textAlign = 'center';
+            ctx.fillText('a = 0 (velocidad constante)', w / 2, h - 12);
+            ctx.textAlign = 'left';
+        }
+
+        // ============ INTERACTIVE DIAGRAMS ============
+        function initPositionVectorInteractive() {
+            // Use the GeoGebra factory to create canvas and controls
+            const ggb = createGeoGebraCanvas('posvec-diagram', { scale: 22, offsetX: -20, offsetY: 20, forceStep: 1 });
+            if (!ggb) return;
+
+            // Get references to sliders
+            const inputX = document.getElementById('pos-x');
+            const inputY = document.getElementById('pos-y');
+            const valX = document.getElementById('pos-x-val');
+            const valY = document.getElementById('pos-y-val');
+            const valMod = document.getElementById('pos-mod');
+
+            // Define the draw function that will be called by GGB + inputs
+            ggb.state.drawCallback = () => {
+                const ctx = ggb.canvas.getContext('2d');
+                const w = ggb.canvas.width;
+                const h = ggb.canvas.height;
+                const state = ggb.state;
+
+                // Read values
+                const x = parseFloat(inputX?.value || 3);
+                const y = parseFloat(inputY?.value || 4);
+
+                // Update UI text
+                if (valX) valX.textContent = x;
+                if (valY) valY.textContent = y;
+                const mod = Math.sqrt(x * x + y * y);
+                if (valMod) valMod.textContent = mod.toFixed(2);
+
+                // Draw background grid
+                drawGeoGebraGrid(ctx, w, h, state);
+
+                const p0 = toCanvas(0, 0, state, w, h);
+                const p1 = toCanvas(x, y, state, w, h);
+
+                // Draw Point (First, so vector covers it if they overlap, or user request 'vector por encima')
+                // User asked "vector se dibuje por encima del punto P" -> Vector ON TOP OF Point.
+                // Current order was Vector then Point (Point on top).
+                // So I will draw Point first.
+                // Adjustable point radius: "mas pequeño" -> 4
+                ctx.fillStyle = '#e63946';
+                ctx.beginPath();
+                ctx.arc(p1.x, p1.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Draw Vector (On top)
+                drawVector(ctx, p0.x, p0.y, p1.x, p1.y, '#0077b6', 'r⃗', 3);
+
+                // Label
+                ctx.font = 'bold 12px Nunito';
+                ctx.fillStyle = '#333';
+                ctx.fillText(`(${x}, ${y})`, p1.x + 10, p1.y - 10);
+            };
+
+            // Initial draw
+            ggb.state.drawCallback();
+
+            // Attach listeners to sliders
+            [inputX, inputY].forEach(el => {
+                el?.addEventListener('input', () => {
+                    ggb.state.drawCallback();
+                });
+            });
+        }
+
+        function initDisplacementInteractive() {
+            // Use GeoGebra factory with forced step of 1 unit
+            const ggb = createGeoGebraCanvas('desp-diagram', { scale: 30, forceStep: 1 });
+            if (!ggb) return;
+
+            // Get inputs
+            const inputs = ['desp-x0', 'desp-y0', 'desp-xf', 'desp-yf'].map(id => document.getElementById(id));
+
+            ggb.state.drawCallback = () => {
+                const ctx = ggb.canvas.getContext('2d');
+                const w = ggb.canvas.width;
+                const h = ggb.canvas.height;
+                const state = ggb.state;
+
+                const x0 = parseFloat(document.getElementById('desp-x0')?.value || -2);
+                const y0 = parseFloat(document.getElementById('desp-y0')?.value || 1);
+                const xf = parseFloat(document.getElementById('desp-xf')?.value || 3);
+                const yf = parseFloat(document.getElementById('desp-yf')?.value || 4);
+
+                // Update UI Labels
+                if (document.getElementById('desp-x0-val')) document.getElementById('desp-x0-val').textContent = x0;
+                if (document.getElementById('desp-y0-val')) document.getElementById('desp-y0-val').textContent = y0;
+                if (document.getElementById('desp-xf-val')) document.getElementById('desp-xf-val').textContent = xf;
+                if (document.getElementById('desp-yf-val')) document.getElementById('desp-yf-val').textContent = yf;
+
+                const dx = xf - x0, dy = yf - y0;
+                const mod = Math.sqrt(dx * dx + dy * dy);
+                if (document.getElementById('desp-dx')) document.getElementById('desp-dx').textContent = dx.toFixed(1);
+                if (document.getElementById('desp-dy')) document.getElementById('desp-dy').textContent = dy.toFixed(1);
+                if (document.getElementById('desp-mod')) document.getElementById('desp-mod').textContent = mod.toFixed(2);
+
+                // Draw GGB Grid
+                drawGeoGebraGrid(ctx, w, h, state);
+
+                // Transform points
+                const p0 = toCanvas(0, 0, state, w, h);
+                const pStart = toCanvas(x0, y0, state, w, h);
+                const pEnd = toCanvas(xf, yf, state, w, h);
+
+                // Draw vectors
+                // r_i (Origin -> Start)
+                drawVector(ctx, p0.x, p0.y, pStart.x, pStart.y, '#666', 'r⃗ᵢ', 2);
+                // r_f (Origin -> End)
+                drawVector(ctx, p0.x, p0.y, pEnd.x, pEnd.y, '#00b4d8', 'r⃗ᶠ', 2);
+                // Delta r (Start -> End)
+                drawVector(ctx, pStart.x, pStart.y, pEnd.x, pEnd.y, '#e63946', 'Δr⃗', 3);
+
+                // Points circles
+                ctx.fillStyle = '#0077b6';
+                ctx.beginPath(); ctx.arc(pStart.x, pStart.y, 4, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#2a9d8f';
+                ctx.beginPath(); ctx.arc(pEnd.x, pEnd.y, 4, 0, Math.PI * 2); ctx.fill();
+
+                // Labels
+                ctx.font = 'bold 11px Nunito';
+                ctx.fillStyle = '#0077b6';
+                ctx.fillText('Inicio', pStart.x - 20, pStart.y - 12);
+                ctx.fillStyle = '#2a9d8f';
+                ctx.fillText('Fin', pEnd.x + 10, pEnd.y - 5);
+            };
+
+            // Initial draw
+            ggb.state.drawCallback();
+
+            // Listeners
+            inputs.forEach(el => el?.addEventListener('input', ggb.state.drawCallback));
+        }
+
+        function initMRUGraphInteractive() {
+            // Wait for DOM
+            setTimeout(() => {
+                const ggb = createGeoGebraCanvas('mrugraph-diagram', { scale: 20 });
+                if (!ggb) return;
+
+                // Adjust initial view to show quadrants nicely
+                ggb.state.offsetX = -100;
+                ggb.state.offsetY = 100;
+
+                function draw(ctx, w, h, state) {
+                    const x0 = parseFloat(document.getElementById('mru-x0')?.value || 10);
+                    const v = parseFloat(document.getElementById('mru-v')?.value || 5);
+
+                    if (document.getElementById('mru-x0-val')) document.getElementById('mru-x0-val').textContent = x0;
+                    if (document.getElementById('mru-v-val')) document.getElementById('mru-v-val').textContent = v;
+                    if (document.getElementById('mru-eq')) document.getElementById('mru-eq').textContent = `${x0} + ${v} t`;
+
+                    drawGeoGebraGrid(ctx, w, h, state);
+
+                    // Draw Line: x = x0 + v*t
+                    // We plot t on X-axis (horizontal), x on Y-axis (vertical)
+                    ctx.strokeStyle = '#0077b6';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+
+                    // Draw from t = -10 to t = 20 (in world coords)
+                    const tStart = -20;
+                    const tEnd = 40;
+
+                    const pStart = toCanvas(tStart, x0 + v * tStart, state, w, h);
+                    const pEnd = toCanvas(tEnd, x0 + v * tEnd, state, w, h);
+
+                    ctx.moveTo(pStart.x, pStart.y);
+                    ctx.lineTo(pEnd.x, pEnd.y);
+                    ctx.stroke();
+
+                    // Draw intercept point (0, x0)
+                    const pInt = toCanvas(0, x0, state, w, h);
+                    ctx.fillStyle = '#e63946';
+                    ctx.beginPath();
+                    ctx.arc(pInt.x, pInt.y, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#333';
+                    ctx.font = 'bold 12px Nunito';
+                    ctx.fillText(`x₀`, pInt.x + 8, pInt.y - 5);
+
+                    // Label the line
+                    ctx.fillStyle = '#0077b6';
+                    const pLabel = toCanvas(5, x0 + v * 5, state, w, h);
+                    ctx.fillText(`v = ${v} m / s`, pLabel.x + 5, pLabel.y - 10);
+                }
+
+                ggb.state.drawCallback = () => draw(ggb.canvas.getContext('2d'), ggb.canvas.width, ggb.canvas.height, ggb.state);
+                ggb.state.drawCallback();
+
+                ['mru-x0', 'mru-v'].forEach(id => {
+                    document.getElementById(id)?.addEventListener('input', ggb.state.drawCallback);
+                });
+            }, 200);
+        }
+
+        function initMobilesInteractive() {
+            setTimeout(() => {
+                // Initialize with placeholders; will auto-fit immediately
+                const ggb = createGeoGebraCanvas('mobiles-diagram', { scaleX: 15, scaleY: 1 });
+                if (!ggb) return;
+
+                function draw(ctx, w, h, state) {
+                    const x0a = parseFloat(document.getElementById('mob-x0a')?.value || 0);
+                    const va = parseFloat(document.getElementById('mob-va')?.value || 20);
+                    const x0b = parseFloat(document.getElementById('mob-x0b')?.value || 300);
+                    const vb = parseFloat(document.getElementById('mob-vb')?.value || -10);
+
+                    // Update UI labels
+                    if (document.getElementById('mob-x0a-val')) document.getElementById('mob-x0a-val').textContent = x0a + ' km';
+                    if (document.getElementById('mob-va-val')) document.getElementById('mob-va-val').textContent = va + ' km/h';
+                    if (document.getElementById('mob-x0b-val')) document.getElementById('mob-x0b-val').textContent = x0b + ' km';
+                    if (document.getElementById('mob-vb-val')) document.getElementById('mob-vb-val').textContent = vb + ' km/h';
+
+                    const t_meet = (x0b - x0a) / (va - vb);
+                    const x_meet = x0a + va * t_meet;
+
+                    // Update UI results
+                    if (document.getElementById('mob-t')) document.getElementById('mob-t').textContent = isFinite(t_meet) ? t_meet.toFixed(1) : '---';
+                    if (document.getElementById('mob-x')) document.getElementById('mob-x').textContent = isFinite(x_meet) ? x_meet.toFixed(1) : '---';
+                    if (document.getElementById('mob-eqA')) document.getElementById('mob-eqA').textContent = `${x0a} + ${va} t`;
+                    if (document.getElementById('mob-eqB')) document.getElementById('mob-eqB').textContent = `${x0b} + (${vb}) t`;
+
+                    // --- Auto-Fit Logic ---
+                    // We want to ensure (0,0), (t_meet, x_meet), (0, x0a), (0, x0b) are somewhat visible.
+                    // Important points:
+                    const pointsT = [0, isFinite(t_meet) ? t_meet : 0];
+                    const pointsX = [x0a, x0b, isFinite(x_meet) ? x_meet : 0];
+
+                    // Add some margin (e.g. 10%)
+                    const minT = Math.min(...pointsT);
+                    const maxT = Math.max(...pointsT);
+                    const minX = Math.min(...pointsX);
+                    const maxX = Math.max(...pointsX);
+
+                    // Calculate desired range size
+                    const rangeT = (maxT - minT) || 10;
+                    const rangeX = (maxX - minX) || 100;
+
+                    // Only auto-scale if not currently dragging (to allow manual inspection)
+                    // Or we could enforce it only on parameter change. 
+                    // For better UX during parameter tuning, we'll soft-adjust if points go out of view, 
+                    // or just set a good reset. For this "Auto-Fit" requirement, we'll aggressively 
+                    // fit on each draw if it significantly changes, or simple approach: 
+                    // Just set optimal scales.
+
+                    // Let's set 'optimal' viewport centered roughly on the action
+                    // Center roughly at meeting point/2
+                    const centerT = (minT + maxT) / 2;
+                    const centerX = (minX + maxX) / 2;
+
+                    // Calculate scales to fit this range in the canvas (w, h)
+                    // We want rangeT to take up ~80% of width
+                    const desiredScaleX = (w * 0.8) / (rangeT || 1);
+                    const desiredScaleY = (h * 0.8) / (rangeX || 1);
+
+                    // We can update state if this is the first draw or significant change?
+                    if (!state.hasUserInteracted && !state.isInitialized) {
+                        // Initial fit
+                        // Calculate desired range size
+                        const rangeT = 20; // Show slightly more than interaction (10h)
+                        const rangeX = 450; // 400m
+
+                        // Scales
+                        state.scaleX = (w * 0.8) / rangeT;
+                        state.scaleY = (h * 0.8) / rangeX;
+
+                        // Center
+                        const centerT = 10; // Midpoint of 0-20
+                        const centerX = 225; // Midpoint 0-450
+
+                        state.offsetX = -centerT * state.scaleX;
+                        state.offsetY = centerX * state.scaleY;
+
+                        state.isInitialized = true;
+                    }
+
+                    // Explicitly draw grid with CURRENT state (no auto-fit per frame)
+                    drawGeoGebraGrid(ctx, w, h, state);
+
+                    // Mobile A
+                    ctx.strokeStyle = '#0077b6';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    // Draw a bit beyond the meeting point
+                    const tStart = minT - rangeT * 0.2;
+                    const tEnd = maxT + rangeT * 0.2;
+
+                    const pA1 = toCanvas(tStart, x0a + va * tStart, state, w, h);
+                    const pA2 = toCanvas(tEnd, x0a + va * tEnd, state, w, h);
+                    ctx.moveTo(pA1.x, pA1.y);
+                    ctx.lineTo(pA2.x, pA2.y);
+                    ctx.stroke();
+
+                    // Mobile B
+                    ctx.strokeStyle = '#2a9d8f';
+                    ctx.beginPath();
+                    const pB1 = toCanvas(tStart, x0b + vb * tStart, state, w, h);
+                    const pB2 = toCanvas(tEnd, x0b + vb * tEnd, state, w, h);
+                    ctx.moveTo(pB1.x, pB1.y);
+                    ctx.lineTo(pB2.x, pB2.y);
+                    ctx.stroke();
+
+                    // Meeting Point
+                    if (isFinite(t_meet) && isFinite(x_meet)) {
+                        const pMeet = toCanvas(t_meet, x_meet, state, w, h);
+                        ctx.fillStyle = '#e63946';
+                        ctx.beginPath();
+                        ctx.arc(pMeet.x, pMeet.y, 8, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // Label
+                        ctx.fillStyle = '#333';
+                        ctx.font = 'bold 12px Nunito';
+                        ctx.fillText(`(${t_meet.toFixed(1)}h, ${x_meet.toFixed(0)}km)`, pMeet.x + 10, pMeet.y - 10);
+                    }
+                }
+
+                ggb.state.drawCallback = () => draw(ggb.canvas.getContext('2d'), ggb.canvas.width, ggb.canvas.height, ggb.state);
+                // Trigger initial draw
+                ggb.state.drawCallback();
+
+                ['mob-x0a', 'mob-va', 'mob-x0b', 'mob-vb'].forEach(id => {
+                    document.getElementById(id)?.addEventListener('input', () => {
+                        // On input change, we want to auto-fit again. 
+                        // The draw loop handles auto-calculation of scale if !isDragging.
+                        ggb.state.drawCallback();
+                    });
+                });
+            }, 200);
+        }
+
+        function drawEj313Graph(ctx, w, h, state) {
+            // Auto-fit scales if not manually set (simple heuristic for this specific problem)
+            // We know the action is around t=[0, 15], x=[0, 300]. Meeting at (10, 200).
+            // Let's set scales to fit this comfortably if not dragging
+            if (!state.isDragging && !state.hasUserInteracted) {
+                // Fits t=0..20, x=0..350 roughly
+                state.scaleX = Math.min(state.scaleX, w / 25);
+                state.scaleY = Math.min(state.scaleY, h / 350);
+                state.offsetX = -w / 3; // Shift to show t=0 on left
+                state.offsetY = h / 3;  // Shift to show x=0 on bottom
+            }
+
+            drawGeoGebraGrid(ctx, w, h, state);
+
+            // Train A: x = 20t
+            ctx.strokeStyle = '#e63946';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            const pA1 = toCanvas(0, 0, state, w, h);
+            const pA2 = toCanvas(15, 300, state, w, h); // 20*15 = 300
+            ctx.moveTo(pA1.x, pA1.y);
+            ctx.lineTo(pA2.x, pA2.y);
+            ctx.stroke();
+
+            // Train B: x = 300 - 10t
+            ctx.strokeStyle = '#0077b6';
+            ctx.beginPath();
+            const pB1 = toCanvas(0, 300, state, w, h);
+            const pB2 = toCanvas(15, 150, state, w, h); // 300 - 10*15 = 150
+            ctx.moveTo(pB1.x, pB1.y);
+            ctx.lineTo(pB2.x, pB2.y);
+            ctx.stroke();
+
+            // Meeting Point: t=10, x=200
+            const pMeet = toCanvas(10, 200, state, w, h);
+            ctx.fillStyle = '#e63946';
+            ctx.beginPath();
+            ctx.arc(pMeet.x, pMeet.y, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 12px Nunito';
+            ctx.fillText('P (10h, 200km)', pMeet.x + 10, pMeet.y - 10);
+
+            // Labels
+            ctx.fillStyle = '#e63946';
+            const lblA = toCanvas(2, 60, state, w, h);
+            ctx.fillText('Tren A', lblA.x, lblA.y);
+
+            ctx.fillStyle = '#0077b6';
+            const lblB = toCanvas(2, 260, state, w, h);
+            ctx.fillText('Tren B', lblB.x, lblB.y);
+        }
+
+        function drawEjSalidaGraph(ctx, w, h, state) {
+            // Auto-fit scales if not dragging
+            if (!state.isDragging && !state.hasUserInteracted) {
+                // Fits t=0..25, x=0..500
+                state.scaleX = Math.min(state.scaleX, w / 30);
+                state.scaleY = Math.min(state.scaleY, h / 550);
+                state.offsetX = -w / 3;
+                state.offsetY = h / 3;
+            }
+
+            drawGeoGebraGrid(ctx, w, h, state);
+
+            // Car A: x = 20t
+            ctx.strokeStyle = '#0077b6';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            const pA1 = toCanvas(0, 0, state, w, h);
+            const pA2 = toCanvas(25, 500, state, w, h);
+            ctx.moveTo(pA1.x, pA1.y);
+            ctx.lineTo(pA2.x, pA2.y);
+            ctx.stroke();
+
+            // Car B: x = 200 + 10t
+            ctx.strokeStyle = '#2a9d8f';
+            ctx.beginPath();
+            const pB1 = toCanvas(0, 200, state, w, h);
+            const pB2 = toCanvas(25, 450, state, w, h);
+            ctx.moveTo(pB1.x, pB1.y);
+            ctx.lineTo(pB2.x, pB2.y);
+            ctx.stroke();
+
+            // Meeting: t=20, x=400
+            const pMeet = toCanvas(20, 400, state, w, h);
+            ctx.fillStyle = '#e63946';
+            ctx.beginPath();
+            ctx.arc(pMeet.x, pMeet.y, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 12px Nunito';
+            ctx.fillText('Encuentro (20h, 400km)', pMeet.x - 140, pMeet.y + 25);
+        }
+    </script>
+</body>
+
+</html>

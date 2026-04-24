@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CartesiLab ✦ Calculadora de Relaciones</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@500;700;900&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            startup: {
+                typeset: false // Control manual de renderizado para apps dinámicas
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+    <style>
+        /* ==========================================================================
+           VARIABLES & RESET
+           ========================================================================== */
+        :root {
+            --bg-deep: #05050f;
+            --bg-glass: rgba(20, 20, 35, 0.4);
+            --bg-glass-hover: rgba(30, 30, 50, 0.6);
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --accent-cyan: #00d4ff;
+            --accent-violet: #7c3aed;
+            --accent-magenta: #e040fb;
+            --accent-gold: #ffd600;
+            --accent-green: #00e676;
+            --accent-red: #ff1744;
+            --text-main: #f8f9fa;
+            --text-muted: #9ba1a6;
+            --font-ui: 'Sora', sans-serif;
+            --font-math: 'JetBrains Mono', monospace;
+            --font-title: 'Orbitron', sans-serif;
+            --shadow-neon: 0 0 10px rgba(0, 212, 255, 0.5);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: var(--font-ui);
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+            cursor: crosshair;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border-glass); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-violet); }
+        ::selection { background: rgba(124, 58, 237, 0.5); color: #fff; }
+
+        /* ==========================================================================
+           BACKGROUND & EFFECTS
+           ========================================================================== */
+        .aurora-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -2;
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(124, 58, 237, 0.15), transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(0, 212, 255, 0.15), transparent 40%),
+                radial-gradient(circle at 50% 80%, rgba(224, 64, 251, 0.1), transparent 40%);
+            filter: blur(60px);
+            animation: aurora-shift 20s infinite alternate ease-in-out;
+        }
+        
+        .particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; pointer-events: none;
+            background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
+        }
+
+        @keyframes aurora-shift {
+            0% { transform: scale(1) translate(0, 0); }
+            50% { transform: scale(1.1) translate(5%, 2%); }
+            100% { transform: scale(1) translate(-5%, -2%); }
+        }
+
+        /* ==========================================================================
+           UI COMPONENTS (Glassmorphism)
+           ========================================================================== */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: var(--font-ui);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
+        
+        .btn-cyan:hover { border-color: var(--accent-cyan); box-shadow: 0 0 15px rgba(0, 212, 255, 0.4); color: var(--accent-cyan); }
+        .btn-violet:hover { border-color: var(--accent-violet); box-shadow: 0 0 15px rgba(124, 58, 237, 0.4); color: #fff;}
+        .btn-danger:hover { border-color: var(--accent-red); box-shadow: 0 0 15px rgba(255, 23, 68, 0.4); color: var(--accent-red); }
+
+        input[type="text"], .math-input, select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-glass);
+            color: var(--accent-cyan);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-family: var(--font-math);
+            font-size: 1.1rem;
+            transition: var(--transition);
+            outline: none;
+        }
+        input[type="text"]:focus, .math-input:focus, select:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+        select option { background: var(--bg-deep); color: #fff; }
+
+        .chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-glass);
+            font-family: var(--font-math);
+            font-size: 0.9rem;
+            animation: fade-in-up 0.3s ease-out;
+        }
+        .chip .remove { cursor: pointer; color: var(--accent-red); opacity: 0.7; }
+        .chip .remove:hover { opacity: 1; }
+
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==========================================================================
+           LAYOUT & SECTIONS
+           ========================================================================== */
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+        /* HEADER */
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { font-family: var(--font-title); font-size: 2.5rem; letter-spacing: 2px; text-transform: uppercase; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-violet)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; }
+        .subtitle { color: var(--text-muted); font-size: 1.1rem; letter-spacing: 1px; }
+
+        /* TABS NAVIGATION */
+        .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 12px 24px; font-size: 1rem; cursor: pointer; border-bottom: 2px solid transparent; transition: var(--transition); font-weight: 600; font-family: var(--font-title); letter-spacing: 1px;}
+        .tab-btn:hover { color: var(--text-main); }
+        .tab-btn.active { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); text-shadow: 0 0 10px rgba(0,212,255,0.5); }
+
+        .panel { display: none; animation: fade-in-up 0.4s ease-out; }
+        .panel.active { display: block; }
+
+        /* PANEL 1: SETS */
+        .sets-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+        .set-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border-glass);}
+        .set-name-input { font-family: var(--font-math); font-size: 1.4rem; color: var(--accent-gold); background: transparent; border: none; border-bottom: 1px dashed transparent; width: 120px; padding: 2px 5px; outline: none; transition: 0.3s; }
+        .set-name-input:focus { border-bottom-color: var(--accent-gold); text-shadow: 0 0 8px rgba(255, 214, 0, 0.5); background: rgba(255,255,255,0.05); border-radius: 4px;}
+        .chips-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; min-height: 50px; }
+
+        /* PANEL 2: CARTESIAN PRODUCT */
+        .cartesian-controls { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;}
+        .results-views { display: flex; flex-direction: column; gap: 20px; }
+        .matrix-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-family: var(--font-math); }
+        .matrix-table th, .matrix-table td { padding: 12px; border: 1px solid var(--border-glass); text-align: center; }
+        .matrix-table th { background: rgba(0, 212, 255, 0.1); color: var(--accent-cyan); }
+        .latex-view { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; font-size: 1.2rem; overflow-x: auto; white-space: nowrap;}
+
+        /* PANEL 3: RELATIONS */
+        .relation-card { margin-bottom: 20px; border-left: 4px solid var(--accent-violet); }
+        .rel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 10px 15px; border-radius: 8px;}
+        .rel-title { font-family: var(--font-math); font-size: 1.4rem; color: #fff; }
+        .toggle-switch { display: flex; background: rgba(0,0,0,0.5); border-radius: 20px; overflow: hidden; }
+        .toggle-btn { padding: 5px 15px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; transition: 0.3s; }
+        .toggle-btn.active { background: var(--border-glass); color: #fff; }
+        
+        .math-keyboard { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 8px; margin-top: 10px; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; }
+        .key-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); border-radius: 6px; padding: 8px 0; color: #fff; font-family: var(--font-math); cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s; }
+        .key-btn:hover { background: rgba(255,255,255,0.15); border-color: var(--accent-cyan); box-shadow: inset 0 0 10px rgba(0,212,255,0.2); }
+        .key-btn small { font-size: 0.55rem; color: var(--text-muted); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; max-width: 90%; }
+        
+        .key-var { border-color: rgba(255, 214, 0, 0.4); }
+        .key-var:hover { border-color: var(--accent-gold) !important; box-shadow: inset 0 0 10px rgba(255, 214, 0, 0.2) !important; color: var(--accent-gold); }
+        
+        .key-log { border-color: rgba(224, 64, 251, 0.3); }
+        .key-log:hover { border-color: var(--accent-magenta) !important; box-shadow: inset 0 0 10px rgba(224, 64, 251, 0.2) !important; color: var(--accent-magenta); }
+        
+        .key-func { border-color: rgba(124, 58, 237, 0.3); }
+        .key-func:hover { border-color: var(--accent-violet) !important; box-shadow: inset 0 0 10px rgba(124, 58, 237, 0.2) !important; color: #fff; }
+
+        .key-const { border-color: rgba(0, 230, 118, 0.3); }
+        .key-const:hover { border-color: var(--accent-green) !important; box-shadow: inset 0 0 10px rgba(0, 230, 118, 0.2) !important; color: var(--accent-green); }
+
+        .rel-results { margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; }
+        .eval-results-container { max-height: 250px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 8px; padding-right: 5px; margin-top: 10px; }
+        .valid-pair { border-color: var(--accent-green); color: var(--accent-green); background: rgba(0, 230, 118, 0.1); }
+        .invalid-pair { border-color: var(--accent-red); color: var(--accent-red); background: rgba(255, 23, 68, 0.05); text-decoration: line-through; opacity: 0.6; }
+
+        /* PANEL 4: SAGITTAL DIAGRAM */
+        .svg-container { width: 100%; height: 500px; background: #000; border-radius: 12px; overflow: hidden; position: relative; border: 1px solid var(--border-glass); box-shadow: inset 0 0 30px rgba(0,0,0,0.8); }
+        svg { width: 100%; height: 100%; }
+        .node { cursor: pointer; }
+        .node circle { stroke-width: 2; transition: all 0.3s; }
+        .node text { fill: #fff; font-family: var(--font-math); font-size: 14px; text-anchor: middle; dominant-baseline: middle; pointer-events: none; }
+        .node:hover circle { fill: rgba(255,255,255,0.2) !important; filter: drop-shadow(0 0 8px rgba(255,255,255,0.6)); stroke-width: 3; }
+        
+        .arrow-path { fill: none; stroke-linecap: round; transition: filter 0.3s, stroke-width 0.3s, opacity 0.3s; }
+        .arrow-path:hover { filter: drop-shadow(0 0 8px currentColor); cursor: pointer; stroke-width: 5 !important; opacity: 1 !important; z-index: 10; }
+        .animated-arrow { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw-arrow 1.5s ease-out forwards; }
+        @keyframes draw-arrow { to { stroke-dashoffset: 0; } }
+        
+        .diagram-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; flex-wrap: wrap; gap: 10px;}
+        
+        .color-picker { background: transparent; border: none; width: 30px; height: 30px; cursor: pointer; padding: 0; border-radius: 5px; overflow: hidden; }
+        .color-picker::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-picker::-webkit-color-swatch { border: 1px solid var(--border-glass); border-radius: 4px; }
+        .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; }
+        .config-item { display: flex; flex-direction: column; gap: 5px; }
+
+        /* PANEL 5: ANALYSIS */
+        .analysis-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        @media (max-width: 1024px) { .analysis-grid { grid-template-columns: 1fr; } }
+        .props-list { display: flex; flex-direction: column; gap: 10px; }
+        .prop-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 4px solid transparent; }
+        .prop-item.true { border-left-color: var(--accent-green); }
+        .prop-item.false { border-left-color: var(--accent-red); }
+        .prop-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; font-family: var(--font-math);}
+        .badge-true { background: rgba(0, 230, 118, 0.2); color: var(--accent-green); }
+        .badge-false { background: rgba(255, 23, 68, 0.2); color: var(--accent-red); }
+        .ce-text { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; display: block; font-family: var(--font-math);}
+
+        .dom-ran-container { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; }
+        .stat-card { flex: 1; min-width: 150px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); border-radius: 12px; padding: 15px; text-align: center; transition: var(--transition); }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .stat-card.cyan { border-bottom: 3px solid var(--accent-cyan); }
+        .stat-card.violet { border-bottom: 3px solid var(--accent-violet); }
+        .stat-card.gold { border-bottom: 3px solid var(--accent-gold); }
+        .stat-card h4 { font-family: var(--font-title); font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px; }
+        .stat-card .value { font-family: var(--font-math); font-size: 1.1rem; color: #fff; overflow-wrap: break-word; }
+
+        /* TOOLTIP JS */
+        #global-tooltip { position: absolute; background: rgba(10, 10, 20, 0.95); border: 1px solid var(--accent-cyan); color: #fff; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; pointer-events: none; z-index: 9999; opacity: 0; transition: opacity 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.5); max-width: 300px; font-family: var(--font-ui); }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+        .emoji-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 10px; margin-top: 15px; }
+        .emoji-btn { font-size: 1.5rem; background: rgba(255,255,255,0.05); border: 1px solid transparent; border-radius: 8px; cursor: pointer; padding: 5px; transition: 0.2s; text-align: center;}
+        .emoji-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
+    </style>
+</head>
+<body>
+
+    <div class="aurora-bg"></div>
+    <div class="particles"></div>
+    <div id="global-tooltip"></div>
+
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <h1>CartesiLab <i class="fa-solid fa-atom fa-spin-pulse" style="font-size: 0.8em; color: var(--accent-cyan);"></i></h1>
+            <p class="subtitle">Laboratorio Avanzado de Relaciones y Producto Cartesiano</p>
+        </header>
+
+        <!-- NAVIGATION -->
+        <nav class="tabs glass-panel" style="padding: 10px;">
+            <button class="tab-btn active" data-target="panel-sets"><i class="fa-solid fa-cubes"></i> Conjuntos</button>
+            <button class="tab-btn" data-target="panel-cartesian"><i class="fa-solid fa-xmark"></i> Prod. Cartesiano</button>
+            <button class="tab-btn" data-target="panel-relations"><i class="fa-solid fa-link"></i> Relaciones</button>
+            <button class="tab-btn" data-target="panel-diagram"><i class="fa-solid fa-project-diagram"></i> Sagital</button>
+            <button class="tab-btn" data-target="panel-analysis"><i class="fa-solid fa-microscope"></i> Análisis</button>
+        </nav>
+
+        <!-- PANEL 1: SETS -->
+        <section id="panel-sets" class="panel active">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                <h2 style="font-family: var(--font-title); color: var(--accent-cyan);">Definir Conjuntos</h2>
+                <button class="btn btn-cyan" onclick="addSet()"><i class="fa-solid fa-folder-plus"></i> Nuevo Conjunto</button>
+            </div>
+            <div class="sets-grid" id="dynamic-sets-container">
+                <!-- Sets injected via JS -->
+            </div>
+        </section>
+
+        <!-- PANEL 2: CARTESIAN PRODUCT -->
+        <section id="panel-cartesian" class="panel">
+            <div class="glass-panel">
+                
+                <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: center; gap: 15px; align-items: center; flex-wrap: wrap;">
+                    <span style="color: var(--text-muted); font-family: var(--font-title);">Operar:</span>
+                    <select id="sel-set-1" class="math-input" style="width: auto; min-width: 100px; text-align: center; font-size: 1.2rem; font-weight: bold;" onchange="updateCartesianProduct()"></select>
+                    <span style="color: var(--accent-magenta); font-size: 1.5rem; font-weight: bold;">×</span>
+                    <select id="sel-set-2" class="math-input" style="width: auto; min-width: 100px; text-align: center; font-size: 1.2rem; font-weight: bold;" onchange="updateCartesianProduct()"></select>
+                </div>
+
+                <div class="cartesian-controls" id="cartesian-buttons-container">
+                    <!-- Buttons like A x B generated dynamically -->
+                </div>
+                
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <span id="cartesian-stats" class="chip" style="background: rgba(224, 64, 251, 0.2); border-color: var(--accent-magenta); color: #fff;"></span>
+                </div>
+
+                <div class="results-views">
+                    <div>
+                        <h3 style="color: var(--text-muted); margin-bottom: 10px; font-size: 0.9rem;"><i class="fa-solid fa-square-root-variable"></i> VISTA DE CONJUNTO</h3>
+                        <div class="latex-view math-tex" id="cartesian-latex"></div>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--text-muted); margin-bottom: 10px; font-size: 0.9rem;"><i class="fa-solid fa-list-ul"></i> PARES ORDENADOS</h3>
+                        <div class="chips-container" id="cartesian-chips"></div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <h3 style="color: var(--text-muted); margin-bottom: 10px; font-size: 0.9rem;"><i class="fa-solid fa-table-cells"></i> MATRIZ CARTESIANA</h3>
+                        <table class="matrix-table" id="cartesian-matrix"></table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANEL 3: RELATIONS -->
+        <section id="panel-relations" class="panel">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                <h2 style="font-family: var(--font-title); color: var(--accent-cyan);" id="rel-title-heading">Definir Relaciones</h2>
+                <button class="btn btn-violet" onclick="addRelation()"><i class="fa-solid fa-link"></i> Nueva Relación</button>
+            </div>
+            
+            <div id="relations-container">
+                <!-- Relation cards will be injected here by JS -->
+            </div>
+        </section>
+
+        <!-- PANEL 4: SAGITTAL DIAGRAM -->
+        <section id="panel-diagram" class="panel">
+            <div class="glass-panel" style="margin-bottom: 15px;">
+                <h4 style="color: var(--accent-gold); font-family: var(--font-title); margin-bottom: 15px;"><i class="fa-solid fa-palette"></i> Personalizar Diagrama</h4>
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label class="ce-text">Color de Óvalo Izquierdo</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="color" class="color-picker" id="conf-oval1-fill" value="#00d4ff" onchange="updateDiagramConfig()" data-tooltip="Color de Relleno">
+                            <input type="color" class="color-picker" id="conf-oval1-stroke" value="#00d4ff" onchange="updateDiagramConfig()" data-tooltip="Color del Borde">
+                        </div>
+                    </div>
+                    <div class="config-item">
+                        <label class="ce-text">Color de Óvalo Derecho</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="color" class="color-picker" id="conf-oval2-fill" value="#7c3aed" onchange="updateDiagramConfig()" data-tooltip="Color de Relleno">
+                            <input type="color" class="color-picker" id="conf-oval2-stroke" value="#7c3aed" onchange="updateDiagramConfig()" data-tooltip="Color del Borde">
+                        </div>
+                    </div>
+                    <div class="config-item">
+                        <label class="ce-text">Bordes de Óvalos</label>
+                        <select id="conf-oval-style" onchange="updateDiagramConfig()" style="padding: 5px;">
+                            <option value="none">Sólido</option>
+                            <option value="5,5" selected>Discontinuo</option>
+                            <option value="2,4">Punteado</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label class="ce-text">Flechas (Grosor / Estilo)</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="range" id="conf-arrow-width" min="1" max="8" value="2" onchange="updateDiagramConfig()" oninput="this.nextElementSibling.textContent=this.value" style="width: 60px;">
+                            <span style="color: var(--accent-cyan); font-size: 0.8rem; font-family: var(--font-math); width: 10px;">2</span>
+                            <select id="conf-arrow-style" onchange="updateDiagramConfig()" style="padding: 5px; flex: 1;">
+                                <option value="none" selected>Sólidas</option>
+                                <option value="5,5">Discont.</option>
+                                <option value="1,3">Puntos</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="config-item">
+                        <label class="ce-text" style="color: var(--accent-green);"><i class="fa-solid fa-bullseye"></i> Mostrar Dom/Ran</label>
+                        <div class="toggle-switch" style="width: fit-content;">
+                            <button id="btn-show-subsets-yes" class="toggle-btn active" onclick="setSubsetsToggle(true)">Sí</button>
+                            <button id="btn-show-subsets-no" class="toggle-btn" onclick="setSubsetsToggle(false)">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;" id="diagram-rel-selector">
+                    <!-- Relation toggles injected here -->
+                </div>
+                
+                <div class="svg-container" id="svg-wrapper">
+                    <svg id="sagittal-svg">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" />
+                            </marker>
+                        </defs>
+                        <!-- Oval outlines -->
+                        <ellipse id="oval-A" cx="150" cy="250" rx="80" ry="220" fill="#00d4ff" fill-opacity="0.05" stroke="#00d4ff" stroke-width="2" stroke-dasharray="5,5"/>
+                        <ellipse id="oval-B" cx="650" cy="250" rx="80" ry="220" fill="#7c3aed" fill-opacity="0.05" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,5"/>
+                        <text id="label-oval-A" x="150" y="20" fill="#00d4ff" font-family="Orbitron" font-size="20" text-anchor="middle">A</text>
+                        <text id="label-oval-B" x="650" y="20" fill="#7c3aed" font-family="Orbitron" font-size="20" text-anchor="middle">B</text>
+                        
+                        <!-- Groups for content layering -->
+                        <g id="svg-subsets"></g> <!-- Subsets behind everything -->
+                        <g id="svg-paths"></g>
+                        <g id="svg-nodes-A"></g>
+                        <g id="svg-nodes-B"></g>
+                    </svg>
+                </div>
+                
+                <div class="diagram-controls">
+                    <div>
+                        <label style="font-size: 0.9rem; color: var(--text-muted);"><i class="fa-solid fa-gauge-high"></i> Velocidad</label>
+                        <input type="range" id="anim-speed" min="0.1" max="3" step="0.1" value="1.5">
+                    </div>
+                    <div>
+                        <button class="btn" onclick="drawDiagram()"><i class="fa-solid fa-rotate-right"></i> Redibujar</button>
+                        <button class="btn btn-cyan" onclick="exportSVG()"><i class="fa-solid fa-download"></i> Descargar SVG</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANEL 5: ANALYSIS -->
+        <section id="panel-analysis" class="panel">
+            <div class="glass-panel">
+                <div style="margin-bottom: 20px;">
+                    <label style="color: var(--accent-cyan); font-family: var(--font-title);"><i class="fa-solid fa-magnifying-glass-chart"></i> Analizar Relación:</label>
+                    <select id="analysis-selector" class="btn" style="background: rgba(0,0,0,0.5); margin-left: 10px; font-family: var(--font-math);" onchange="runAnalysis()">
+                        <!-- Options injected here -->
+                    </select>
+                </div>
+                
+                <div class="analysis-grid">
+                    <div class="props-list" id="props-container">
+                        <!-- Properties injected here -->
+                    </div>
+                    
+                    <div>
+                        <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">
+                            <h3 style="text-align: center; font-size: 1rem; color: var(--text-muted); margin-bottom: 15px;">Densidad de Pares</h3>
+                            <canvas id="analysisChart"></canvas>
+                        </div>
+                        
+                        <div class="dom-ran-container">
+                            <div class="stat-card cyan">
+                                <h4><i class="fa-solid fa-bullseye"></i> Dominio</h4>
+                                <div class="value math-tex" id="stats-domain"></div>
+                            </div>
+                            <div class="stat-card violet">
+                                <h4><i class="fa-solid fa-arrows-to-circle"></i> Rango (Imagen)</h4>
+                                <div class="value math-tex" id="stats-range"></div>
+                            </div>
+                            <div class="stat-card gold" style="min-width: 100%;">
+                                <h4><i class="fa-solid fa-hashtag"></i> Cardinalidad de la Relación</h4>
+                                <div class="value math-tex" id="stats-card"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- EMOJI MODAL -->
+    <div class="modal-overlay" id="emojiModal" onclick="if(event.target==this) closeEmojiModal()">
+        <div class="glass-panel modal-content" style="background: rgba(10,10,20,0.95);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-glass); padding-bottom: 10px;">
+                <h3 style="color: var(--accent-gold); font-family: var(--font-title);">Insertar Símbolo</h3>
+                <button class="btn" style="padding: 5px 10px;" onclick="closeEmojiModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="tabs" style="margin-top: 15px; margin-bottom: 10px;">
+                <button class="tab-btn active" style="padding: 5px 10px; font-size: 0.8rem;" onclick="switchEmojiTab('math')">Matemáticas</button>
+                <button class="tab-btn" style="padding: 5px 10px; font-size: 0.8rem;" onclick="switchEmojiTab('greek')">Griegas</button>
+                <button class="tab-btn" style="padding: 5px 10px; font-size: 0.8rem;" onclick="switchEmojiTab('emoji')">Emojis</button>
+            </div>
+            
+            <div id="emoji-grid" class="emoji-grid">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        /* ==========================================================================
+           STATE MANAGEMENT & UTILS
+           ========================================================================== */
+        const AppState = {
+            sets: [
+                { id: 'set_' + Date.now(), name: 'A', data: ['1', '2', '3'] },
+                { id: 'set_' + (Date.now() + 1), name: 'B', data: ['a', 'b', 'c'] }
+            ],
+            selSet1Id: null,
+            selSet2Id: null,
+            cartesianMode: '1x2',
+            relations: [
+                { id: Date.now()+2, name: 'R_{1}', mode: 'extension', data: '(1,a), (2,b), (3,c)', color: '#00d4ff', activeDiagram: true },
+                { id: Date.now()+3, name: 'R_{2}', mode: 'comprehension', data: '(a == 1 && b == "b") || (a == 3 && b == "a")', color: '#e040fb', activeDiagram: false }
+            ],
+            diagramConfig: {
+                oval1Fill: '#00d4ff', oval1Stroke: '#00d4ff',
+                oval2Fill: '#7c3aed', oval2Stroke: '#7c3aed',
+                ovalStyle: '5,5',
+                arrowWidth: 2, arrowStyle: 'none',
+                showSubsets: true
+            },
+            colors: ['#00d4ff', '#e040fb', '#00e676', '#ffd600', '#ff1744', '#ff9100', '#651fff'],
+            chartInstance: null
+        };
+
+        const THE_SYMBOLS = {
+            math: ['∅','∞','∈','∉','⊂','⊃','∪','∩','∀','∃','∄','∧','∨','→','↔','⊕','¬','≠','≤','≥','≈','≡','ℕ','ℤ','ℚ','ℝ','ℂ'],
+            greek: ['α','β','γ','δ','ε','ζ','η','θ','λ','μ','π','σ','τ','φ','ψ','ω','Δ','Σ','Π','Ω'],
+            emoji: ['🌟','🚀','🍎','🍕','🎸','🎮','🐱','🐶','🦊','🦄','🔥','💧','⚡','❄','⚽','🏀','🏆','💡','💎','🔮']
+        };
+
+        const DOM = {
+            tooltip: document.getElementById('global-tooltip')
+        };
+
+        function getSetObj(id) { return AppState.sets.find(s => s.id === id); }
+        function getActiveSet1() { return getSetObj(AppState.selSet1Id) || AppState.sets[0]; }
+        function getActiveSet2() { return getSetObj(AppState.selSet2Id) || (AppState.sets[1] || AppState.sets[0]); }
+
+        function parseSetString(str) {
+            if(!str.trim()) return [];
+            return [...new Set(str.split(',').map(s => s.trim()).filter(s => s !== ''))];
+        }
+
+        // ==========================================================================
+        // RENDERIZADO MATEMÁTICO - MATHJAX.JS
+        // ==========================================================================
+        function renderMath(element = null) {
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                const target = element ? [element] : [document.body];
+                MathJax.typesetPromise(target).catch(function (err) {
+                    console.error('Error de MathJax:', err.message);
+                });
+            } else {
+                setTimeout(() => renderMath(element), 100);
+            }
+        }
+
+        function setupTooltips() {
+            document.addEventListener('mouseover', e => {
+                const target = e.target.closest('[data-tooltip]');
+                if (!target) { DOM.tooltip.style.opacity = '0'; return; }
+                
+                DOM.tooltip.innerHTML = target.getAttribute('data-tooltip');
+                renderMath(DOM.tooltip); 
+                
+                const rect = target.getBoundingClientRect();
+                DOM.tooltip.style.left = `${rect.left + window.scrollX}px`;
+                DOM.tooltip.style.top = `${rect.bottom + window.scrollY + 10}px`;
+                DOM.tooltip.style.opacity = '1';
+                
+                const tRect = DOM.tooltip.getBoundingClientRect();
+                if (tRect.right > window.innerWidth) DOM.tooltip.style.left = `${window.innerWidth - tRect.width - 10}px`;
+            });
+        }
+
+        /* ==========================================================================
+           TAB NAVIGATION
+           ========================================================================== */
+        document.querySelectorAll('.tab-btn[data-target]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                
+                e.target.classList.add('active');
+                const targetId = e.target.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+
+                if(targetId === 'panel-cartesian') updateCartesianProduct();
+                if(targetId === 'panel-relations') renderRelations();
+                if(targetId === 'panel-diagram') { updateDiagramSelectors(); drawDiagram(); }
+                if(targetId === 'panel-analysis') { updateAnalysisSelector(); runAnalysis(); }
+            });
+        });
+
+        /* ==========================================================================
+           SET EDITOR LOGIC (PANEL 1)
+           ========================================================================== */
+        function renderSets() {
+            const container = document.getElementById('dynamic-sets-container');
+            container.innerHTML = '';
+            
+            AppState.sets.forEach((set, index) => {
+                const card = document.createElement('div');
+                card.className = 'glass-panel';
+                card.innerHTML = `
+                    <div class="set-header">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-pen" style="color: var(--accent-gold); font-size: 0.9rem; opacity: 0.7;"></i>
+                            <input type="text" class="set-name-input" value="${set.name}" 
+                                onchange="renameSet('${set.id}', this.value)" title="Editar nombre del conjunto">
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <span class="chip" data-tooltip="Cardinalidad"><i class="fa-solid fa-hashtag"></i> ${set.data.length}</span>
+                            ${AppState.sets.length > 1 ? `<button class="btn btn-danger" style="padding: 5px 10px;" onclick="deleteSet('${set.id}')" data-tooltip="Eliminar conjunto"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+                        </div>
+                    </div>
+                    <p class="ce-text mb-2">Elementos separados por comas:</p>
+                    <input type="text" placeholder="Ej: 1, 2, a, 🌟" value="${set.data.join(', ')}" 
+                        oninput="updateSetData('${set.id}', this.value)">
+                    <div class="chips-container" id="chips-${set.id}">
+                        ${set.data.map(item => `<div class="chip"><span>$${item}$</span> <i class="fa-solid fa-xmark remove" onclick="removeSetElement('${set.id}', '${item}')" data-tooltip="Quitar elemento"></i></div>`).join('')}
+                    </div>
+                    <div style="margin-top: 15px; display: flex; gap: 10px;">
+                        <button class="btn btn-cyan" onclick="openEmojiModal('${set.id}')"><i class="fa-solid fa-icons"></i> Insertar Símbolo</button>
+                        <button class="btn" onclick="clearSet('${set.id}')"><i class="fa-solid fa-eraser"></i> Limpiar</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            renderMath(container);
+            updateGlobalSetSelects();
+        }
+
+        function addSet() {
+            const num = AppState.sets.length + 1;
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const name = num <= 26 ? alphabet[num-1] : `S_{${num}}`;
+            AppState.sets.push({ id: 'set_' + Date.now(), name: name, data: [] });
+            renderSets();
+        }
+
+        function deleteSet(id) {
+            if(AppState.sets.length <= 1) return;
+            if(confirm('¿Seguro que deseas eliminar este conjunto por completo?')) {
+                AppState.sets = AppState.sets.filter(s => s.id !== id);
+                if(!getSetObj(AppState.selSet1Id)) AppState.selSet1Id = AppState.sets[0].id;
+                if(!getSetObj(AppState.selSet2Id)) AppState.selSet2Id = AppState.sets[0].id;
+                renderSets();
+                updateCartesianProduct();
+                renderRelations();
+            }
+        }
+
+        function renameSet(id, newName) {
+            const s = getSetObj(id);
+            if(s) {
+                s.name = newName.trim() || 'X';
+                renderSets();
+                updateCartesianProduct();
+                renderRelations();
+            }
+        }
+
+        function updateSetData(id, valStr) {
+            const s = getSetObj(id);
+            if(s) {
+                s.data = parseSetString(valStr);
+                const chipCont = document.getElementById(`chips-${id}`);
+                chipCont.innerHTML = s.data.map(item => 
+                    `<div class="chip"><span>$${item}$</span> <i class="fa-solid fa-xmark remove" onclick="removeSetElement('${id}', '${item}')" data-tooltip="Quitar elemento"></i></div>`
+                ).join('');
+                renderMath(chipCont);
+                
+                const card = chipCont.parentElement;
+                card.querySelector('.set-header .chip').innerHTML = `<i class="fa-solid fa-hashtag"></i> ${s.data.length}`;
+
+                updateCartesianProduct(true);
+            }
+        }
+
+        function removeSetElement(setId, item) {
+            const s = getSetObj(setId);
+            if(s) {
+                s.data = s.data.filter(x => x !== item);
+                renderSets();
+                updateCartesianProduct();
+            }
+        }
+
+        function clearSet(setId) {
+            if(confirm(`¿Deseas vaciar todos los elementos del conjunto?`)) {
+                updateSetData(setId, "");
+                renderSets();
+            }
+        }
+
+        let currentTargetSetId = null;
+        function openEmojiModal(setId) {
+            currentTargetSetId = setId;
+            document.getElementById('emojiModal').classList.add('active');
+            switchEmojiTab('math');
+        }
+        function closeEmojiModal() {
+            document.getElementById('emojiModal').classList.remove('active');
+        }
+        function switchEmojiTab(cat) {
+            const grid = document.getElementById('emoji-grid');
+            grid.innerHTML = '';
+            THE_SYMBOLS[cat].forEach(sym => {
+                const btn = document.createElement('div');
+                btn.className = 'emoji-btn';
+                btn.textContent = sym;
+                btn.onclick = () => {
+                    const s = getSetObj(currentTargetSetId);
+                    if(s) {
+                        s.data.push(sym);
+                        s.data = [...new Set(s.data)];
+                        renderSets(); 
+                        updateCartesianProduct();
+                    }
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        /* ==========================================================================
+           CARTESIAN PRODUCT LOGIC (PANEL 2)
+           ========================================================================== */
+        function updateGlobalSetSelects() {
+            const s1 = document.getElementById('sel-set-1');
+            const s2 = document.getElementById('sel-set-2');
+            
+            if(!AppState.selSet1Id && AppState.sets.length > 0) AppState.selSet1Id = AppState.sets[0].id;
+            if(!AppState.selSet2Id && AppState.sets.length > 1) AppState.selSet2Id = AppState.sets[1].id;
+            else if(!AppState.selSet2Id && AppState.sets.length > 0) AppState.selSet2Id = AppState.sets[0].id;
+
+            let opts = AppState.sets.map(s => `<option value="${s.id}">${s.name.replace(/[{}]/g, '')}</option>`).join('');
+            s1.innerHTML = opts; s2.innerHTML = opts;
+            
+            s1.value = AppState.selSet1Id;
+            s2.value = AppState.selSet2Id;
+
+            const name1 = getActiveSet1().name;
+            const name2 = getActiveSet2().name;
+            document.getElementById('rel-title-heading').innerHTML = `Relaciones $\\subseteq ${name1} \\times ${name2}$`;
+            document.getElementById('label-oval-A').textContent = name1.replace(/[{}]/g, '');
+            document.getElementById('label-oval-B').textContent = name2.replace(/[{}]/g, '');
+        }
+
+        function updateCartesianProduct(silent = false) {
+            AppState.selSet1Id = document.getElementById('sel-set-1').value;
+            AppState.selSet2Id = document.getElementById('sel-set-2').value;
+            updateGlobalSetSelects(); 
+
+            const S1 = getActiveSet1();
+            const S2 = getActiveSet2();
+
+            const btnCont = document.getElementById('cartesian-buttons-container');
+            btnCont.innerHTML = `
+                <button class="btn ${AppState.cartesianMode === '1x2' ? 'btn-cyan' : ''}" onclick="setCartesianMode('1x2')">$${S1.name} \\times ${S2.name}$</button>
+                <button class="btn ${AppState.cartesianMode === '2x1' ? 'btn-cyan' : ''}" onclick="setCartesianMode('2x1')">$${S2.name} \\times ${S1.name}$</button>
+                <button class="btn ${AppState.cartesianMode === '1x1' ? 'btn-cyan' : ''}" onclick="setCartesianMode('1x1')">$${S1.name} \\times ${S1.name}$</button>
+                <button class="btn ${AppState.cartesianMode === '2x2' ? 'btn-cyan' : ''}" onclick="setCartesianMode('2x2')">$${S2.name} \\times ${S2.name}$</button>
+            `;
+            
+            let leftSet, rightSet, modeName;
+            if(AppState.cartesianMode === '1x2') { leftSet = S1; rightSet = S2; modeName = `${S1.name} \\times ${S2.name}`; }
+            if(AppState.cartesianMode === '2x1') { leftSet = S2; rightSet = S1; modeName = `${S2.name} \\times ${S1.name}`; }
+            if(AppState.cartesianMode === '1x1') { leftSet = S1; rightSet = S1; modeName = `${S1.name} \\times ${S1.name}`; }
+            if(AppState.cartesianMode === '2x2') { leftSet = S2; rightSet = S2; modeName = `${S2.name} \\times ${S2.name}`; }
+
+            const pairs = generateProductPairs(leftSet.data, rightSet.data);
+
+            document.getElementById('cartesian-stats').innerHTML = `$n(${modeName}) = ${leftSet.data.length} \\cdot ${rightSet.data.length} = ${pairs.length}$`;
+
+            const texStr = `$$ ${modeName} = \\{ ${pairs.map(p => `(${p.a}, ${p.b})`).join(', ')} \\} $$`;
+            document.getElementById('cartesian-latex').innerHTML = texStr;
+
+            const chipsCont = document.getElementById('cartesian-chips');
+            chipsCont.innerHTML = pairs.map(p => `<div class="chip">($${p.a}$, $${p.b}$)</div>`).join('');
+
+            const table = document.getElementById('cartesian-matrix');
+            let html = `<tr><th>$${leftSet.name} \\backslash ${rightSet.name}$</th>` + rightSet.data.map(b => `<th>$${b}$</th>`).join('') + `</tr>`;
+            leftSet.data.forEach(a => {
+                html += `<tr><th>$${a}$</th>` + rightSet.data.map(b => `<td>($${a}$,$${b}$)</td>`).join('') + `</tr>`;
+            });
+            table.innerHTML = html;
+
+            renderMath(document.getElementById('panel-cartesian'));
+            renderMath(document.getElementById('rel-title-heading'));
+            
+            if(!silent) renderRelations();
+        }
+
+        function generateProductPairs(arr1, arr2) {
+            let res = [];
+            for (let a of arr1) for (let b of arr2) res.push({a, b});
+            return res;
+        }
+
+        function setCartesianMode(mode) {
+            AppState.cartesianMode = mode;
+            updateCartesianProduct();
+        }
+
+        /* ==========================================================================
+           RELATIONS LOGIC (PANEL 3)
+           ========================================================================== */
+        const MATH_KEYS = [
+            { t: 'a', c: 'a', k: 'var', tt: '1er comp.' }, { t: 'b', c: 'b', k: 'var', tt: '2da comp.' },
+            { t: 'π', c: 'Math.PI', k: 'const' }, { t: 'e', c: 'Math.E', k: 'const' },
+            { t: '+', c: '+', k: 'op' }, { t: '−', c: '-', k: 'op' }, { t: '×', c: '*', k: 'op' }, { t: '÷', c: '/', k: 'op' }, { t: 'mód', c: '%', k: 'op', tt: 'Resto (ej: a % 2 == 0)' },
+            { t: '=', c: '==', k: 'op' }, { t: '≠', c: '!=', k: 'op' }, { t: '<', c: '<', k: 'op' }, { t: '≤', c: '<=', k: 'op' }, { t: '>', c: '>', k: 'op' }, { t: '≥', c: '>=', k: 'op' },
+            { t: 'AND', c: '&&', k: 'log' }, { t: 'OR', c: '||', k: 'log' }, { t: 'NOT', c: '!', k: 'log' },
+            { t: 'x²', c: '**2', k: 'func' }, { t: 'x³', c: '**3', k: 'func' }, { t: 'xⁿ', c: '**', k: 'func' },
+            { t: '√x', c: 'Math.sqrt()', k: 'func' }, { t: '∛x', c: 'Math.cbrt()', k: 'func' },
+            { t: '|x|', c: 'Math.abs()', k: 'func' }, { t: '⌊x⌋', c: 'Math.floor()', k: 'func' }, { t: '⌈x⌉', c: 'Math.ceil()', k: 'func' },
+            { t: 'sen', c: 'Math.sin()', k: 'func' }, { t: 'cos', c: 'Math.cos()', k: 'func' }
+        ];
+
+        function addRelation() {
+            const newId = Date.now();
+            const num = AppState.relations.length + 1;
+            const color = AppState.colors[num % AppState.colors.length];
+            AppState.relations.push({
+                id: newId, name: `R_{${num}}`, mode: 'comprehension', data: '', color: color, activeDiagram: true
+            });
+            renderRelations();
+            updateDiagramSelectors(); drawDiagram();
+        }
+
+        function deleteRelation(id) {
+            if(confirm('¿Eliminar esta relación definitivamente?')) {
+                AppState.relations = AppState.relations.filter(r => r.id !== id);
+                renderRelations();
+                updateDiagramSelectors(); drawDiagram();
+            }
+        }
+
+        function toggleRelMode(id, mode) {
+            const rel = AppState.relations.find(r => r.id === id);
+            rel.mode = mode;
+            rel.data = '';
+            renderRelations();
+        }
+
+        function updateRelData(id, value) {
+            const rel = AppState.relations.find(r => r.id === id);
+            rel.data = value;
+            evaluateRelation(rel);
+        }
+
+        function insertToInput(id, str) {
+            const input = document.getElementById(`rel-input-${id}`);
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            input.value = input.value.substring(0, start) + str + input.value.substring(end);
+            input.focus();
+            let offset = str.length;
+            if (str.endsWith('()')) offset -= 1; 
+            input.selectionStart = input.selectionEnd = start + offset;
+            updateRelData(id, input.value);
+        }
+
+        function evaluateRelation(rel) {
+            const S1 = getActiveSet1().data;
+            const S2 = getActiveSet2().data;
+            const product = generateProductPairs(S1, S2);
+            
+            let validPairs = [];
+            const resultsDiv = document.getElementById(`rel-res-${rel.id}`);
+            if(!resultsDiv) return;
+
+            let html = '<div class="eval-results-container">';
+
+            if (rel.mode === 'extension') {
+                const regex = /\(([^,()]+),\s*([^,()]+)\)/g;
+                let match;
+                const parsedPairs = [];
+                while ((match = regex.exec(rel.data)) !== null) {
+                    parsedPairs.push({a: match[1].trim(), b: match[2].trim()});
+                }
+                
+                if(parsedPairs.length === 0) {
+                    html += `<span class="ce-text">Escribe pares como (1,a), (2,b)</span>`;
+                } else {
+                    parsedPairs.forEach(p => {
+                        const isValid = product.some(cartP => cartP.a === p.a && cartP.b === p.b);
+                        if(isValid) {
+                            validPairs.push(p);
+                            html += `<span class="chip valid-pair" data-tooltip="Pertenece al producto cartesiano"><i class="fa-solid fa-check"></i> ($${p.a}$, $${p.b}$)</span>`;
+                        } else {
+                            html += `<span class="chip invalid-pair" data-tooltip="No pertenece al producto"><i class="fa-solid fa-xmark"></i> ($${p.a}$, $${p.b}$)</span>`;
+                        }
+                    });
+                }
+            } else {
+                if(!rel.data.trim()) {
+                    html += `<span class="ce-text">Escribe una condición. Ej: a == 1 || b == "a"</span>`;
+                } else {
+                    try {
+                        const evaluator = new Function('a', 'b', `
+                            const numA = isNaN(a) ? a : Number(a);
+                            const numB = isNaN(b) ? b : Number(b);
+                            return (function(a,b) { return ${rel.data}; })(numA, numB);
+                        `);
+                        
+                        product.forEach(p => {
+                            try {
+                                const res = evaluator(p.a, p.b);
+                                if(res === true) {
+                                    validPairs.push(p);
+                                    html += `<span class="chip valid-pair" data-tooltip="Cumple la condición"><i class="fa-solid fa-check"></i> ($${p.a}$, $${p.b}$)</span>`;
+                                } else {
+                                    html += `<span class="chip invalid-pair" data-tooltip="Rechazado"><i class="fa-solid fa-xmark"></i> ($${p.a}$, $${p.b}$)</span>`;
+                                }
+                            } catch(e) { 
+                                html += `<span class="chip invalid-pair" style="border-color:orange" data-tooltip="Error evaluando"><i class="fa-solid fa-triangle-exclamation"></i> ($${p.a}$, $${p.b}$)</span>`;
+                            }
+                        });
+                    } catch(e) {
+                        html += `<span class="ce-text" style="color:var(--accent-red)"><i class="fa-solid fa-triangle-exclamation"></i> Error de sintaxis: ${e.message}</span>`;
+                    }
+                }
+            }
+            html += '</div>';
+            
+            rel._evaluatedPairs = validPairs;
+            resultsDiv.innerHTML = html;
+            renderMath(resultsDiv);
+            
+            if(rel.activeDiagram && document.getElementById('panel-diagram').classList.contains('active')) {
+                drawDiagram();
+            }
+        }
+
+        function renderRelations() {
+            const container = document.getElementById('relations-container');
+            container.innerHTML = '';
+
+            AppState.relations.forEach(rel => {
+                const card = document.createElement('div');
+                card.className = 'glass-panel relation-card';
+                card.style.borderLeftColor = rel.color;
+
+                let keyboardHTML = '';
+                if(rel.mode === 'comprehension') {
+                    keyboardHTML = `<div class="math-keyboard">` + 
+                        MATH_KEYS.map(k => {
+                            let kClass = '';
+                            if(k.k === 'var') kClass = 'key-var';
+                            else if(k.k === 'log') kClass = 'key-log';
+                            else if(k.k === 'func') kClass = 'key-func';
+                            else if(k.k === 'const') kClass = 'key-const';
+                            return `<button class="key-btn ${kClass}" data-tooltip="${k.tt||''}" onclick="insertToInput(${rel.id}, '${k.c}')">${k.t}<small>${k.c}</small></button>`;
+                        }).join('') +
+                    `</div>`;
+                }
+
+                card.innerHTML = `
+                    <div class="rel-header">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 15px; height: 15px; border-radius: 50%; background: ${rel.color}; box-shadow: 0 0 10px ${rel.color}"></div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-pen" style="color: rgba(255,255,255,0.7); font-size: 0.9rem;"></i>
+                                <input type="text" value="${rel.name.replace(/[{}]/g, '')}" 
+                                    style="width:100px; padding:0 5px; background:transparent; border:none; border-bottom:1px dashed ${rel.color}; color:#fff; font-size:1.4rem; outline:none; font-family:var(--font-math);" 
+                                    onchange="renameRelation(${rel.id}, this.value)" title="Editar nombre de la relación">
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <div class="toggle-switch">
+                                <button class="toggle-btn ${rel.mode === 'extension' ? 'active' : ''}" onclick="toggleRelMode(${rel.id}, 'extension')">Por Extensión</button>
+                                <button class="toggle-btn ${rel.mode === 'comprehension' ? 'active' : ''}" onclick="toggleRelMode(${rel.id}, 'comprehension')">Por Comprensión</button>
+                            </div>
+                            <button class="btn btn-danger" style="padding: 5px 10px;" onclick="deleteRelation(${rel.id})" data-tooltip="Eliminar relación"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <input type="text" id="rel-input-${rel.id}" class="math-input" 
+                            placeholder="${rel.mode === 'extension' ? 'Ej: (1,a), (2,b)' : 'Ej: a == 1 || b == a**2'}" 
+                            value="${rel.data}" oninput="updateRelData(${rel.id}, this.value)">
+                    </div>
+                    
+                    ${keyboardHTML}
+
+                    <div class="rel-results" id="rel-res-${rel.id}">
+                        <!-- Results injected here -->
+                    </div>
+                `;
+                container.appendChild(card);
+                evaluateRelation(rel);
+            });
+            renderMath(container);
+            setupTooltips();
+        }
+
+        function renameRelation(id, newName) {
+            const rel = AppState.relations.find(r => r.id === id);
+            if(rel) {
+                rel.name = newName || 'R';
+                renderRelations();
+                updateDiagramSelectors();
+                updateAnalysisSelector();
+            }
+        }
+
+        /* ==========================================================================
+           SAGITTAL DIAGRAM LOGIC (PANEL 4)
+           ========================================================================== */
+        function setSubsetsToggle(show) {
+            AppState.diagramConfig.showSubsets = show;
+            document.getElementById('btn-show-subsets-yes').classList.toggle('active', show);
+            document.getElementById('btn-show-subsets-no').classList.toggle('active', !show);
+            drawDiagram();
+        }
+
+        function updateDiagramConfig() {
+            AppState.diagramConfig.oval1Fill = document.getElementById('conf-oval1-fill').value;
+            AppState.diagramConfig.oval1Stroke = document.getElementById('conf-oval1-stroke').value;
+            AppState.diagramConfig.oval2Fill = document.getElementById('conf-oval2-fill').value;
+            AppState.diagramConfig.oval2Stroke = document.getElementById('conf-oval2-stroke').value;
+            AppState.diagramConfig.ovalStyle = document.getElementById('conf-oval-style').value;
+            AppState.diagramConfig.arrowWidth = document.getElementById('conf-arrow-width').value;
+            AppState.diagramConfig.arrowStyle = document.getElementById('conf-arrow-style').value;
+            
+            const oA = document.getElementById('oval-A');
+            const oB = document.getElementById('oval-B');
+            oA.setAttribute('fill', AppState.diagramConfig.oval1Fill);
+            oA.setAttribute('stroke', AppState.diagramConfig.oval1Stroke);
+            oB.setAttribute('fill', AppState.diagramConfig.oval2Fill);
+            oB.setAttribute('stroke', AppState.diagramConfig.oval2Stroke);
+            
+            const dashStyle = AppState.diagramConfig.ovalStyle === 'none' ? '' : AppState.diagramConfig.ovalStyle;
+            oA.setAttribute('stroke-dasharray', dashStyle);
+            oB.setAttribute('stroke-dasharray', dashStyle);
+            
+            document.getElementById('label-oval-A').setAttribute('fill', AppState.diagramConfig.oval1Stroke);
+            document.getElementById('label-oval-B').setAttribute('fill', AppState.diagramConfig.oval2Stroke);
+
+            drawDiagram(); 
+        }
+
+        function updateDiagramSelectors() {
+            const container = document.getElementById('diagram-rel-selector');
+            container.innerHTML = '<span style="color:var(--text-muted); padding-top: 5px;">Mostrar:</span>';
+            AppState.relations.forEach(rel => {
+                const btn = document.createElement('button');
+                btn.className = `btn ${rel.activeDiagram ? '' : 'btn-outline'}`;
+                btn.style.borderColor = rel.color;
+                if(rel.activeDiagram) {
+                    btn.style.background = `rgba(${hexToRgb(rel.color)}, 0.2)`;
+                    btn.style.color = '#fff';
+                    btn.style.boxShadow = `0 0 10px ${rel.color}`;
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = rel.color;
+                }
+                btn.innerHTML = `$${rel.name}$`;
+                btn.onclick = () => {
+                    rel.activeDiagram = !rel.activeDiagram;
+                    updateDiagramSelectors();
+                    drawDiagram();
+                };
+                container.appendChild(btn);
+            });
+            renderMath(container);
+        }
+
+        function hexToRgb(hex) {
+            let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '255,255,255';
+        }
+
+        // Dibuja los subconjuntos envolventes para Dom/Ran (agrupando contiguos)
+        function generateSubsetPath(dataArray, activeSet, cx, baseY, spacing, color, labelText, isLeft) {
+            let segments = [];
+            let current = null;
+            dataArray.forEach((val, i) => {
+                if(activeSet.has(String(val))) {
+                    if(!current) current = {start: i, end: i};
+                    else current.end = i;
+                } else {
+                    if(current) { segments.push(current); current = null; }
+                }
+            });
+            if(current) segments.push(current);
+
+            let html = '';
+            segments.forEach((seg, idx) => {
+                const y1 = baseY + seg.start * spacing - 26;
+                const y2 = baseY + seg.end * spacing + 26;
+                const h = y2 - y1;
+                html += `<rect x="${cx - 35}" y="${y1}" width="70" height="${h}" rx="35" fill="${color}" fill-opacity="0.15" stroke="${color}" stroke-dasharray="4,4" stroke-width="2" style="filter: drop-shadow(0 0 8px ${color});" />`;
+                
+                // Mostrar la etiqueta (Dom/Ran) solo en el primer bloque contiguo
+                if (idx === 0) {
+                    const lx = isLeft ? cx - 45 : cx + 45;
+                    const anchor = isLeft ? 'end' : 'start';
+                    html += `<text x="${lx}" y="${y1 + h/2}" fill="${color}" font-family="Orbitron" font-size="14" text-anchor="${anchor}" dominant-baseline="middle" font-weight="bold">${labelText}</text>`;
+                }
+            });
+            return html;
+        }
+
+        function drawDiagram() {
+            const svg = document.getElementById('sagittal-svg');
+            const gSubsets = document.getElementById('svg-subsets');
+            const gNodesA = document.getElementById('svg-nodes-A');
+            const gNodesB = document.getElementById('svg-nodes-B');
+            const gPaths = document.getElementById('svg-paths');
+            
+            gSubsets.innerHTML = ''; gNodesA.innerHTML = ''; gNodesB.innerHTML = ''; gPaths.innerHTML = '';
+
+            const cxA = 150, cxB = 650;
+            const baseY = 80, spacing = 50;
+            
+            const AData = getActiveSet1().data;
+            const BData = getActiveSet2().data;
+            
+            const maxNodes = Math.max(AData.length, BData.length);
+            const requiredHeight = Math.max(500, baseY * 2 + maxNodes * spacing);
+            svg.setAttribute('viewBox', `0 0 800 ${requiredHeight}`);
+            
+            const oRy = Math.max((maxNodes * spacing)/2 + 40, 100);
+            const oCy = Math.max((maxNodes * spacing)/2 + 40, 150);
+            document.getElementById('oval-A').setAttribute('ry', oRy);
+            document.getElementById('oval-A').setAttribute('cy', oCy);
+            document.getElementById('oval-B').setAttribute('ry', oRy);
+            document.getElementById('oval-B').setAttribute('cy', oCy);
+
+            const coords = { A: {}, B: {} };
+
+            // Extraer dominio y rango global de relaciones activas
+            const activePairs = [];
+            AppState.relations.filter(r => r.activeDiagram).forEach(rel => {
+                if(rel._evaluatedPairs) activePairs.push(...rel._evaluatedPairs);
+            });
+            const globalDomSet = new Set(activePairs.map(p => String(p.a)));
+            const globalRanSet = new Set(activePairs.map(p => String(p.b)));
+
+            // Dibujar subconjuntos envolventes si está activado
+            if(AppState.diagramConfig.showSubsets) {
+                gSubsets.innerHTML += generateSubsetPath(AData, globalDomSet, cxA, baseY, spacing, AppState.diagramConfig.oval1Stroke, 'Dom', true);
+                gSubsets.innerHTML += generateSubsetPath(BData, globalRanSet, cxB, baseY, spacing, AppState.diagramConfig.oval2Stroke, 'Ran', false);
+            }
+
+            // Nodos
+            AData.forEach((val, i) => {
+                const y = baseY + i * spacing;
+                coords.A[val] = {x: cxA, y: y};
+                gNodesA.innerHTML += `
+                    <g class="node" transform="translate(${cxA}, ${y})" data-val="${val}">
+                        <circle r="20" fill="${AppState.diagramConfig.oval1Fill}" stroke="${AppState.diagramConfig.oval1Stroke}" />
+                        <text>${val}</text>
+                    </g>`;
+            });
+
+            BData.forEach((val, i) => {
+                const y = baseY + i * spacing;
+                coords.B[val] = {x: cxB, y: y};
+                gNodesB.innerHTML += `
+                    <g class="node" transform="translate(${cxB}, ${y})" data-val="${val}">
+                        <circle r="20" fill="${AppState.diagramConfig.oval2Fill}" stroke="${AppState.diagramConfig.oval2Stroke}" />
+                        <text>${val}</text>
+                    </g>`;
+            });
+
+            // Flechas
+            const speed = document.getElementById('anim-speed').value;
+            const aWidth = AppState.diagramConfig.arrowWidth;
+            const aStyle = AppState.diagramConfig.arrowStyle === 'none' ? '' : AppState.diagramConfig.arrowStyle;
+            
+            let pathCounter = 0;
+            AppState.relations.filter(r => r.activeDiagram).forEach(rel => {
+                if(!rel._evaluatedPairs) return;
+                
+                rel._evaluatedPairs.forEach(pair => {
+                    const ptA = coords.A[pair.a];
+                    const ptB = coords.B[pair.b];
+                    if(!ptA || !ptB) return;
+
+                    const dx = ptB.x - ptA.x;
+                    const dy = ptB.y - ptA.y;
+                    const angle = Math.atan2(dy, dx);
+                    const startX = ptA.x + 20 * Math.cos(angle);
+                    const startY = ptA.y + 20 * Math.sin(angle);
+                    const endX = ptB.x - 24 * Math.cos(angle);
+                    const endY = ptB.y - 24 * Math.sin(angle);
+
+                    const cp1X = startX + (endX - startX) * 0.4;
+                    const cp1Y = startY;
+                    const cp2X = startX + (endX - startX) * 0.6;
+                    const cp2Y = endY;
+
+                    const d = `M ${startX} ${startY} C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, ${endX} ${endY}`;
+                    
+                    pathCounter++;
+                    gPaths.innerHTML += `
+                        <path class="arrow-path animated-arrow" 
+                              d="${d}" 
+                              stroke="${rel.color}" 
+                              stroke-width="${aWidth}"
+                              stroke-dasharray="${aStyle}"
+                              marker-end="url(#arrowhead)"
+                              style="animation-duration: ${speed}s; animation-delay: ${pathCounter*0.05}s;"
+                              data-source="${pair.a}"
+                              data-target="${pair.b}"
+                              data-basewidth="${aWidth}"
+                              data-tooltip="Par: ($${pair.a}$, $${pair.b}$) \\in $${rel.name}$" />`;
+                });
+            });
+            setupTooltips();
+        }
+
+        // Manejo de Hover para interactividad global en el SVG
+        function setupDiagramHoverInteractivity() {
+            const svgElement = document.getElementById('sagittal-svg');
+            
+            svgElement.addEventListener('mouseover', e => {
+                const node = e.target.closest('.node');
+                if(node) {
+                    const val = node.dataset.val;
+                    document.querySelectorAll('.arrow-path').forEach(p => {
+                        if(p.dataset.source === String(val) || p.dataset.target === String(val)) {
+                            p.style.strokeWidth = (parseInt(p.dataset.basewidth) + 2) + 'px';
+                            p.style.opacity = '1';
+                            p.style.filter = 'drop-shadow(0 0 8px currentColor)';
+                            p.parentNode.appendChild(p); // Bring to front
+                        } else {
+                            p.style.opacity = '0.15';
+                            p.style.filter = 'none';
+                        }
+                    });
+                }
+            });
+
+            svgElement.addEventListener('mouseout', e => {
+                const node = e.target.closest('.node');
+                if(node) {
+                    document.querySelectorAll('.arrow-path').forEach(p => {
+                        p.style.strokeWidth = p.dataset.basewidth + 'px';
+                        p.style.opacity = '1';
+                        p.style.filter = 'none';
+                    });
+                }
+            });
+        }
+        
+        function exportSVG() {
+            const svgData = document.getElementById('sagittal-svg').outerHTML;
+            const blob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "DiagramaSagital.svg";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        /* ==========================================================================
+           ANALYSIS LOGIC (PANEL 5)
+           ========================================================================== */
+        
+        function updateAnalysisSelector() {
+            const select = document.getElementById('analysis-selector');
+            select.innerHTML = '';
+            AppState.relations.forEach(r => {
+                select.innerHTML += `<option value="${r.id}">Relación ${r.name.replace(/[{}]/g, '')}</option>`;
+            });
+        }
+
+        function runAnalysis() {
+            const id = document.getElementById('analysis-selector').value;
+            if(!id) return;
+            const rel = AppState.relations.find(r => r.id == id);
+            if(!rel) return;
+
+            evaluateRelation(rel);
+            const R = rel._evaluatedPairs || [];
+            const A = getActiveSet1().data;
+            const B = getActiveSet2().data;
+
+            const domSet = new Set(R.map(p => p.a));
+            const ranSet = new Set(R.map(p => p.b));
+            
+            document.getElementById('stats-domain').innerHTML = `$$ Dom(${rel.name}) = \\{ ${[...domSet].join(', ')} \\} $$`;
+            document.getElementById('stats-range').innerHTML = `$$ Ran(${rel.name}) = \\{ ${[...ranSet].join(', ')} \\} $$`;
+            document.getElementById('stats-card').innerHTML = `$$ |${rel.name}| = ${R.length} \\text{ pares} $$`;
+            
+            const R_has = (a, b) => R.some(p => String(p.a) === String(a) && String(p.b) === String(b));
+            
+            let refValid = true, refCE = null;
+            for(let a of A) { if(!R_has(a,a)) { refValid = false; refCE = `(${a},${a}) \\notin R`; break; } }
+
+            let symValid = true, symCE = null;
+            for(let p of R) { if(!R_has(p.b, p.a)) { symValid = false; symCE = `(${p.a},${p.b}) \\in R \\implies (${p.b},${p.a}) \\notin R`; break; } }
+
+            let antiValid = true, antiCE = null;
+            for(let p of R) { if(p.a !== p.b && R_has(p.b, p.a)) { antiValid = false; antiCE = `(${p.a},${p.b}), (${p.b},${p.a}) \\in R \\text{ pero } ${p.a} \\neq ${p.b}`; break; } }
+
+            let transValid = true, transCE = null;
+            for(let p1 of R) {
+                for(let p2 of R) {
+                    if(p1.b === p2.a && !R_has(p1.a, p2.b)) {
+                        transValid = false; transCE = `(${p1.a},${p1.b}), (${p2.a},${p2.b}) \\in R \\implies (${p1.a},${p2.b}) \\notin R`; break;
+                    }
+                }
+                if(!transValid) break;
+            }
+
+            let isFunc = true, funcCE = null;
+            for(let a of domSet) {
+                const images = R.filter(p => p.a === a);
+                if(images.length > 1) { isFunc = false; funcCE = `${a} \\text{ tiene img: } ${images.map(i=>i.b).join(', ')}`; break; }
+            }
+
+            const isTotal = domSet.size === A.length;
+            const totalCE = isTotal ? null : `Dom(R) \\neq ${getActiveSet1().name}`;
+
+            let isInj = true, injCE = null;
+            if(isFunc) {
+                for(let b of ranSet) {
+                    const preimages = R.filter(p => p.b === b);
+                    if(preimages.length > 1) { isInj = false; injCE = `${b} \\text{ proviene de: } ${preimages.map(i=>i.a).join(', ')}`; break; }
+                }
+            } else { isInj = false; injCE = '\\text{No es función}'; }
+
+            const isSurj = isFunc && ranSet.size === B.length;
+            const surjCE = isSurj ? null : `Ran(R) \\neq ${getActiveSet2().name}`;
+            const isBij = isFunc && isInj && isSurj;
+
+            const propsData = [
+                { name: 'Reflexiva', valid: refValid, ce: refCE, tt: '$\\forall x \\in A, (x,x) \\in R$' },
+                { name: 'Simétrica', valid: symValid, ce: symCE, tt: '$\\forall x,y: (x,y) \\in R \\implies (y,x) \\in R$' },
+                { name: 'Antisimétrica', valid: antiValid, ce: antiCE, tt: '$(x,y) \\in R \\land (y,x) \\in R \\implies x = y$' },
+                { name: 'Transitiva', valid: transValid, ce: transCE, tt: '$(x,y) \\in R \\land (y,z) \\in R \\implies (x,z) \\in R$' },
+                { name: 'Es Función', valid: isFunc, ce: funcCE, tt: '\\text{Cada elemento del dominio tiene exactamente una imagen.}' },
+                { name: 'Función Total', valid: isTotal, ce: totalCE, tt: '\\text{Dominio de R equivale al Conjunto de Salida}' },
+                { name: 'Inyectiva (1-1)', valid: isInj, ce: injCE, tt: '$f(x_1) = f(x_2) \\implies x_1 = x_2$' },
+                { name: 'Sobreyectiva', valid: isSurj, ce: surjCE, tt: '\\text{Rango de R equivale al Conjunto de Llegada}' },
+                { name: 'Biyectiva', valid: isBij, ce: isBij ? null : '\\text{Falla Inyectividad o Sobreyectividad}', tt: '\\text{Correspondencia uno a uno y sobre.}' }
+            ];
+
+            const cont = document.getElementById('props-container');
+            cont.innerHTML = '';
+            propsData.forEach(p => {
+                cont.innerHTML += `
+                    <div class="prop-item ${p.valid ? 'true' : 'false'}" data-tooltip="${p.tt}">
+                        <div>
+                            <strong>${p.name}</strong>
+                            ${!p.valid && p.ce ? `<span class="ce-text"><i class="fa-solid fa-xmark"></i> Falla: $${p.ce}$</span>` : ''}
+                        </div>
+                        <span class="prop-badge ${p.valid ? 'badge-true' : 'badge-false'}">${p.valid ? 'SÍ' : 'NO'}</span>
+                    </div>
+                `;
+            });
+            renderMath(document.getElementById('panel-analysis'));
+            setupTooltips();
+            updateChart();
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('analysisChart').getContext('2d');
+            const labels = AppState.relations.map(r => `R ${r.name.replace(/[{}]/g, '')}`);
+            const data = AppState.relations.map(r => { evaluateRelation(r); return r._evaluatedPairs ? r._evaluatedPairs.length : 0; });
+            const bgColors = AppState.relations.map(r => `rgba(${hexToRgb(r.color)}, 0.6)`);
+            const borderColors = AppState.relations.map(r => r.color);
+
+            if(AppState.chartInstance) AppState.chartInstance.destroy();
+
+            AppState.chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{ label: 'Pares', data: data, backgroundColor: bgColors, borderColor: borderColors, borderWidth: 1, borderRadius: 4 }]
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ba1a6', stepSize: 1 } }, x: { grid: { display: false }, ticks: { color: '#9ba1a6', font: {family: 'Orbitron'} } } }, plugins: { legend: { display: false } } }
+            });
+        }
+
+        /* ==========================================================================
+           INITIALIZATION
+           ========================================================================== */
+        window.onload = () => {
+            renderSets();
+            updateCartesianProduct(true);
+            renderRelations();
+            setupTooltips();
+            updateDiagramConfig(); 
+            setupDiagramHoverInteractivity(); // Initialize hover physics
+            renderMath();
+            window.addEventListener('resize', () => { if(document.getElementById('panel-diagram').classList.contains('active')) drawDiagram(); });
+        };
+
+    </script>
+</body>
+</html>

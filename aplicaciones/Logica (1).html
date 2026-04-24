@@ -1,0 +1,2939 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>LogicVerse Pro | Suite Lógica Matemática</title>
+    <meta name="description"
+        content="Calculadora de lógica proposicional por pasos y biblioteca de reglas de inferencia completa.">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        orbitron: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        glass: {
+                            light: 'rgba(255, 255, 255, 0.7)',
+                            dark: 'rgba(17, 24, 39, 0.7)',
+                            border: 'rgba(255, 255, 255, 0.2)',
+                        },
+                    },
+                    animation: {
+                        'blob': 'blob 10s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* ============================================
+           LOGICVERSE PRO - ESTILOS PREMIUM
+           Glassmorphism + Neumorphism + Diseño Artístico
+           ============================================ */
+
+        /* === VARIABLES CSS === */
+        :root {
+            /* Dark Theme Colors */
+            --dark-bg-primary: #0f172a;
+            --dark-bg-secondary: #1e293b;
+            --dark-accent-cyan: #0ea5e9;
+            --dark-accent-purple: #8b5cf6;
+            --dark-accent-pink: #ec4899;
+            --dark-text-primary: #f1f5f9;
+            --dark-text-secondary: #94a3b8;
+
+            /* Light Theme Colors - VIBRANTE Y ARTÍSTICO */
+            --light-bg-gradient-start: #667eea;
+            --light-bg-gradient-mid: #764ba2;
+            --light-bg-gradient-end: #f093fb;
+            --light-bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            --light-bg-secondary: #fdfbfb;
+            --light-accent-violet: #7c3aed;
+            --light-accent-fuchsia: #d946ef;
+            --light-accent-rose: #f43f5e;
+            --light-accent-amber: #f59e0b;
+            --light-accent-emerald: #10b981;
+            --light-text-primary: #1e1b4b;
+            --light-text-secondary: #4c1d95;
+
+            /* Glass Effects */
+            --glass-blur: 20px;
+            --glass-saturation: 180%;
+        }
+
+        /* === ESTILOS BASE === */
+        body {
+            background-color: var(--dark-bg-primary);
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
+        }
+
+        /* === SCROLLBAR PERSONALIZADO === */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #0ea5e9, #8b5cf6, #ec4899);
+            border-radius: 10px;
+            border: 2px solid rgba(15, 23, 42, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #38bdf8, #a78bfa, #f472b6);
+        }
+
+        /* === GLASSMORPHISM DARK === */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+            -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-panel-heavy {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        /* ============================================
+           TEMA LIGHT - DISEÑO PREMIUM VIBRANTE
+           ============================================ */
+
+        html.light body {
+            background: linear-gradient(135deg,
+                    #a8edea 0%,
+                    #fed6e3 25%,
+                    #d299c2 50%,
+                    #fef9d7 75%,
+                    #a8edea 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: var(--light-text-primary);
+        }
+
+        @keyframes gradientShift {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        /* Glassmorphism Light - Premium */
+        html.light .glass-panel {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            box-shadow:
+                0 8px 32px rgba(103, 126, 234, 0.2),
+                0 4px 16px rgba(236, 72, 153, 0.1),
+                inset 0 2px 4px rgba(255, 255, 255, 0.8),
+                inset 0 -1px 2px rgba(0, 0, 0, 0.05);
+            color: var(--light-text-primary);
+        }
+
+        html.light .glass-panel-heavy {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(30px) saturate(200%);
+            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow:
+                0 25px 50px rgba(103, 126, 234, 0.25),
+                0 10px 30px rgba(236, 72, 153, 0.15),
+                inset 0 2px 4px rgba(255, 255, 255, 0.9);
+            color: var(--light-text-primary);
+        }
+
+        /* Aurora Background Light Mode */
+        html.light .aurora-bg {
+            background: linear-gradient(135deg,
+                    rgba(167, 139, 250, 0.3) 0%,
+                    rgba(236, 72, 153, 0.2) 50%,
+                    rgba(6, 182, 212, 0.3) 100%);
+        }
+
+        html.light .aurora-bg .blob {
+            opacity: 0.4;
+            filter: blur(100px);
+        }
+
+        html.light .aurora-bg .blob:nth-child(1) {
+            background: linear-gradient(135deg, #a78bfa, #818cf8) !important;
+        }
+
+        html.light .aurora-bg .blob:nth-child(2) {
+            background: linear-gradient(135deg, #f472b6, #fb7185) !important;
+        }
+
+        html.light .aurora-bg .blob:nth-child(3) {
+            background: linear-gradient(135deg, #2dd4bf, #34d399) !important;
+        }
+
+        /* Header Light Mode */
+        html.light header.glass-panel-heavy {
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            box-shadow: 0 4px 30px rgba(103, 126, 234, 0.15);
+        }
+
+        html.light .font-orbitron {
+            background: linear-gradient(135deg, #7c3aed, #db2777, #0891b2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Botones de Navegación Light */
+        html.light .btn-ribbon {
+            color: var(--light-text-primary);
+        }
+
+        html.light .btn-ribbon:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(236, 72, 153, 0.1));
+        }
+
+        html.light .btn-ribbon::after {
+            background: linear-gradient(90deg, #7c3aed, #db2777, #0891b2);
+        }
+
+        html.light .btn-ribbon i {
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        /* Calculator Section Light - Neumorphism */
+        html.light section.glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            box-shadow:
+                20px 20px 60px rgba(166, 180, 200, 0.4),
+                -20px -20px 60px rgba(255, 255, 255, 0.9),
+                inset 0 2px 4px rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+
+        html.light section.glass-panel>div:first-child {
+            background: linear-gradient(90deg, #7c3aed, #db2777, #0891b2, #7c3aed);
+            background-size: 300% 100%;
+            animation: gradientLine 3s ease infinite;
+        }
+
+        @keyframes gradientLine {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        html.light .bg-slate-900\/40 {
+            background: rgba(255, 255, 255, 0.3) !important;
+        }
+
+        /* Input Light Mode - Claymorphism */
+        html.light #expression-input {
+            background: rgba(255, 255, 255, 0.8) !important;
+            border: 2px solid rgba(139, 92, 246, 0.3) !important;
+            box-shadow:
+                inset 4px 4px 8px rgba(166, 180, 200, 0.3),
+                inset -4px -4px 8px rgba(255, 255, 255, 0.8),
+                0 4px 15px rgba(139, 92, 246, 0.1);
+            color: var(--light-text-primary) !important;
+        }
+
+        html.light #expression-input::placeholder {
+            color: rgba(124, 58, 237, 0.4);
+        }
+
+        html.light #expression-input:focus {
+            border-color: rgba(139, 92, 246, 0.6) !important;
+            box-shadow:
+                inset 2px 2px 4px rgba(166, 180, 200, 0.2),
+                inset -2px -2px 4px rgba(255, 255, 255, 0.9),
+                0 0 20px rgba(139, 92, 246, 0.3),
+                0 0 40px rgba(236, 72, 153, 0.2);
+        }
+
+        /* Keypad Light - Neumorphism Buttons */
+        html.light .keypad-btn {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.8) !important;
+            box-shadow:
+                4px 4px 10px rgba(166, 180, 200, 0.4),
+                -4px -4px 10px rgba(255, 255, 255, 0.9);
+            color: var(--light-text-primary);
+            transition: all 0.2s ease;
+        }
+
+        html.light .keypad-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1));
+            box-shadow:
+                2px 2px 5px rgba(166, 180, 200, 0.4),
+                -2px -2px 5px rgba(255, 255, 255, 0.9);
+            transform: translateY(-1px);
+        }
+
+        html.light .keypad-btn:active {
+            box-shadow:
+                inset 2px 2px 5px rgba(166, 180, 200, 0.4),
+                inset -2px -2px 5px rgba(255, 255, 255, 0.9);
+            transform: scale(0.95);
+        }
+
+        html.light .keypad-btn.text-cyan-400 {
+            color: #0891b2;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(34, 211, 238, 0.05));
+        }
+
+        html.light .keypad-btn.text-rose-400 {
+            color: #e11d48;
+            background: linear-gradient(135deg, rgba(225, 29, 72, 0.1), rgba(251, 113, 133, 0.05));
+        }
+
+        html.light .keypad-btn.text-yellow-400 {
+            color: #d97706;
+            background: linear-gradient(135deg, rgba(217, 119, 6, 0.1), rgba(251, 191, 36, 0.05));
+        }
+
+        /* Botones Principales Light - Gradient 3D */
+        html.light #calculate-btn {
+            background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 50%, #a78bfa 100%);
+            box-shadow:
+                0 10px 30px rgba(124, 58, 237, 0.4),
+                0 5px 15px rgba(139, 92, 246, 0.3),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            border: none;
+        }
+
+        html.light #calculate-btn:hover {
+            background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 50%, #8b5cf6 100%);
+            box-shadow:
+                0 15px 40px rgba(124, 58, 237, 0.5),
+                0 8px 20px rgba(139, 92, 246, 0.4);
+            transform: translateY(-2px);
+        }
+
+        html.light #simplify-btn {
+            background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+            box-shadow:
+                0 10px 30px rgba(16, 185, 129, 0.4),
+                0 5px 15px rgba(52, 211, 153, 0.3),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            border: none;
+        }
+
+        html.light #simplify-btn:hover {
+            background: linear-gradient(135deg, #047857 0%, #059669 50%, #10b981 100%);
+            box-shadow:
+                0 15px 40px rgba(16, 185, 129, 0.5),
+                0 8px 20px rgba(52, 211, 153, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Diagnóstico Panel Light */
+        html.light .bg-slate-950\/30 {
+            background: rgba(255, 255, 255, 0.5) !important;
+            border: 1px solid rgba(139, 92, 246, 0.15) !important;
+        }
+
+        html.light .text-slate-400 {
+            color: #6b7280 !important;
+        }
+
+        html.light .text-slate-500 {
+            color: #6b7280 !important;
+        }
+
+        html.light .text-slate-300 {
+            color: #374151 !important;
+        }
+
+        /* Stats Cards Light */
+        html.light .bg-emerald-500\/10 {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.1)) !important;
+            border: 1px solid rgba(16, 185, 129, 0.3) !important;
+        }
+
+        html.light .bg-rose-500\/10 {
+            background: linear-gradient(135deg, rgba(244, 63, 94, 0.15), rgba(251, 113, 133, 0.1)) !important;
+            border: 1px solid rgba(244, 63, 94, 0.3) !important;
+        }
+
+        /* Table Section Light */
+        html.light #table-section .glass-panel-heavy {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow:
+                0 25px 50px rgba(103, 126, 234, 0.2),
+                0 10px 30px rgba(236, 72, 153, 0.1);
+        }
+
+        html.light .bg-slate-900\/80 {
+            background: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        html.light .bg-slate-900 {
+            background: rgba(248, 250, 252, 0.95) !important;
+        }
+
+        html.light .bg-slate-950\/40 {
+            background: rgba(255, 255, 255, 0.6) !important;
+        }
+
+        /* Table Colors Light */
+        html.light .table-cell-true {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.15)) !important;
+            color: #047857 !important;
+            font-weight: 700;
+        }
+
+        html.light .table-cell-false {
+            background: linear-gradient(135deg, rgba(244, 63, 94, 0.2), rgba(251, 113, 133, 0.15)) !important;
+            color: #be123c !important;
+            font-weight: 700;
+        }
+
+        html.light .col-var {
+            background: linear-gradient(to bottom, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.05)) !important;
+            border-top: 3px solid #0891b2 !important;
+        }
+
+        html.light .col-step {
+            background: linear-gradient(to bottom, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05)) !important;
+            border-top: 3px solid #d97706 !important;
+        }
+
+        html.light .col-result {
+            background: linear-gradient(to bottom, rgba(217, 70, 239, 0.2), rgba(217, 70, 239, 0.08)) !important;
+            border-top: 3px solid #c026d3 !important;
+        }
+
+        html.light .col-var.text-cyan-400 {
+            color: #0891b2 !important;
+        }
+
+        html.light .col-step.text-yellow-400 {
+            color: #d97706 !important;
+        }
+
+        html.light .col-result.text-fuchsia-400 {
+            color: #c026d3 !important;
+        }
+
+        html.light table th {
+            color: var(--light-text-primary);
+        }
+
+        html.light table td {
+            border-color: rgba(139, 92, 246, 0.1) !important;
+        }
+
+        /* Modal Dialogs Light */
+        html.light dialog {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow:
+                0 25px 80px rgba(103, 126, 234, 0.3),
+                0 15px 40px rgba(236, 72, 153, 0.2);
+        }
+
+        html.light dialog::backdrop {
+            background: linear-gradient(135deg,
+                    rgba(124, 58, 237, 0.4),
+                    rgba(236, 72, 153, 0.3),
+                    rgba(6, 182, 212, 0.3));
+            backdrop-filter: blur(10px);
+        }
+
+        html.light dialog .bg-slate-900\/80 {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.05)) !important;
+        }
+
+        html.light dialog .bg-black\/40,
+        html.light dialog .bg-black\/30 {
+            background: rgba(248, 250, 252, 0.8) !important;
+            border: 1px solid rgba(139, 92, 246, 0.15);
+        }
+
+        html.light dialog .text-white {
+            color: var(--light-text-primary) !important;
+        }
+
+        /* Law Cards Light */
+        html.light .law-card {
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow:
+                4px 4px 15px rgba(166, 180, 200, 0.3),
+                -4px -4px 15px rgba(255, 255, 255, 0.8);
+        }
+
+        html.light .law-card:hover {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow:
+                6px 6px 20px rgba(166, 180, 200, 0.4),
+                -6px -6px 20px rgba(255, 255, 255, 0.9);
+        }
+
+        /* Rule Cards Light */
+        html.light .rule-card {
+            background: rgba(255, 255, 255, 0.6) !important;
+            border: 1px solid rgba(139, 92, 246, 0.1) !important;
+        }
+
+        html.light .rule-card:hover {
+            background: rgba(255, 255, 255, 0.85) !important;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15);
+        }
+
+        /* Truth Table Mini Light */
+        html.light .truth-table-mini th {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(167, 139, 250, 0.15));
+            color: #6d28d9;
+        }
+
+        html.light .truth-table-mini td {
+            border-color: rgba(139, 92, 246, 0.2) !important;
+        }
+
+        html.light .truth-table-mini .cell-v {
+            background: rgba(16, 185, 129, 0.2);
+            color: #047857;
+        }
+
+        html.light .truth-table-mini .cell-f {
+            background: rgba(244, 63, 94, 0.2);
+            color: #be123c;
+        }
+
+        /* Floating Buttons Light */
+        html.light #tts-toggle,
+        html.light #contrast-toggle {
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow:
+                4px 4px 15px rgba(166, 180, 200, 0.4),
+                -4px -4px 15px rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.9) !important;
+        }
+
+        html.light #tts-toggle {
+            color: #0891b2;
+        }
+
+        html.light #contrast-toggle {
+            color: #d97706;
+        }
+
+        html.light #tts-toggle:hover,
+        html.light #contrast-toggle:hover {
+            box-shadow:
+                2px 2px 8px rgba(166, 180, 200, 0.4),
+                -2px -2px 8px rgba(255, 255, 255, 0.9),
+                0 0 20px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Footer Light */
+        html.light footer.glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            border-top: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        /* Simplify Modal Light */
+        html.light .bg-emerald-900\/30 {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.1)) !important;
+        }
+
+        html.light .bg-yellow-900\/20 {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.1)) !important;
+        }
+
+        html.light .bg-slate-800\/50 {
+            background: rgba(255, 255, 255, 0.6) !important;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+        }
+
+        /* Scrollbar Light */
+        html.light ::-webkit-scrollbar-track {
+            background: rgba(248, 250, 252, 0.8);
+        }
+
+        html.light ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #7c3aed, #db2777, #0891b2);
+            border: 2px solid rgba(248, 250, 252, 0.8);
+        }
+
+        /* Theme Toggle Button Light */
+        html.light #theme-toggle {
+            color: #6d28d9;
+        }
+
+        /* Text Colors for Light Mode */
+        html.light h1,
+        html.light h2,
+        html.light h3,
+        html.light h4 {
+            color: var(--light-text-primary);
+        }
+
+        html.light .text-sky-400 {
+            color: #0891b2 !important;
+        }
+
+        html.light .text-purple-400,
+        html.light .text-purple-300 {
+            color: #7c3aed !important;
+        }
+
+        html.light .text-emerald-400,
+        html.light .text-emerald-300 {
+            color: #059669 !important;
+        }
+
+        html.light .text-pink-300 {
+            color: #db2777 !important;
+        }
+
+        html.light .text-yellow-300 {
+            color: #d97706 !important;
+        }
+
+        html.light .text-cyan-300 {
+            color: #0891b2 !important;
+        }
+
+        html.light .text-indigo-300 {
+            color: #4f46e5 !important;
+        }
+
+        html.light .text-rose-400 {
+            color: #e11d48 !important;
+        }
+
+        html.light .text-amber-400 {
+            color: #d97706 !important;
+        }
+
+        /* ============================================
+           ESTILOS COMUNES (DARK & LIGHT)
+           ============================================ */
+
+        /* Aurora Background */
+        .aurora-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: blob 15s infinite alternate;
+        }
+
+        @keyframes blob {
+            0% {
+                transform: translate(0px, 0px) scale(1) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(30px, -50px) scale(1.1) rotate(120deg);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9) rotate(240deg);
+            }
+
+            100% {
+                transform: translate(0px, 0px) scale(1) rotate(360deg);
+            }
+        }
+
+        /* Ribbon & Buttons */
+        .btn-ribbon {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ribbon:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-ribbon::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: linear-gradient(90deg, #0ea5e9, #a855f7, #ec4899);
+            transition: width 0.3s ease;
+        }
+
+        .btn-ribbon:hover::after {
+            width: 100%;
+        }
+
+        /* Keypad Buttons */
+        .keypad-btn:active {
+            transform: scale(0.92);
+        }
+
+        /* Table Cells */
+        .table-cell-true {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            text-shadow: 0 0 10px rgba(52, 211, 153, 0.3);
+        }
+
+        .table-cell-false {
+            background-color: rgba(244, 63, 94, 0.15);
+            color: #fb7185;
+            text-shadow: 0 0 10px rgba(251, 113, 133, 0.3);
+        }
+
+        .col-var {
+            border-top: 3px solid #06b6d4;
+            background: linear-gradient(to bottom, rgba(6, 182, 212, 0.1), transparent);
+        }
+
+        .col-step {
+            border-top: 3px solid #eab308;
+            background: linear-gradient(to bottom, rgba(234, 179, 8, 0.1), transparent);
+        }
+
+        .col-result {
+            border-top: 3px solid #d946ef;
+            background: linear-gradient(to bottom, rgba(217, 70, 239, 0.2), transparent);
+        }
+
+        /* High Contrast Mode */
+        .high-contrast .glass-panel,
+        .high-contrast .glass-panel-heavy {
+            background: #000;
+            border: 2px solid #fff;
+            backdrop-filter: none;
+        }
+
+        .high-contrast * {
+            text-shadow: none !important;
+            box-shadow: none !important;
+        }
+
+        .high-contrast .table-cell-true {
+            background: #000;
+            color: #0f0;
+            border: 1px solid #fff;
+        }
+
+        .high-contrast .table-cell-false {
+            background: #000;
+            color: #f00;
+            border: 1px solid #fff;
+        }
+
+        /* Dialog Animation */
+        dialog[open] {
+            animation: zoomIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+        }
+
+        /* Masonry Grid */
+        .masonry-grid {
+            column-count: 1;
+        }
+
+        @media (min-width: 768px) {
+            .masonry-grid {
+                column-count: 2;
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .masonry-grid {
+                column-count: 3;
+            }
+        }
+
+        .break-inside-avoid {
+            break-inside: avoid;
+        }
+
+        /* Truth Table Mini */
+        .truth-table-mini {
+            font-size: 0.8rem;
+            border-collapse: collapse;
+        }
+
+        .truth-table-mini th,
+        .truth-table-mini td {
+            padding: 0.5rem 0.75rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .truth-table-mini th {
+            background: rgba(139, 92, 246, 0.25);
+            color: #c4b5fd;
+            font-weight: 600;
+        }
+
+        .truth-table-mini .cell-v {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            font-weight: 700;
+        }
+
+        .truth-table-mini .cell-f {
+            background: rgba(244, 63, 94, 0.2);
+            color: #fb7185;
+            font-weight: 700;
+        }
+
+        /* Law Cards */
+        .law-card {
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .law-card:hover {
+            transform: translateX(8px);
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ============================================
+           RESPONSIVIDAD MÓVIL MEJORADA
+           ============================================ */
+
+        @media (max-width: 1024px) {
+            .lg\:col-span-7 {
+                padding-bottom: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-stack {
+                flex-direction: column !important;
+            }
+
+            .mobile-full {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .keypad-btn {
+                min-height: 3.5rem !important;
+                font-size: 1.25rem !important;
+            }
+
+            dialog {
+                margin: 0.5rem !important;
+                width: calc(100% - 1rem) !important;
+                max-width: calc(100% - 1rem) !important;
+                max-height: 95vh !important;
+                border-radius: 1rem !important;
+            }
+
+            .container {
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+            }
+
+            .text-3xl {
+                font-size: 1.75rem !important;
+            }
+
+            /* Header mobile improvements */
+            header nav {
+                justify-content: center;
+            }
+
+            header .btn-ribbon {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.875rem;
+            }
+
+            /* Table scroll improvements */
+            #table-section table {
+                font-size: 0.875rem;
+            }
+
+            #table-section th,
+            #table-section td {
+                padding: 0.5rem 0.75rem !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .keypad-btn {
+                min-height: 2.75rem !important;
+                font-size: 1rem !important;
+            }
+
+            .text-3xl {
+                font-size: 1.5rem !important;
+            }
+
+            .text-2xl {
+                font-size: 1.25rem !important;
+            }
+
+            .p-6 {
+                padding: 1rem !important;
+            }
+
+            /* Smaller buttons on small screens */
+            #calculate-btn,
+            #simplify-btn {
+                padding-top: 0.875rem !important;
+                padding-bottom: 0.875rem !important;
+                font-size: 0.875rem !important;
+            }
+
+            /* Floating buttons smaller */
+            #tts-toggle,
+            #contrast-toggle {
+                padding: 0.75rem !important;
+            }
+
+            #tts-toggle i,
+            #contrast-toggle i {
+                width: 1.25rem !important;
+                height: 1.25rem !important;
+            }
+        }
+
+        /* Touch friendly */
+        .touch-action {
+            touch-action: manipulation;
+        }
+
+        /* Reduce motion */
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Float animation */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Pulse animation */
+        @keyframes pulse-slow {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .animate-pulse-slow {
+            animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Fade in animation */
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Custom scrollbar hide for nav */
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Shimmer effect for loading states */
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.2) 50%,
+                    transparent 100%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite;
+        }
+    </style>
+</head>
+
+<body class="text-slate-200 antialiased selection:bg-purple-500 selection:text-white transition-colors duration-300">
+
+    <!-- Aurora Background -->
+    <div class="aurora-bg">
+        <div class="blob bg-indigo-600 w-96 h-96 top-0 left-0 mix-blend-multiply"></div>
+        <div class="blob bg-sky-600 w-96 h-96 top-0 right-0 mix-blend-multiply animation-delay-2000"></div>
+        <div class="blob bg-fuchsia-600 w-96 h-96 bottom-0 left-1/2 mix-blend-multiply animation-delay-4000"></div>
+    </div>
+
+    <!-- Floating Controls -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+        <button id="tts-toggle"
+            class="p-4 rounded-full glass-panel hover:bg-sky-500 hover:text-white transition-all text-sky-400 shadow-lg group border border-white/20"
+            title="Lectura en Voz Alta">
+            <i data-lucide="volume-2" class="w-6 h-6"></i>
+            <span
+                class="absolute right-full mr-3 bg-black/80 px-3 py-1.5 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-white/10">Leer
+                Resultados</span>
+        </button>
+        <button id="contrast-toggle"
+            class="p-4 rounded-full glass-panel hover:bg-yellow-500 hover:text-black transition-all text-yellow-400 shadow-lg group border border-white/20"
+            title="Alto Contraste">
+            <i data-lucide="eye" class="w-6 h-6"></i>
+            <span
+                class="absolute right-full mr-3 bg-black/80 px-3 py-1.5 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-white/10">Alto
+                Contraste</span>
+        </button>
+    </div>
+
+    <!-- App Wrapper -->
+    <div id="app" class="flex flex-col min-h-screen">
+
+        <!-- Header Ribbon -->
+        <header class="sticky top-0 z-40 glass-panel-heavy border-b border-white/10 shadow-xl">
+            <div class="container mx-auto px-4 py-2">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-3">
+                    <!-- Brand -->
+                    <div class="flex items-center gap-3 group cursor-pointer select-none"
+                        onclick="window.location.reload()">
+                        <div
+                            class="relative p-2.5 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-lg group-hover:rotate-12 transition-transform duration-500 ring-1 ring-white/20">
+                            <i data-lucide="brain-circuit" class="text-white w-7 h-7"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <h1
+                                class="font-orbitron font-black text-2xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-indigo-300 to-purple-300 drop-shadow-sm">
+                                LogicVerse</h1>
+                            <span
+                                class="text-[0.65rem] font-mono text-slate-400 tracking-[0.2em] uppercase font-bold">Pro
+                                Edition v3.0</span>
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <nav class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 scrollbar-hide">
+                        <button onclick="app.ui.openModal('theory-modal')"
+                            class="btn-ribbon flex items-center gap-2 px-4 py-2.5 rounded-xl text-slate-300 font-medium whitespace-nowrap hover:bg-white/5">
+                            <i data-lucide="book-open" class="w-4 h-4 text-sky-400"></i>
+                            <span>Teoría</span>
+                        </button>
+                        <button onclick="app.ui.openModal('rules-modal')"
+                            class="btn-ribbon flex items-center gap-2 px-4 py-2.5 rounded-xl text-slate-300 font-medium whitespace-nowrap hover:bg-white/5">
+                            <i data-lucide="gavel" class="w-4 h-4 text-purple-400"></i>
+                            <span>Reglas (18)</span>
+                        </button>
+                        <button onclick="app.ui.openModal('help-modal')"
+                            class="btn-ribbon flex items-center gap-2 px-4 py-2.5 rounded-xl text-slate-300 font-medium whitespace-nowrap hover:bg-white/5">
+                            <i data-lucide="life-buoy" class="w-4 h-4 text-emerald-400"></i>
+                            <span>Manual</span>
+                        </button>
+
+                        <div class="w-px h-8 bg-white/10 mx-1"></div>
+                        <button id="theme-toggle"
+                            class="p-2.5 rounded-xl hover:bg-white/10 text-yellow-400 transition-transform hover:rotate-180">
+                            <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                            <i data-lucide="moon" class="w-5 h-5 block dark:hidden text-indigo-600"></i>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="flex-grow container mx-auto px-4 py-8 flex flex-col items-center gap-8 w-full">
+
+            <!-- Calculator Card -->
+            <section class="w-full max-w-5xl glass-panel rounded-3xl p-1 relative overflow-hidden group shadow-2xl">
+                <!-- Top Gradient Line -->
+                <div
+                    class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500">
+                </div>
+
+                <div class="bg-slate-900/40 rounded-[1.4rem] p-6 md:p-8 backdrop-blur-sm">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+                        <!-- Left Column: Input (7 cols) -->
+                        <div class="lg:col-span-7 space-y-6">
+                            <div class="flex justify-between items-end mb-2">
+                                <h2 class="text-xl font-orbitron font-bold text-sky-400 flex items-center gap-2">
+                                    <i data-lucide="terminal-square"></i> Constructor Lógico
+                                </h2>
+                                <div
+                                    class="flex items-center gap-2 bg-slate-800/80 rounded-lg px-3 py-1.5 border border-white/10 hover:border-sky-500/50 transition-colors">
+                                    <i data-lucide="variable" class="w-4 h-4 text-slate-400"></i>
+                                    <select id="num-vars"
+                                        class="bg-transparent border-none text-sm focus:ring-0 text-slate-300 cursor-pointer font-mono font-bold outline-none">
+                                        <option value="2">2 variables (p, q)</option>
+                                        <option value="3" selected>3 variables (p..r)</option>
+                                        <option value="4">4 variables (p..s)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Input Display -->
+                            <div class="relative group/input">
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-xl blur opacity-20 group-hover/input:opacity-40 transition duration-500">
+                                </div>
+                                <input type="text" id="expression-input"
+                                    class="relative w-full bg-slate-950/80 border border-white/10 rounded-xl px-4 py-5 text-3xl font-mono text-center tracking-widest text-white placeholder-slate-600 focus:outline-none focus:border-sky-500/50 focus:ring-1 focus:ring-sky-500/50 transition-all shadow-inner"
+                                    placeholder="(p ∧ q) → r" autocomplete="off" spellcheck="false">
+                                <button onclick="app.logic.clearInput()"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 p-2 hover:bg-red-500/20 rounded-lg text-slate-500 hover:text-red-400 transition-colors z-10"
+                                    title="Limpiar">
+                                    <i data-lucide="delete"></i>
+                                </button>
+                            </div>
+
+                            <!-- Virtual Keypad -->
+                            <div class="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-3 select-none" id="keypad">
+                                <!-- Populated by JS -->
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <button id="calculate-btn"
+                                    class="flex-1 py-4 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] hover:bg-right transition-all duration-500 text-white font-bold font-orbitron tracking-widest shadow-lg shadow-purple-900/30 active:scale-[0.98] flex items-center justify-center gap-3 text-lg border border-white/10 group/btn">
+                                    <i data-lucide="play"
+                                        class="fill-current group-hover/btn:scale-110 transition-transform"></i>
+                                    ANALIZAR
+                                </button>
+                                <button id="simplify-btn"
+                                    class="flex-1 py-4 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 bg-[length:200%_auto] hover:bg-right transition-all duration-500 text-white font-bold font-orbitron tracking-widest shadow-lg shadow-emerald-900/30 active:scale-[0.98] flex items-center justify-center gap-3 text-lg border border-white/10 group/btn">
+                                    <i data-lucide="sparkles"
+                                        class="group-hover/btn:scale-110 transition-transform"></i> SIMPLIFICAR
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Status & Mini-Stats (5 cols) -->
+                        <div
+                            class="lg:col-span-5 flex flex-col h-full bg-slate-950/30 rounded-2xl border border-white/5 p-6 relative min-h-[300px]">
+                            <h3
+                                class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-6 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Diagnóstico en Tiempo Real
+                            </h3>
+
+                            <!-- State: Idle -->
+                            <div id="result-status"
+                                class="flex-grow flex flex-col items-center justify-center text-center gap-4 transition-all opacity-100">
+                                <div class="relative">
+                                    <div
+                                        class="absolute inset-0 bg-sky-500 blur-2xl opacity-20 rounded-full animate-pulse">
+                                    </div>
+                                    <div
+                                        class="w-24 h-24 rounded-full bg-gradient-to-tr from-slate-800 to-slate-900 border border-white/10 flex items-center justify-center animate-float relative z-10">
+                                        <i data-lucide="cpu" class="w-10 h-10 text-slate-500"></i>
+                                    </div>
+                                </div>
+                                <p class="text-slate-500 text-sm font-medium">Motor lógico v3.0 listo.<br>Esperando
+                                    entrada...</p>
+                            </div>
+
+                            <!-- State: Result -->
+                            <div id="analysis-summary" class="hidden flex-col justify-between h-full animate-fade-in">
+                                <div class="text-center space-y-2">
+                                    <div id="main-verdict-icon"
+                                        class="inline-flex p-4 rounded-full bg-slate-900/80 mb-2 ring-1 ring-white/10 shadow-lg">
+                                    </div>
+                                    <h2 id="main-verdict-text" class="text-3xl font-black font-orbitron tracking-tight">
+                                    </h2>
+                                    <p id="main-verdict-sub" class="text-slate-400 text-sm font-medium"></p>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3 mt-6">
+                                    <div
+                                        class="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl text-center">
+                                        <span
+                                            class="block text-xs text-emerald-300/70 font-bold uppercase mb-1">Verdaderos</span>
+                                        <span id="stat-true"
+                                            class="text-3xl font-mono font-bold text-emerald-400">0</span>
+                                    </div>
+                                    <div class="bg-rose-500/10 border border-rose-500/20 p-4 rounded-xl text-center">
+                                        <span
+                                            class="block text-xs text-rose-300/70 font-bold uppercase mb-1">Falsos</span>
+                                        <span id="stat-false"
+                                            class="text-3xl font-mono font-bold text-rose-400">0</span>
+                                    </div>
+                                </div>
+
+                                <button onclick="app.ui.toggleTable()"
+                                    class="mt-6 w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors flex items-center justify-center gap-2 text-sm font-bold text-sky-300 hover:text-sky-200">
+                                    <i data-lucide="table-2"></i> VER TABLA EXTENDIDA
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Expanded Truth Table Section -->
+            <section id="table-section" class="w-full max-w-6xl hidden transition-all duration-700 ease-in-out">
+                <div class="glass-panel-heavy rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+                    <div
+                        class="bg-slate-900/80 p-4 md:p-6 border-b border-white/10 flex justify-between items-center sticky left-0">
+                        <div>
+                            <h3 class="font-orbitron font-bold text-xl flex items-center gap-3 text-white">
+                                <i data-lucide="table" class="text-purple-400"></i> Tabla de Verdad Paso a Paso
+                            </h3>
+                            <p class="text-sm text-slate-400 mt-1 font-mono">Construcción por subfórmulas (Atomos →
+                                Grupos → Final)</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <div
+                                class="hidden md:flex items-center gap-4 text-xs font-mono mr-4 bg-black/30 p-2 rounded-lg border border-white/5">
+                                <span class="flex items-center gap-2 px-2"><span
+                                        class="w-3 h-3 bg-cyan-500 rounded-sm"></span> Variables</span>
+                                <span class="flex items-center gap-2 px-2 border-l border-white/10"><span
+                                        class="w-3 h-3 bg-yellow-500 rounded-sm"></span> Pasos</span>
+                                <span class="flex items-center gap-2 px-2 border-l border-white/10"><span
+                                        class="w-3 h-3 bg-fuchsia-500 rounded-sm"></span> Conclusión</span>
+                            </div>
+                            <button onclick="app.ui.toggleTable()"
+                                class="p-2 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-white">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto custom-scrollbar bg-slate-950/40">
+                        <table class="w-full text-center border-collapse">
+                            <thead
+                                class="text-xs font-bold uppercase text-slate-300 tracking-wider bg-slate-900 sticky top-0 z-10 shadow-lg">
+                                <tr id="table-head">
+                                    <!-- Dynamic Headers -->
+                                </tr>
+                            </thead>
+                            <tbody id="table-body" class="font-mono text-base md:text-lg divide-y divide-white/5">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div
+                        class="p-3 bg-slate-950/80 border-t border-white/10 text-center text-xs text-slate-500 font-mono flex justify-center items-center gap-2">
+                        <i data-lucide="info" class="w-3 h-3"></i> Mostrando todas las combinaciones posibles
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MODALES BLINDADOS -->
+
+    <!-- 1. Modal Teoría (Ampliado) -->
+    <dialog id="theory-modal"
+        class="rounded-2xl glass-panel-heavy w-full max-w-4xl p-0 shadow-2xl backdrop:backdrop-blur-xl text-slate-200 m-4 md:m-auto">
+        <div class="flex flex-col max-h-[90vh]">
+            <!-- Header -->
+            <div
+                class="flex justify-between items-center p-6 border-b border-white/10 bg-slate-900/80 sticky top-0 z-10">
+                <h2 class="text-2xl font-orbitron font-bold text-sky-400 flex items-center gap-3">
+                    <i data-lucide="book-open"></i> Teoría Lógica
+                </h2>
+                <button onclick="app.ui.closeModal('theory-modal')"
+                    class="p-2 rounded-full hover:bg-red-500/20 hover:text-red-400 transition-all close-spin">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- Content -->
+            <div class="overflow-y-auto p-6 md:p-8 space-y-10 custom-scrollbar bg-slate-900/30">
+
+                <!-- Sección 1: Definiciones -->
+                <section>
+                    <h3
+                        class="flex items-center gap-2 text-xl font-bold text-purple-300 mb-6 pb-2 border-b border-white/10">
+                        <i data-lucide="list-tree"></i> 1. Conectores Lógicos Fundamentales
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div
+                            class="bg-black/40 p-5 rounded-xl border-l-4 border-purple-500 hover:bg-black/60 transition-colors">
+                            <h4 class="font-bold text-white mb-2 flex justify-between">Negación <span>¬p</span></h4>
+                            <p class="text-sm text-slate-400 leading-relaxed">Invierte el valor de verdad. "No es cierto
+                                que p".</p>
+                        </div>
+                        <div
+                            class="bg-black/40 p-5 rounded-xl border-l-4 border-sky-500 hover:bg-black/60 transition-colors">
+                            <h4 class="font-bold text-white mb-2 flex justify-between">Conjunción <span>p ∧ q</span>
+                            </h4>
+                            <p class="text-sm text-slate-400 leading-relaxed">Verdadera solo si AMBAS son verdaderas. "p
+                                Y q".</p>
+                        </div>
+                        <div
+                            class="bg-black/40 p-5 rounded-xl border-l-4 border-sky-500 hover:bg-black/60 transition-colors">
+                            <h4 class="font-bold text-white mb-2 flex justify-between">Disyunción <span>p ∨ q</span>
+                            </h4>
+                            <p class="text-sm text-slate-400 leading-relaxed">Verdadera si AL MENOS una es verdadera. "p
+                                O q".</p>
+                        </div>
+                        <div
+                            class="bg-black/40 p-5 rounded-xl border-l-4 border-yellow-500 hover:bg-black/60 transition-colors">
+                            <h4 class="font-bold text-white mb-2 flex justify-between">Condicional <span>p → q</span>
+                            </h4>
+                            <p class="text-sm text-slate-400 leading-relaxed">Falsa solo si Antecedente=V y
+                                Consecuente=F.</p>
+                        </div>
+                        <div
+                            class="bg-black/40 p-5 rounded-xl border-l-4 border-emerald-500 hover:bg-black/60 transition-colors">
+                            <h4 class="font-bold text-white mb-2 flex justify-between">Bicondicional <span>p ↔ q</span>
+                            </h4>
+                            <p class="text-sm text-slate-400 leading-relaxed">Verdadera si ambas tienen el MISMO valor.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sección 2: Jerarquía -->
+                <section>
+                    <h3
+                        class="flex items-center gap-2 text-xl font-bold text-pink-300 mb-6 pb-2 border-b border-white/10">
+                        <i data-lucide="layers"></i> 2. Jerarquía de Operadores
+                    </h3>
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-white/5">
+                        <p class="text-slate-300 mb-4">Si no hay paréntesis, el orden de evaluación es:</p>
+                        <ol class="list-decimal list-inside space-y-2 text-sm font-mono text-slate-400">
+                            <li><strong class="text-white">Negación (¬)</strong> - Máxima prioridad</li>
+                            <li><strong class="text-white">Conjunción (∧) y Disyunción (∨)</strong></li>
+                            <li><strong class="text-white">Condicional (→)</strong></li>
+                            <li><strong class="text-white">Bicondicional (↔)</strong> - Mínima prioridad</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <!-- Sección 3: Método por Pasos -->
+                <section>
+                    <h3
+                        class="flex items-center gap-2 text-xl font-bold text-yellow-300 mb-6 pb-2 border-b border-white/10">
+                        <i data-lucide="workflow"></i> 3. Construcción de Tabla por Subfórmulas
+                    </h3>
+                    <div class="bg-indigo-900/20 p-6 rounded-2xl border border-indigo-500/30">
+                        <p class="text-slate-300 mb-4">Para la fórmula <code
+                                class="bg-black/50 px-2 py-1 rounded text-pink-300 font-mono">(p ∧ q) → r</code>, la
+                            tabla extendida crea columnas así:</p>
+
+                        <div class="flex flex-col md:flex-row gap-4 items-center justify-center text-sm font-mono mt-6">
+                            <div
+                                class="p-4 bg-black/40 rounded-xl border border-cyan-500/50 text-cyan-300 w-full md:w-auto text-center shadow-lg">
+                                <span class="block text-xs text-slate-500 mb-1 uppercase">Paso 1</span>
+                                <span class="text-white text-lg font-bold">p, q, r</span>
+                                <div class="text-xs mt-1">Atomos</div>
+                            </div>
+                            <i data-lucide="arrow-right" class="text-slate-500 hidden md:block"></i>
+                            <div
+                                class="p-4 bg-black/40 rounded-xl border border-yellow-500/50 text-yellow-300 w-full md:w-auto text-center shadow-lg">
+                                <span class="block text-xs text-slate-500 mb-1 uppercase">Paso 2</span>
+                                <span class="text-white text-lg font-bold">(p ∧ q)</span>
+                                <div class="text-xs mt-1">Subfórmula</div>
+                            </div>
+                            <i data-lucide="arrow-right" class="text-slate-500 hidden md:block"></i>
+                            <div
+                                class="p-4 bg-black/40 rounded-xl border border-purple-500/50 text-purple-300 w-full md:w-auto text-center shadow-lg">
+                                <span class="block text-xs text-slate-500 mb-1 uppercase">Paso 3</span>
+                                <span class="text-white text-lg font-bold">→ r</span>
+                                <div class="text-xs mt-1">Conclusión</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sección 4: TABLAS DE VERDAD COMPLETAS -->
+                <section>
+                    <h3
+                        class="flex items-center gap-2 text-xl font-bold text-emerald-300 mb-6 pb-2 border-b border-white/10">
+                        <i data-lucide="table-2"></i> 4. Tablas de Verdad de los Conectores
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Negación -->
+                        <div class="bg-black/30 p-4 rounded-xl border border-purple-500/30">
+                            <h4 class="font-bold text-purple-300 mb-3 text-center">Negación (¬p)</h4>
+                            <table class="truth-table-mini w-full rounded-lg overflow-hidden">
+                                <thead>
+                                    <tr>
+                                        <th>p</th>
+                                        <th>¬p</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-f">F</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-v">V</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p class="text-xs text-slate-500 mt-2 text-center">Invierte el valor</p>
+                        </div>
+                        <!-- Conjunción -->
+                        <div class="bg-black/30 p-4 rounded-xl border border-sky-500/30">
+                            <h4 class="font-bold text-sky-300 mb-3 text-center">Conjunción (p ∧ q)</h4>
+                            <table class="truth-table-mini w-full rounded-lg overflow-hidden">
+                                <thead>
+                                    <tr>
+                                        <th>p</th>
+                                        <th>q</th>
+                                        <th>p ∧ q</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-v">V</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-f">F</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-f">F</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-f">F</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p class="text-xs text-slate-500 mt-2 text-center">V solo si AMBAS son V</p>
+                        </div>
+                        <!-- Disyunción -->
+                        <div class="bg-black/30 p-4 rounded-xl border border-cyan-500/30">
+                            <h4 class="font-bold text-cyan-300 mb-3 text-center">Disyunción (p ∨ q)</h4>
+                            <table class="truth-table-mini w-full rounded-lg overflow-hidden">
+                                <thead>
+                                    <tr>
+                                        <th>p</th>
+                                        <th>q</th>
+                                        <th>p ∨ q</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-v">V</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-v">V</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-v">V</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-f">F</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p class="text-xs text-slate-500 mt-2 text-center">F solo si AMBAS son F</p>
+                        </div>
+                        <!-- Implicación -->
+                        <div class="bg-black/30 p-4 rounded-xl border border-yellow-500/30">
+                            <h4 class="font-bold text-yellow-300 mb-3 text-center">Implicación (p → q)</h4>
+                            <table class="truth-table-mini w-full rounded-lg overflow-hidden">
+                                <thead>
+                                    <tr>
+                                        <th>p</th>
+                                        <th>q</th>
+                                        <th>p → q</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-v">V</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-f">F</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-v">V</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-v">V</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p class="text-xs text-slate-500 mt-2 text-center">F solo si V→F</p>
+                        </div>
+                        <!-- Bicondicional -->
+                        <div class="bg-black/30 p-4 rounded-xl border border-pink-500/30">
+                            <h4 class="font-bold text-pink-300 mb-3 text-center">Bicondicional (p ↔ q)</h4>
+                            <table class="truth-table-mini w-full rounded-lg overflow-hidden">
+                                <thead>
+                                    <tr>
+                                        <th>p</th>
+                                        <th>q</th>
+                                        <th>p ↔ q</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-v">V</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-f">F</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-v">V</td>
+                                        <td class="cell-f">F</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-f">F</td>
+                                        <td class="cell-v">V</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p class="text-xs text-slate-500 mt-2 text-center">V si tienen el mismo valor</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sección 5: LEYES DE LA LÓGICA -->
+                <section>
+                    <h3
+                        class="flex items-center gap-2 text-xl font-bold text-orange-300 mb-6 pb-2 border-b border-white/10">
+                        <i data-lucide="scale"></i> 5. Leyes Fundamentales de la Lógica
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Doble Negación -->
+                        <div class="law-card border-purple-500">
+                            <h4 class="font-bold text-purple-300 mb-2">1. Doble Negación</h4>
+                            <p class="font-mono text-sm text-white bg-black/40 p-2 rounded">¬(¬p) ⇔ p</p>
+                        </div>
+                        <!-- Conmutativas -->
+                        <div class="law-card border-sky-500">
+                            <h4 class="font-bold text-sky-300 mb-2">2. Leyes Conmutativas</h4>
+                            <div class="font-mono text-sm text-white bg-black/40 p-2 rounded space-y-1">
+                                <p>(p ∨ q) ⇔ (q ∨ p)</p>
+                                <p>(p ∧ q) ⇔ (q ∧ p)</p>
+                                <p>(p ↔ q) ⇔ (q ↔ p)</p>
+                            </div>
+                        </div>
+                        <!-- Asociativas -->
+                        <div class="law-card border-cyan-500">
+                            <h4 class="font-bold text-cyan-300 mb-2">3. Leyes Asociativas</h4>
+                            <div class="font-mono text-sm text-white bg-black/40 p-2 rounded space-y-1">
+                                <p>[(p ∨ q) ∨ r] ⇔ [p ∨ (q ∨ r)]</p>
+                                <p>[(p ∧ q) ∧ r] ⇔ [p ∧ (q ∧ r)]</p>
+                            </div>
+                        </div>
+                        <!-- Distributivas -->
+                        <div class="law-card border-emerald-500">
+                            <h4 class="font-bold text-emerald-300 mb-2">4. Leyes Distributivas</h4>
+                            <div class="font-mono text-sm text-white bg-black/40 p-2 rounded space-y-1">
+                                <p>[p ∨ (q ∧ r)] ⇔ [(p ∨ q) ∧ (p ∨ r)]</p>
+                                <p>[p ∧ (q ∨ r)] ⇔ [(p ∧ q) ∨ (p ∧ r)]</p>
+                            </div>
+                        </div>
+                        <!-- Idempotencia -->
+                        <div class="law-card border-yellow-500">
+                            <h4 class="font-bold text-yellow-300 mb-2">5. Leyes de Idempotencia</h4>
+                            <div class="font-mono text-sm text-white bg-black/40 p-2 rounded space-y-1">
+                                <p>(p ∨ p) ⇔ p</p>
+                                <p>(p ∧ p) ⇔ p</p>
+                            </div>
+                        </div>
+                        <!-- De Morgan -->
+                        <div class="law-card border-pink-500">
+                            <h4 class="font-bold text-pink-300 mb-2">6. Leyes de De Morgan</h4>
+                            <div class="font-mono text-sm text-white bg-black/40 p-2 rounded space-y-1">
+                                <p>¬(p ∨ q) ⇔ (¬p ∧ ¬q)</p>
+                                <p>¬(p ∧ q) ⇔ (¬p ∨ ¬q)</p>
+                                <p>(p ∨ q) ⇔ ¬(¬p ∧ ¬q)</p>
+                                <p>(p ∧ q) ⇔ ¬(¬p ∨ ¬q)</p>
+                            </div>
+                        </div>
+                        <!-- Implicación -->
+                        <div class="law-card border-orange-500">
+                            <h4 class="font-bold text-orange-300 mb-2">7. Ley de Implicación</h4>
+                            <div class="font-mono text-sm text-white bg-black/40 p-2 rounded space-y-1">
+                                <p>(p → q) ⇔ (¬p ∨ q)</p>
+                                <p>(p → q) ⇔ ¬(p ∧ ¬q)</p>
+                            </div>
+                        </div>
+                        <!-- Identidad -->
+                        <div class="law-card border-indigo-500">
+                            <h4 class="font-bold text-indigo-300 mb-2">8. Leyes de Identidad</h4>
+                            <div class="font-mono text-sm text-white bg-black/40 p-2 rounded space-y-1">
+                                <p>p ∨ F ⇔ p</p>
+                                <p>p ∧ V ⇔ p</p>
+                            </div>
+                        </div>
+                        <!-- Dominación -->
+                        <div class="law-card border-red-500">
+                            <h4 class="font-bold text-red-300 mb-2">9. Leyes de Dominación</h4>
+                            <div class="font-mono text-sm text-white bg-black/40 p-2 rounded space-y-1">
+                                <p>p ∨ V ⇔ V</p>
+                                <p>p ∧ F ⇔ F</p>
+                            </div>
+                        </div>
+                        <!-- Equivalencia -->
+                        <div class="law-card border-violet-500">
+                            <h4 class="font-bold text-violet-300 mb-2">10. Ley de Equivalencia</h4>
+                            <p class="font-mono text-sm text-white bg-black/40 p-2 rounded">(p ↔ q) ⇔ (p → q) ∧ (q → p)
+                            </p>
+                        </div>
+                        <!-- Exportación -->
+                        <div class="law-card border-teal-500">
+                            <h4 class="font-bold text-teal-300 mb-2">11. Ley de Exportación</h4>
+                            <p class="font-mono text-sm text-white bg-black/40 p-2 rounded">[(p ∧ q) → r] ⇔ [p → (q →
+                                r)]</p>
+                        </div>
+                        <!-- Adición y Simplificación -->
+                        <div class="law-card border-lime-500">
+                            <h4 class="font-bold text-lime-300 mb-2">12. Adición y Simplificación</h4>
+                            <div class="font-mono text-sm text-white bg-black/40 p-2 rounded space-y-1">
+                                <p>p ⇒ (p ∨ q) <span class="text-slate-500">— Adición</span></p>
+                                <p>(p ∧ q) ⇒ p <span class="text-slate-500">— Simplificación</span></p>
+                            </div>
+                        </div>
+                        <!-- Reducción al Absurdo -->
+                        <div class="law-card border-rose-500">
+                            <h4 class="font-bold text-rose-300 mb-2">13. Reducción al Absurdo</h4>
+                            <p class="font-mono text-sm text-white bg-black/40 p-2 rounded">(p → q) ⇔ [(p ∧ ¬q) → c]</p>
+                            <p class="text-xs text-slate-500 mt-1">donde c es una contradicción</p>
+                        </div>
+                        <!-- Contraposición -->
+                        <div class="law-card border-amber-500">
+                            <h4 class="font-bold text-amber-300 mb-2">14. Contraposición</h4>
+                            <p class="font-mono text-sm text-white bg-black/40 p-2 rounded">(p → q) ⇔ (¬q → ¬p)</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 2. Modal Manual de Usuario (AMPLIADO) -->
+    <dialog id="help-modal"
+        class="rounded-2xl glass-panel-heavy w-full max-w-3xl p-0 shadow-2xl backdrop:backdrop-blur-xl text-slate-200 m-4 md:m-auto">
+        <div class="flex flex-col max-h-[90vh]">
+            <div
+                class="flex justify-between items-center p-6 border-b border-white/10 bg-slate-900/80 sticky top-0 z-10">
+                <h2 class="text-2xl font-orbitron font-bold text-emerald-400 flex items-center gap-3">
+                    <i data-lucide="life-buoy"></i> Manual de Usuario Completo
+                </h2>
+                <button onclick="app.ui.closeModal('help-modal')"
+                    class="p-2 rounded-full hover:bg-white/10 close-spin"><i data-lucide="x"></i></button>
+            </div>
+
+            <div class="p-6 space-y-8 overflow-y-auto custom-scrollbar">
+
+                <!-- Bienvenida -->
+                <div
+                    class="bg-gradient-to-r from-emerald-900/30 to-cyan-900/30 p-5 rounded-xl border border-emerald-500/20">
+                    <h3 class="font-bold text-emerald-300 mb-2 flex items-center gap-2"><i data-lucide="sparkles"
+                            class="w-5 h-5"></i> ¡Bienvenido a LogicVerse Pro!</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed">Esta herramienta está diseñada para facilitar el
+                        aprendizaje de la lógica proposicional. Incluye funciones de accesibilidad para estudiantes con
+                        discapacidades auditivas y visuales.</p>
+                </div>
+
+                <!-- Sintaxis -->
+                <div class="bg-slate-800/50 rounded-xl p-5 border border-white/5">
+                    <h3 class="font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="keyboard"></i>
+                        Sintaxis Soportada</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                        <div class="bg-black/30 p-3 rounded-lg text-center"><span
+                                class="text-purple-400 font-mono text-lg">¬</span><br><span
+                                class="text-slate-400">Negación</span><br><span class="text-xs text-slate-500">Tecla: ~
+                                o !</span></div>
+                        <div class="bg-black/30 p-3 rounded-lg text-center"><span
+                                class="text-sky-400 font-mono text-lg">∧</span><br><span
+                                class="text-slate-400">Conjunción (Y)</span><br><span
+                                class="text-xs text-slate-500">Tecla: & o ^</span></div>
+                        <div class="bg-black/30 p-3 rounded-lg text-center"><span
+                                class="text-cyan-400 font-mono text-lg">∨</span><br><span
+                                class="text-slate-400">Disyunción (O)</span><br><span
+                                class="text-xs text-slate-500">Tecla: |</span></div>
+                        <div class="bg-black/30 p-3 rounded-lg text-center"><span
+                                class="text-yellow-400 font-mono text-lg">→</span><br><span
+                                class="text-slate-400">Condicional</span><br><span class="text-xs text-slate-500">Tecla:
+                                ></span></div>
+                        <div class="bg-black/30 p-3 rounded-lg text-center"><span
+                                class="text-pink-400 font-mono text-lg">↔</span><br><span
+                                class="text-slate-400">Bicondicional</span><br><span
+                                class="text-xs text-slate-500">Tecla: =</span></div>
+                        <div class="bg-black/30 p-3 rounded-lg text-center"><span
+                                class="text-amber-400 font-mono text-lg">( )</span><br><span
+                                class="text-slate-400">Paréntesis</span><br><span
+                                class="text-xs text-slate-500">Agrupar</span></div>
+                    </div>
+                </div>
+
+                <!-- Pasos de Uso -->
+                <div>
+                    <h3 class="font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="list-ordered"></i>
+                        Cómo Usar la Calculadora</h3>
+                    <div class="relative pl-8 border-l-2 border-emerald-500/50 space-y-6">
+                        <div class="relative">
+                            <span
+                                class="absolute -left-[2.3rem] top-0 w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-white text-sm">1</span>
+                            <h4 class="font-bold text-emerald-300 mb-1">Selecciona el Número de Variables</h4>
+                            <p class="text-slate-400 text-sm">Usa el selector en la parte superior para elegir entre 2,
+                                3 o 4 variables (p, q, r, s).</p>
+                        </div>
+                        <div class="relative">
+                            <span
+                                class="absolute -left-[2.3rem] top-0 w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-white text-sm">2</span>
+                            <h4 class="font-bold text-emerald-300 mb-1">Escribe tu Fórmula</h4>
+                            <p class="text-slate-400 text-sm">Usa el teclado virtual o físico. Ejemplo: <code
+                                    class="bg-black/50 px-2 py-0.5 rounded text-pink-300">(p ∧ q) → r</code></p>
+                        </div>
+                        <div class="relative">
+                            <span
+                                class="absolute -left-[2.3rem] top-0 w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-white text-sm">3</span>
+                            <h4 class="font-bold text-emerald-300 mb-1">Presiona "ANALIZAR EXPRESIÓN"</h4>
+                            <p class="text-slate-400 text-sm">El sistema evaluará tu fórmula y mostrará si es
+                                Tautología, Contradicción o Contingencia.</p>
+                        </div>
+                        <div class="relative">
+                            <span
+                                class="absolute -left-[2.3rem] top-0 w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-white text-sm">4</span>
+                            <h4 class="font-bold text-emerald-300 mb-1">Explora la Tabla de Verdad</h4>
+                            <p class="text-slate-400 text-sm">Haz clic en "VER TABLA EXTENDIDA" para ver todos los pasos
+                                de evaluación.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ejemplos Prácticos -->
+                <div class="bg-indigo-900/20 p-5 rounded-xl border border-indigo-500/30">
+                    <h3 class="font-bold text-indigo-300 mb-4 flex items-center gap-2"><i data-lucide="lightbulb"></i>
+                        Ejemplos Prácticos</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between items-center bg-black/30 p-3 rounded-lg">
+                            <code class="text-pink-300 font-mono">p ∨ ¬p</code>
+                            <span class="text-emerald-400 font-bold">→ TAUTOLOGÍA</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-black/30 p-3 rounded-lg">
+                            <code class="text-pink-300 font-mono">p ∧ ¬p</code>
+                            <span class="text-rose-400 font-bold">→ CONTRADICCIÓN</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-black/30 p-3 rounded-lg">
+                            <code class="text-pink-300 font-mono">(p → q) ↔ (¬p ∨ q)</code>
+                            <span class="text-emerald-400 font-bold">→ TAUTOLOGÍA (Ley de Implicación)</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-black/30 p-3 rounded-lg">
+                            <code class="text-pink-300 font-mono">p → q</code>
+                            <span class="text-amber-400 font-bold">→ CONTINGENCIA</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accesibilidad -->
+                <div class="bg-purple-900/20 p-5 rounded-xl border border-purple-500/30">
+                    <h3 class="font-bold text-purple-300 mb-4 flex items-center gap-2"><i
+                            data-lucide="accessibility"></i> Funciones de Accesibilidad</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="volume-2" class="w-5 h-5 text-sky-400 mt-0.5"></i>
+                            <div><strong class="text-white">Lectura en Voz Alta</strong>
+                                <p class="text-slate-400">Lee los resultados automáticamente usando síntesis de voz.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="eye" class="w-5 h-5 text-yellow-400 mt-0.5"></i>
+                            <div><strong class="text-white">Alto Contraste</strong>
+                                <p class="text-slate-400">Colores de alto contraste para mejor visibilidad.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="sun" class="w-5 h-5 text-amber-400 mt-0.5"></i>
+                            <div><strong class="text-white">Modo Claro/Oscuro</strong>
+                                <p class="text-slate-400">Cambia entre temas según tu preferencia.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="smartphone" class="w-5 h-5 text-emerald-400 mt-0.5"></i>
+                            <div><strong class="text-white">Táctil Amigable</strong>
+                                <p class="text-slate-400">Botones grandes optimizados para pantallas táctiles.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interpretación de Resultados -->
+                <div class="bg-slate-800/50 rounded-xl p-5 border border-white/5">
+                    <h3 class="font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="bar-chart-3"></i>
+                        Interpretación de Resultados</h3>
+                    <div class="space-y-3">
+                        <div
+                            class="flex items-center gap-3 p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                            <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center"><i
+                                    data-lucide="check-circle-2" class="text-emerald-400"></i></div>
+                            <div><strong class="text-emerald-400">TAUTOLOGÍA</strong>
+                                <p class="text-sm text-slate-400">Siempre verdadera, sin importar los valores de las
+                                    variables.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-rose-500/10 rounded-lg border border-rose-500/20">
+                            <div class="w-10 h-10 rounded-full bg-rose-500/20 flex items-center justify-center"><i
+                                    data-lucide="x-circle" class="text-rose-400"></i></div>
+                            <div><strong class="text-rose-400">CONTRADICCIÓN</strong>
+                                <p class="text-sm text-slate-400">Siempre falsa, sin importar los valores de las
+                                    variables.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                            <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center"><i
+                                    data-lucide="scale" class="text-amber-400"></i></div>
+                            <div><strong class="text-amber-400">CONTINGENCIA</strong>
+                                <p class="text-sm text-slate-400">A veces verdadera, a veces falsa, depende de los
+                                    valores.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ -->
+                <div class="bg-slate-800/50 rounded-xl p-5 border border-white/5">
+                    <h3 class="font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="help-circle"></i>
+                        Preguntas Frecuentes (FAQ)</h3>
+                    <div class="space-y-4 text-sm">
+                        <div>
+                            <p class="font-bold text-cyan-300">¿Por qué mi fórmula da error?</p>
+                            <p class="text-slate-400">Verifica que los paréntesis estén balanceados y que uses los
+                                operadores correctos.</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-cyan-300">¿Puedo usar más de 4 variables?</p>
+                            <p class="text-slate-400">Actualmente el límite es 4 variables para mantener un rendimiento
+                                óptimo (16 filas máximo).</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-cyan-300">¿Qué significan los colores en la tabla?</p>
+                            <p class="text-slate-400"><span class="text-cyan-400">Cyan</span> = Variables | <span
+                                    class="text-yellow-400">Amarillo</span> = Pasos intermedios | <span
+                                    class="text-pink-400">Rosa</span> = Resultado final</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Solución de Problemas -->
+                <div class="bg-rose-900/10 p-5 rounded-xl border border-rose-500/20">
+                    <h5 class="text-rose-400 font-bold mb-3 flex items-center gap-2"><i
+                            data-lucide="alert-triangle"></i> Solución de Problemas</h5>
+                    <ul class="list-disc list-inside text-sm text-slate-400 space-y-2">
+                        <li>Si el resultado parece incorrecto, verifica los <strong>paréntesis</strong>.</li>
+                        <li>Usa <strong>operadores explícitos</strong> entre variables (no se asume multiplicación).
+                        </li>
+                        <li>Si la lectura en voz alta no funciona, verifica los permisos del navegador.</li>
+                        <li>En móvil, puedes hacer <strong>pellizco para zoom</strong> en la tabla de verdad.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 3. Modal Reglas de Inferencia (COMPLETO: 18 Reglas) -->
+    <dialog id="rules-modal"
+        class="rounded-2xl glass-panel-heavy text-slate-200 w-full max-w-7xl p-0 shadow-2xl backdrop:backdrop-blur-xl m-4 md:m-auto">
+        <div class="flex flex-col h-[90vh]">
+            <div
+                class="flex justify-between items-center p-6 border-b border-white/10 bg-slate-900/80 sticky top-0 z-10">
+                <h2 class="text-2xl font-orbitron font-bold text-purple-400 flex items-center gap-3">
+                    <i data-lucide="gavel"></i> Biblioteca de Inferencia (18 Reglas)
+                </h2>
+                <button onclick="app.ui.closeModal('rules-modal')"
+                    class="p-2 rounded-full hover:bg-red-500/20 hover:text-red-400 transition-all close-spin">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <div class="overflow-y-auto p-6 md:p-8 bg-black/20 custom-scrollbar">
+                <div class="masonry-grid gap-6 space-y-6">
+
+                    <!-- 1. PP -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-sky-500/50 hover:bg-slate-800/60 transition-all shadow-lg">
+                        <h4 class="font-bold text-sky-300 mb-2">1. Modus Ponendo Ponens (PP)</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-sky-500">
+                            <p>P → Q</p>
+                            <p>P</p>
+                            <hr class="border-slate-600 my-1">
+                            <p class="text-emerald-400 font-bold">∴ Q</p>
+                        </div>
+                    </div>
+
+                    <!-- 2. TT -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-rose-500/50 hover:bg-slate-800/60 transition-all shadow-lg">
+                        <h4 class="font-bold text-rose-300 mb-2">2. Modus Tollendo Tollens (TT)</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-rose-500">
+                            <p>P → Q</p>
+                            <p>¬Q</p>
+                            <hr class="border-slate-600 my-1">
+                            <p class="text-emerald-400 font-bold">∴ ¬P</p>
+                        </div>
+                    </div>
+
+                    <!-- 3. SH -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-purple-500/50 hover:bg-slate-800/60 transition-all shadow-lg">
+                        <h4 class="font-bold text-purple-300 mb-2">3. Silogismo Hipotético (SH)</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-purple-500">
+                            <p>P → Q</p>
+                            <p>Q → R</p>
+                            <hr class="border-slate-600 my-1">
+                            <p class="text-emerald-400 font-bold">∴ P → R</p>
+                        </div>
+                    </div>
+
+                    <!-- 4. TP -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-yellow-500/50 hover:bg-slate-800/60 transition-all shadow-lg">
+                        <h4 class="font-bold text-yellow-300 mb-2">4. Tollendo Ponens (TP)</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-yellow-500">
+                            <p>P ∨ Q</p>
+                            <p>¬P</p>
+                            <hr class="border-slate-600 my-1">
+                            <p class="text-emerald-400 font-bold">∴ Q</p>
+                        </div>
+                    </div>
+
+                    <!-- 5. DN -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-white/30 transition-all shadow-lg">
+                        <h4 class="font-bold text-slate-300 mb-2">5. Doble Negación (DN)</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-slate-500">
+                            <p>¬(¬P) ≡ P</p>
+                        </div>
+                    </div>
+
+                    <!-- 6. A y S -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-white/30 transition-all shadow-lg">
+                        <h4 class="font-bold text-slate-300 mb-2">6. Adjunción y Simplificación</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-slate-500">
+                            <p class="mb-2"><span class="text-xs text-slate-500">Adj:</span> P, Q ∴ P ∧ Q</p>
+                            <p><span class="text-xs text-slate-500">Simp:</span> P ∧ Q ∴ P</p>
+                        </div>
+                    </div>
+
+                    <!-- 7. LA -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-white/30 transition-all shadow-lg">
+                        <h4 class="font-bold text-slate-300 mb-2">7. Ley de Adición (LA)</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-slate-500">
+                            <p>P</p>
+                            <hr class="border-slate-600 my-1">
+                            <p class="text-emerald-400 font-bold">∴ P ∨ Q</p>
+                        </div>
+                    </div>
+
+                    <!-- 8. DS -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-orange-500/50 transition-all shadow-lg">
+                        <h4 class="font-bold text-orange-300 mb-2">8. Silogismo Disyuntivo (DS)</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-orange-500">
+                            <p>P ∨ Q</p>
+                            <p>¬P</p>
+                            <hr class="border-slate-600 my-1">
+                            <p class="text-emerald-400 font-bold">∴ Q</p>
+                        </div>
+                        <p class="text-xs text-slate-500">(Similar a TP)</p>
+                    </div>
+
+                    <!-- 9. SD -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-white/30 transition-all shadow-lg">
+                        <h4 class="font-bold text-slate-300 mb-2">9. Simplificación Disyuntiva</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-slate-500">
+                            <p>P ∨ P ≡ P</p>
+                        </div>
+                    </div>
+
+                    <!-- 10. Prueba Condicional -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-white/30 transition-all shadow-lg">
+                        <h4 class="font-bold text-slate-300 mb-2">10. Prueba del Condicional</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-slate-500">
+                            <p class="text-xs text-slate-400">Asumir antecedente P, derivar Q.</p>
+                        </div>
+                    </div>
+
+                    <!-- 11. Absorción -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-indigo-500/50 transition-all shadow-lg">
+                        <h4 class="font-bold text-indigo-300 mb-2">11. Ley de Absorción (Abs)</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-indigo-500">
+                            <p>P → Q</p>
+                            <hr class="border-slate-600 my-1">
+                            <p class="text-emerald-400 font-bold">∴ P → (P ∧ Q)</p>
+                        </div>
+                    </div>
+
+                    <!-- 12. Contraposición -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-white/30 transition-all shadow-lg">
+                        <h4 class="font-bold text-slate-300 mb-2">12. Contraposición</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-slate-500">
+                            <p>P → Q ≡ ¬Q → ¬P</p>
+                        </div>
+                    </div>
+
+                    <!-- 13. Ley del Condicional -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-white/30 transition-all shadow-lg">
+                        <h4 class="font-bold text-slate-300 mb-2">13. Ley del Condicional</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-slate-500">
+                            <p>P → Q ≡ ¬P ∨ Q</p>
+                        </div>
+                    </div>
+
+                    <!-- 14. Exportación -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-white/30 transition-all shadow-lg">
+                        <h4 class="font-bold text-slate-300 mb-2">14. Ley de Exportación</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-slate-500">
+                            <p>(P ∧ Q) → R ≡ P → (Q → R)</p>
+                        </div>
+                    </div>
+
+                    <!-- 15. Morgan -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-indigo-500/50 transition-all shadow-lg">
+                        <h4 class="font-bold text-indigo-300 mb-2">15. Leyes de Morgan (DM)</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-indigo-500">
+                            <p>¬(P ∧ Q) ≡ ¬P ∨ ¬Q</p>
+                            <p>¬(P ∨ Q) ≡ ¬P ∧ ¬Q</p>
+                        </div>
+                    </div>
+
+                    <!-- 16. Conmutativas -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-white/30 transition-all shadow-lg">
+                        <h4 class="font-bold text-slate-300 mb-2">16. Leyes Conmutativas</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-slate-500">
+                            <p>P ∧ Q ≡ Q ∧ P</p>
+                            <p>P ∨ Q ≡ Q ∨ P</p>
+                        </div>
+                    </div>
+
+                    <!-- 17. Asociativas -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-white/30 transition-all shadow-lg">
+                        <h4 class="font-bold text-slate-300 mb-2">17. Leyes Asociativas</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-slate-500">
+                            <p>(P ∧ Q) ∧ R ≡ P ∧ (Q ∧ R)</p>
+                            <p>(P ∨ Q) ∨ R ≡ P ∨ (Q ∨ R)</p>
+                        </div>
+                    </div>
+
+                    <!-- 18. Distributivas -->
+                    <div
+                        class="rule-card bg-slate-800/40 p-5 rounded-2xl border border-white/5 hover:border-teal-500/50 transition-all shadow-lg">
+                        <h4 class="font-bold text-teal-300 mb-2">18. Leyes Distributivas</h4>
+                        <div class="font-mono text-sm bg-black/40 p-4 rounded-lg mb-2 border-l-2 border-teal-500">
+                            <p>P ∧ (Q ∨ R) ≡ (P ∧ Q) ∨ (P ∧ R)</p>
+                            <p>P ∨ (Q ∧ R) ≡ (P ∨ Q) ∧ (P ∨ R)</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- 4. Modal Simplificador de Expresiones -->
+    <dialog id="simplify-modal"
+        class="rounded-2xl glass-panel-heavy w-full max-w-2xl p-0 shadow-2xl backdrop:backdrop-blur-xl text-slate-200 m-4 md:m-auto">
+        <div class="flex flex-col max-h-[90vh]">
+            <div
+                class="flex justify-between items-center p-6 border-b border-white/10 bg-slate-900/80 sticky top-0 z-10">
+                <h2 class="text-2xl font-orbitron font-bold text-emerald-400 flex items-center gap-3">
+                    <i data-lucide="sparkles"></i> Simplificador Lógico
+                </h2>
+                <button onclick="app.ui.closeModal('simplify-modal')"
+                    class="p-2 rounded-full hover:bg-red-500/20 hover:text-red-400 transition-all">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-6 overflow-y-auto">
+                <!-- Expresión Original -->
+                <div class="bg-slate-800/50 p-4 rounded-xl border border-white/10">
+                    <h4 class="text-xs text-slate-500 uppercase tracking-wider mb-2 font-bold">Expresión Original</h4>
+                    <div id="simplify-original" class="text-xl font-mono text-white text-center py-2"></div>
+                </div>
+
+                <!-- Pasos de Simplificación -->
+                <div>
+                    <h4 class="text-sm text-slate-400 uppercase tracking-wider mb-3 font-bold flex items-center gap-2">
+                        <i data-lucide="list-ordered" class="w-4 h-4"></i> Pasos de Simplificación
+                    </h4>
+                    <div id="simplify-steps" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Resultado Final -->
+                <div class="bg-emerald-900/30 p-5 rounded-xl border border-emerald-500/30">
+                    <h4 class="text-xs text-emerald-300/70 uppercase tracking-wider mb-2 font-bold">Resultado
+                        Simplificado</h4>
+                    <div class="flex items-center justify-between gap-4">
+                        <div id="simplify-result" class="text-2xl font-mono text-emerald-300 flex-1 text-center"></div>
+                        <button onclick="app.logic.copySimplifiedResult()"
+                            class="p-3 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 transition-colors border border-emerald-500/30"
+                            title="Copiar resultado">
+                            <i data-lucide="copy" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mensaje cuando no hay simplificación -->
+                <div id="simplify-no-changes"
+                    class="hidden bg-yellow-900/20 p-4 rounded-xl border border-yellow-500/30">
+                    <p class="text-yellow-200 text-sm flex items-center gap-2">
+                        <i data-lucide="info" class="w-5 h-5"></i>
+                        La expresión ya está en su forma más simple.
+                    </p>
+                </div>
+            </div>
+
+            <div class="p-4 bg-slate-900/50 border-t border-white/10 flex justify-center">
+                <button onclick="app.logic.useSimplifiedResult()"
+                    class="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold flex items-center gap-2 transition-all shadow-lg">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i> Usar Esta Expresión
+                </button>
+            </div>
+        </div>
+    </dialog>
+
+    <script>
+        /**
+         * LogicVerse Pro v3.0 - Core Engine
+         * Full Feature Set
+         */
+        const app = {
+            state: {
+                theme: 'dark',
+                ttsEnabled: false,
+                highContrast: false,
+            },
+
+            ui: {
+                init() {
+                    this.renderKeypad();
+                    this.setupListeners();
+                    this.loadPreferences();
+                    lucide.createIcons();
+                },
+
+                renderKeypad() {
+                    const keys = [
+                        { label: 'p', type: 'var', class: 'text-cyan-400 border-cyan-500/20 bg-cyan-500/5' },
+                        { label: 'q', type: 'var', class: 'text-cyan-400 border-cyan-500/20 bg-cyan-500/5' },
+                        { label: 'r', type: 'var', class: 'text-cyan-400 border-cyan-500/20 bg-cyan-500/5' },
+                        { label: 's', type: 'var', class: 'text-cyan-400 border-cyan-500/20 bg-cyan-500/5' },
+                        { label: '¬', type: 'op', value: '¬', class: 'text-white font-bold bg-white/5' },
+                        { label: '∧', type: 'op', value: '∧', class: 'text-white font-bold bg-white/5' },
+                        { label: '∨', type: 'op', value: '∨', class: 'text-white font-bold bg-white/5' },
+                        { label: '→', type: 'op', value: '→', class: 'text-white font-bold bg-white/5' },
+                        { label: '↔', type: 'op', value: '↔', class: 'text-white font-bold bg-white/5' },
+                        { label: '(', type: 'op', value: '(', class: 'text-yellow-400' },
+                        { label: ')', type: 'op', value: ')', class: 'text-yellow-400' },
+                        { label: '⌫', type: 'action', action: 'backspace', class: 'text-rose-400 border-rose-500/20 bg-rose-500/5' },
+                    ];
+
+                    const container = document.getElementById('keypad');
+                    container.innerHTML = '';
+                    const numVars = parseInt(document.getElementById('num-vars').value);
+                    const activeVars = ['p', 'q', 'r', 's'].slice(0, numVars);
+
+                    keys.forEach(key => {
+                        if (key.type === 'var' && !activeVars.includes(key.label)) return;
+                        const btn = document.createElement('button');
+                        btn.className = `keypad-btn h-12 md:h-14 rounded-xl flex items-center justify-center text-lg md:text-xl font-mono border border-white/5 hover:bg-white/10 transition-all active:scale-95 ${key.class || ''}`;
+                        btn.textContent = key.label;
+                        if (key.type === 'action') btn.onclick = () => this.handleAction(key.action);
+                        else btn.onclick = () => this.insertToken(key.value || key.label);
+                        container.appendChild(btn);
+                    });
+                },
+
+                insertToken(token) {
+                    const input = document.getElementById('expression-input');
+                    const start = input.selectionStart;
+                    const end = input.selectionEnd;
+                    const text = input.value;
+                    input.value = text.substring(0, start) + token + text.substring(end);
+                    input.focus();
+                    input.setSelectionRange(start + token.length, start + token.length);
+                },
+
+                handleAction(action) {
+                    const input = document.getElementById('expression-input');
+                    if (action === 'backspace') {
+                        const start = input.selectionStart;
+                        const end = input.selectionEnd;
+                        if (start === end && start > 0) {
+                            input.value = input.value.substring(0, start - 1) + input.value.substring(end);
+                            input.setSelectionRange(start - 1, start - 1);
+                        } else {
+                            input.value = input.value.substring(0, start) + input.value.substring(end);
+                            input.setSelectionRange(start, start);
+                        }
+                        input.focus();
+                    }
+                },
+
+                setupListeners() {
+                    document.getElementById('theme-toggle').onclick = () => {
+                        document.documentElement.classList.toggle('dark');
+                        document.documentElement.classList.toggle('light');
+                    };
+                    document.getElementById('num-vars').onchange = () => this.renderKeypad();
+                    document.getElementById('calculate-btn').onclick = () => app.logic.process();
+                    document.getElementById('simplify-btn').onclick = () => app.logic.simplifyExpression();
+                    document.getElementById('expression-input').addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') app.logic.process();
+                    });
+                    document.getElementById('tts-toggle').onclick = (e) => {
+                        app.state.ttsEnabled = !app.state.ttsEnabled;
+                        const btn = e.currentTarget;
+                        if (app.state.ttsEnabled) {
+                            btn.classList.add('bg-sky-500', 'text-white');
+                            app.accessibility.speak("Lectura activada");
+                        } else {
+                            btn.classList.remove('bg-sky-500', 'text-white');
+                            window.speechSynthesis.cancel();
+                        }
+                    };
+                    document.getElementById('contrast-toggle').onclick = (e) => {
+                        document.body.classList.toggle('high-contrast');
+                        e.currentTarget.classList.toggle('ring-2');
+                    }
+                },
+
+                loadPreferences() {
+                    document.documentElement.classList.add('dark');
+                },
+
+                openModal(id) {
+                    const modal = document.getElementById(id);
+                    if (modal) modal.showModal();
+                },
+
+                closeModal(id) {
+                    const modal = document.getElementById(id);
+                    if (modal) modal.close();
+                },
+
+                toggleTable() {
+                    const section = document.getElementById('table-section');
+                    section.classList.toggle('hidden');
+                    if (!section.classList.contains('hidden')) {
+                        setTimeout(() => section.scrollIntoView({ behavior: 'smooth' }), 100);
+                    }
+                },
+
+                displayResults(data) {
+                    const { headers, table, isTautology, isContradiction, expression, numVars } = data;
+
+                    // 1. Update Diagnostics
+                    const summaryDiv = document.getElementById('analysis-summary');
+                    const statusDiv = document.getElementById('result-status');
+
+                    statusDiv.classList.add('hidden');
+                    summaryDiv.classList.remove('hidden');
+                    summaryDiv.classList.add('flex');
+
+                    const trueCount = table.filter(r => r[expression]).length;
+                    const falseCount = table.length - trueCount;
+
+                    document.getElementById('stat-true').textContent = trueCount;
+                    document.getElementById('stat-false').textContent = falseCount;
+
+                    const verdictText = document.getElementById('main-verdict-text');
+                    const verdictSub = document.getElementById('main-verdict-sub');
+                    const verdictIcon = document.getElementById('main-verdict-icon');
+
+                    if (isTautology) {
+                        verdictText.textContent = "TAUTOLOGÍA";
+                        verdictText.className = "text-3xl font-black font-orbitron text-emerald-400 tracking-tight";
+                        verdictSub.textContent = "Verdadero en todos los universos posibles.";
+                        verdictIcon.innerHTML = '<i data-lucide="check-circle-2" class="w-12 h-12 text-emerald-400"></i>';
+                    } else if (isContradiction) {
+                        verdictText.textContent = "CONTRADICCIÓN";
+                        verdictText.className = "text-3xl font-black font-orbitron text-rose-500 tracking-tight";
+                        verdictSub.textContent = "Falso en todos los escenarios.";
+                        verdictIcon.innerHTML = '<i data-lucide="x-circle" class="w-12 h-12 text-rose-500"></i>';
+                    } else {
+                        verdictText.textContent = "CONTINGENCIA";
+                        verdictText.className = "text-3xl font-black font-orbitron text-amber-400 tracking-tight";
+                        verdictSub.textContent = `V: ${trueCount} casos | F: ${falseCount} casos`;
+                        verdictIcon.innerHTML = '<i data-lucide="scale" class="w-12 h-12 text-amber-400"></i>';
+                    }
+                    lucide.createIcons();
+
+                    // 2. Build Rainbow Table
+                    const thead = document.getElementById('table-head');
+                    const tbody = document.getElementById('table-body');
+
+                    // Headers categorization
+                    thead.innerHTML = headers.map((h, i) => {
+                        let typeClass = '';
+                        // Remove outer parens for display in headers if they are redundant, for cleaner look
+                        const displayText = h;
+
+                        if (i < numVars) typeClass = 'col-var text-cyan-400 bg-cyan-900/20';
+                        else if (h === expression) typeClass = 'col-result text-fuchsia-400 bg-fuchsia-900/20 text-lg border-l-2 border-white/20';
+                        else typeClass = 'col-step text-yellow-400 bg-yellow-900/20';
+
+                        return `<th class="p-4 whitespace-nowrap border-b border-white/10 ${typeClass}">${displayText}</th>`;
+                    }).join('');
+
+                    tbody.innerHTML = table.map(row => {
+                        return `<tr class="hover:bg-white/5 transition-colors">
+                            ${headers.map((h, i) => {
+                            const val = row[h];
+                            const cellClass = val ? 'table-cell-true' : 'table-cell-false';
+                            const borderClass = i < numVars ? 'border-r border-white/5' : (h === expression ? 'border-l-2 border-white/10 font-bold text-lg' : 'border-r border-white/5 text-sm text-slate-300');
+                            return `<td class="p-3 ${cellClass} ${borderClass}">${val ? 'V' : 'F'}</td>`;
+                        }).join('')}
+                        </tr>`;
+                    }).join('');
+
+                    app.accessibility.speak(`Cálculo finalizado. Es una ${verdictText.textContent}.`);
+                }
+            },
+
+            logic: {
+                clearInput() {
+                    document.getElementById('expression-input').value = '';
+                    document.getElementById('expression-input').focus();
+                },
+
+                process() {
+                    let rawExpr = document.getElementById('expression-input').value;
+                    if (!rawExpr.trim()) return;
+
+                    // Normalize
+                    let expression = rawExpr.replace(/!/g, '¬').replace(/~/g, '¬')
+                        .replace(/&/g, '∧').replace(/\|/g, '∨')
+                        .replace(/=/g, '↔').replace(/>/g, '→')
+                        .replace(/\s+/g, '');
+
+                    document.getElementById('expression-input').value = expression;
+                    const numVars = parseInt(document.getElementById('num-vars').value);
+
+                    try {
+                        const subFormulas = this.getSubFormulas(expression);
+                        const tableData = this.generateTableData(expression, subFormulas, numVars);
+                        app.ui.displayResults(tableData);
+                    } catch (e) {
+                        alert("Error de sintaxis: " + e.message);
+                    }
+                },
+
+                // AST Parser
+                getSubFormulas(expression) {
+                    const tokens = this.tokenize(expression);
+                    const rpn = this.shuntingYard(tokens);
+                    const tree = this.buildAST(rpn);
+
+                    const subExprs = new Set();
+                    const traverse = (node) => {
+                        if (!node) return;
+                        if (node.left) traverse(node.left);
+                        if (node.right) traverse(node.right);
+                        if (node.op) {
+                            subExprs.add(this.nodeToString(node));
+                        }
+                    };
+                    traverse(tree);
+                    return Array.from(subExprs).sort((a, b) => a.length - b.length);
+                },
+
+                tokenize(expr) {
+                    return expr.match(/¬|∧|∨|→|↔|\(|\)|[p-s]/g) || [];
+                },
+
+                precedence: { '¬': 4, '∧': 3, '∨': 2, '→': 1, '↔': 0 },
+
+                shuntingYard(tokens) {
+                    const output = [];
+                    const ops = [];
+                    for (const t of tokens) {
+                        if (/[p-s]/.test(t)) output.push(t);
+                        else if (t === '¬') ops.push(t);
+                        else if (t === '(') ops.push(t);
+                        else if (t === ')') {
+                            while (ops.length && ops[ops.length - 1] !== '(') output.push(ops.pop());
+                            ops.pop();
+                        } else if (this.precedence[t] !== undefined) {
+                            while (ops.length && ops[ops.length - 1] !== '(' && this.precedence[ops[ops.length - 1]] >= this.precedence[t]) {
+                                output.push(ops.pop());
+                            }
+                            ops.push(t);
+                        }
+                    }
+                    return [...output, ...ops.reverse()];
+                },
+
+                buildAST(rpn) {
+                    const stack = [];
+                    for (const t of rpn) {
+                        if (/[p-s]/.test(t)) {
+                            stack.push({ val: t });
+                        } else if (t === '¬') {
+                            const node = stack.pop();
+                            stack.push({ op: '¬', right: node });
+                        } else {
+                            const right = stack.pop();
+                            const left = stack.pop();
+                            stack.push({ op: t, left, right });
+                        }
+                    }
+                    return stack[0];
+                },
+
+                nodeToString(node) {
+                    if (!node.op) return node.val;
+                    if (node.op === '¬') return `¬${this.nodeToString(node.right)}`;
+                    return `(${this.nodeToString(node.left)} ${node.op} ${this.nodeToString(node.right)})`;
+                },
+
+                evaluate(node, context) {
+                    if (!node.op) return context[node.val];
+                    if (node.op === '¬') return !this.evaluate(node.right, context);
+                    const l = this.evaluate(node.left, context);
+                    const r = this.evaluate(node.right, context);
+                    switch (node.op) {
+                        case '∧': return l && r;
+                        case '∨': return l || r;
+                        case '→': return !l || r;
+                        case '↔': return l === r;
+                    }
+                },
+
+                generateTableData(expression, subFormulas, numVars) {
+                    const vars = ['p', 'q', 'r', 's'].slice(0, numVars);
+                    const steps = subFormulas.filter(s => s.replace(/\s/g, '') !== expression);
+                    const headers = [...vars, ...steps, expression];
+
+                    const rows = [];
+                    const rpnMain = this.shuntingYard(this.tokenize(expression));
+                    const astMain = this.buildAST(rpnMain);
+                    const stepASTs = steps.map(s => ({
+                        header: s,
+                        ast: this.buildAST(this.shuntingYard(this.tokenize(s)))
+                    }));
+
+                    for (let i = 0; i < (1 << numVars); i++) {
+                        const row = {};
+                        for (let j = 0; j < numVars; j++) {
+                            const val = !!((i >> (numVars - 1 - j)) & 1);
+                            row[vars[j]] = val;
+                        }
+                        stepASTs.forEach(step => {
+                            row[step.header] = this.evaluate(step.ast, row);
+                        });
+                        row[expression] = this.evaluate(astMain, row);
+                        rows.push(row);
+                    }
+                    const results = rows.map(r => r[expression]);
+
+                    return {
+                        headers, table: rows, expression, numVars,
+                        isTautology: results.every(v => v),
+                        isContradiction: results.every(v => !v)
+                    };
+                },
+
+                // ============== MOTOR DE SIMPLIFICACIÓN ==============
+
+                simplifiedResult: '',
+
+                simplifyExpression() {
+                    const input = document.getElementById('expression-input').value.trim();
+                    if (!input) {
+                        alert('Por favor, ingresa una expresión lógica primero.');
+                        return;
+                    }
+
+                    try {
+                        const tokens = this.tokenize(input);
+                        const rpn = this.shuntingYard(tokens);
+                        const ast = this.buildAST(rpn);
+
+                        // Realizar simplificación
+                        const result = this.simplifyWithSteps(ast);
+
+                        // Mostrar en el modal
+                        this.displaySimplificationResult(input, result);
+                        app.ui.openModal('simplify-modal');
+                        lucide.createIcons();
+
+                    } catch (e) {
+                        alert('Error al procesar la expresión: ' + e.message);
+                    }
+                },
+
+                simplifyWithSteps(ast) {
+                    const steps = [];
+                    let current = JSON.parse(JSON.stringify(ast)); // Deep clone
+                    let changed = true;
+                    let iterations = 0;
+                    const maxIterations = 20;
+
+                    while (changed && iterations < maxIterations) {
+                        changed = false;
+                        iterations++;
+
+                        const result = this.applySimplificationRules(current);
+                        if (result.changed) {
+                            steps.push({
+                                law: result.lawApplied,
+                                before: this.nodeToString(current),
+                                after: this.nodeToString(result.node)
+                            });
+                            current = result.node;
+                            changed = true;
+                        }
+                    }
+
+                    return {
+                        original: ast,
+                        simplified: current,
+                        steps: steps
+                    };
+                },
+
+                applySimplificationRules(node) {
+                    if (!node) return { node, changed: false };
+
+                    // 1. Doble Negación: ¬¬p → p
+                    if (node.op === '¬' && node.right && node.right.op === '¬') {
+                        return {
+                            node: node.right.right,
+                            changed: true,
+                            lawApplied: 'Doble Negación (¬¬p → p)'
+                        };
+                    }
+
+                    // 2. Idempotencia: p∧p → p, p∨p → p
+                    if ((node.op === '∧' || node.op === '∨') && this.nodesAreEqual(node.left, node.right)) {
+                        return {
+                            node: node.left,
+                            changed: true,
+                            lawApplied: `Idempotencia (p${node.op}p → p)`
+                        };
+                    }
+
+                    // 3. Complemento: p∧¬p → F, p∨¬p → V
+                    if (node.op === '∧' && this.isComplement(node.left, node.right)) {
+                        return {
+                            node: { val: 'F' },
+                            changed: true,
+                            lawApplied: 'Complemento (p∧¬p → F)'
+                        };
+                    }
+                    if (node.op === '∨' && this.isComplement(node.left, node.right)) {
+                        return {
+                            node: { val: 'V' },
+                            changed: true,
+                            lawApplied: 'Complemento (p∨¬p → V)'
+                        };
+                    }
+
+                    // 4. Identidad: p∧V → p, p∨F → p
+                    if (node.op === '∧') {
+                        if (node.right && node.right.val === 'V') {
+                            return { node: node.left, changed: true, lawApplied: 'Identidad (p∧V → p)' };
+                        }
+                        if (node.left && node.left.val === 'V') {
+                            return { node: node.right, changed: true, lawApplied: 'Identidad (V∧p → p)' };
+                        }
+                    }
+                    if (node.op === '∨') {
+                        if (node.right && node.right.val === 'F') {
+                            return { node: node.left, changed: true, lawApplied: 'Identidad (p∨F → p)' };
+                        }
+                        if (node.left && node.left.val === 'F') {
+                            return { node: node.right, changed: true, lawApplied: 'Identidad (F∨p → p)' };
+                        }
+                    }
+
+                    // 5. Dominación: p∧F → F, p∨V → V
+                    if (node.op === '∧') {
+                        if ((node.right && node.right.val === 'F') || (node.left && node.left.val === 'F')) {
+                            return { node: { val: 'F' }, changed: true, lawApplied: 'Dominación (p∧F → F)' };
+                        }
+                    }
+                    if (node.op === '∨') {
+                        if ((node.right && node.right.val === 'V') || (node.left && node.left.val === 'V')) {
+                            return { node: { val: 'V' }, changed: true, lawApplied: 'Dominación (p∨V → V)' };
+                        }
+                    }
+
+                    // 6. De Morgan: ¬(p∧q) → ¬p∨¬q, ¬(p∨q) → ¬p∧¬q
+                    if (node.op === '¬' && node.right && node.right.op === '∧') {
+                        return {
+                            node: {
+                                op: '∨',
+                                left: { op: '¬', right: node.right.left },
+                                right: { op: '¬', right: node.right.right }
+                            },
+                            changed: true,
+                            lawApplied: 'De Morgan (¬(p∧q) → ¬p∨¬q)'
+                        };
+                    }
+                    if (node.op === '¬' && node.right && node.right.op === '∨') {
+                        return {
+                            node: {
+                                op: '∧',
+                                left: { op: '¬', right: node.right.left },
+                                right: { op: '¬', right: node.right.right }
+                            },
+                            changed: true,
+                            lawApplied: 'De Morgan (¬(p∨q) → ¬p∧¬q)'
+                        };
+                    }
+
+                    // 7. Absorción: p∧(p∨q) → p, p∨(p∧q) → p
+                    if (node.op === '∧' && node.right && node.right.op === '∨') {
+                        if (this.nodesAreEqual(node.left, node.right.left) || this.nodesAreEqual(node.left, node.right.right)) {
+                            return { node: node.left, changed: true, lawApplied: 'Absorción (p∧(p∨q) → p)' };
+                        }
+                    }
+                    if (node.op === '∧' && node.left && node.left.op === '∨') {
+                        if (this.nodesAreEqual(node.right, node.left.left) || this.nodesAreEqual(node.right, node.left.right)) {
+                            return { node: node.right, changed: true, lawApplied: 'Absorción ((p∨q)∧p → p)' };
+                        }
+                    }
+                    if (node.op === '∨' && node.right && node.right.op === '∧') {
+                        if (this.nodesAreEqual(node.left, node.right.left) || this.nodesAreEqual(node.left, node.right.right)) {
+                            return { node: node.left, changed: true, lawApplied: 'Absorción (p∨(p∧q) → p)' };
+                        }
+                    }
+                    if (node.op === '∨' && node.left && node.left.op === '∧') {
+                        if (this.nodesAreEqual(node.right, node.left.left) || this.nodesAreEqual(node.right, node.left.right)) {
+                            return { node: node.right, changed: true, lawApplied: 'Absorción ((p∧q)∨p → p)' };
+                        }
+                    }
+
+                    // 8. Implicación: p→q ≡ ¬p∨q
+                    if (node.op === '→') {
+                        return {
+                            node: {
+                                op: '∨',
+                                left: { op: '¬', right: node.left },
+                                right: node.right
+                            },
+                            changed: true,
+                            lawApplied: 'Implicación Material (p→q → ¬p∨q)'
+                        };
+                    }
+
+                    // Recursivamente simplificar hijos
+                    if (node.op === '¬' && node.right) {
+                        const rightResult = this.applySimplificationRules(node.right);
+                        if (rightResult.changed) {
+                            return {
+                                node: { op: '¬', right: rightResult.node },
+                                changed: true,
+                                lawApplied: rightResult.lawApplied
+                            };
+                        }
+                    }
+
+                    if (node.left || node.right) {
+                        // Simplificar izquierda primero
+                        if (node.left) {
+                            const leftResult = this.applySimplificationRules(node.left);
+                            if (leftResult.changed) {
+                                return {
+                                    node: { ...node, left: leftResult.node },
+                                    changed: true,
+                                    lawApplied: leftResult.lawApplied
+                                };
+                            }
+                        }
+                        // Luego la derecha
+                        if (node.right && node.op !== '¬') {
+                            const rightResult = this.applySimplificationRules(node.right);
+                            if (rightResult.changed) {
+                                return {
+                                    node: { ...node, right: rightResult.node },
+                                    changed: true,
+                                    lawApplied: rightResult.lawApplied
+                                };
+                            }
+                        }
+                    }
+
+                    return { node, changed: false };
+                },
+
+                nodesAreEqual(a, b) {
+                    if (!a && !b) return true;
+                    if (!a || !b) return false;
+                    if (a.val && b.val) return a.val === b.val;
+                    if (a.op && b.op) {
+                        if (a.op !== b.op) return false;
+                        return this.nodesAreEqual(a.left, b.left) && this.nodesAreEqual(a.right, b.right);
+                    }
+                    return false;
+                },
+
+                isComplement(a, b) {
+                    // p y ¬p
+                    if (a.op === '¬' && this.nodesAreEqual(a.right, b)) return true;
+                    if (b.op === '¬' && this.nodesAreEqual(b.right, a)) return true;
+                    return false;
+                },
+
+                displaySimplificationResult(original, result) {
+                    document.getElementById('simplify-original').textContent = original;
+
+                    const stepsDiv = document.getElementById('simplify-steps');
+                    stepsDiv.innerHTML = '';
+
+                    if (result.steps.length === 0) {
+                        document.getElementById('simplify-no-changes').classList.remove('hidden');
+                        stepsDiv.innerHTML = '<p class="text-slate-500 text-center py-4">No se aplicaron simplificaciones</p>';
+                    } else {
+                        document.getElementById('simplify-no-changes').classList.add('hidden');
+
+                        result.steps.forEach((step, i) => {
+                            const stepEl = document.createElement('div');
+                            stepEl.className = 'bg-slate-800/50 p-4 rounded-xl border border-white/10';
+                            stepEl.innerHTML = `
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="w-7 h-7 rounded-full bg-emerald-600/30 text-emerald-400 flex items-center justify-center text-sm font-bold">${i + 1}</span>
+                                    <span class="text-emerald-300 font-semibold text-sm">${step.law}</span>
+                                </div>
+                                <div class="flex items-center gap-3 font-mono text-sm">
+                                    <span class="text-slate-400">${step.before}</span>
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-emerald-500 flex-shrink-0"></i>
+                                    <span class="text-white">${step.after}</span>
+                                </div>
+                            `;
+                            stepsDiv.appendChild(stepEl);
+                        });
+                    }
+
+                    const finalResult = this.nodeToString(result.simplified);
+                    this.simplifiedResult = finalResult;
+                    document.getElementById('simplify-result').textContent = finalResult;
+                },
+
+                copySimplifiedResult() {
+                    if (this.simplifiedResult) {
+                        navigator.clipboard.writeText(this.simplifiedResult).then(() => {
+                            app.accessibility.speak('Resultado copiado');
+                        });
+                    }
+                },
+
+                useSimplifiedResult() {
+                    if (this.simplifiedResult) {
+                        document.getElementById('expression-input').value = this.simplifiedResult;
+                        app.ui.closeModal('simplify-modal');
+                    }
+                }
+            },
+
+            accessibility: {
+                speak(text) {
+                    if (!this.ttsEnabled && !app.state.ttsEnabled) return;
+                    window.speechSynthesis.cancel();
+                    const u = new SpeechSynthesisUtterance(text);
+                    u.lang = 'es-ES';
+                    window.speechSynthesis.speak(u);
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => app.ui.init());
+
+
+
+
+    </script>
+
+    <!-- Footer Profesional -->
+    <footer class="w-full py-4 mt-8 glass-panel border-t border-white/10">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-center gap-3 text-center">
+                <div class="flex items-center gap-2 text-sm text-slate-400">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-purple-400"></i>
+                    <span>Creado con ayuda de la <span
+                            class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 font-bold">Inteligencia
+                            Artificial</span></span>
+                </div>
+                <span class="hidden md:inline text-slate-600">|</span>
+                <div class="flex items-center gap-2 text-xs text-slate-500">
+                    <i data-lucide="heart" class="w-3 h-3 text-pink-500"></i>
+                    <span>Diseñado para la Accesibilidad</span>
+                </div>
+                <span class="hidden md:inline text-slate-600">|</span>
+                <span class="text-xs text-slate-500 font-mono">LogicVerse Pro © 2026</span>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

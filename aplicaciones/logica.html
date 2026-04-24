@@ -1,0 +1,2456 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LogicVerse Pro | Entorno Lógico Avanzado</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' },
+                        syntax: { var: '#d946ef', op: '#3b82f6', paren: '#9ca3af', error: '#ef4444' }
+                    },
+                    fontFamily: { mono: ['"JetBrains Mono"', 'monospace'], sans: ['"Inter"', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' },
+            startup: { typeset: false }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --header-height: 56px;
+            --footer-height: 28px;
+            --left-width: 320px;
+            --right-width: 300px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .dark .glass-panel {
+            background: rgba(15, 23, 42, 0.97);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .editor-container {
+            position: relative;
+            font-family: 'JetBrains Mono', monospace;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .editor-input {
+            position: absolute;
+            inset: 0;
+            background: transparent;
+            color: transparent;
+            caret-color: #6366f1;
+            border: none;
+            resize: none;
+            outline: none;
+            padding: 1rem;
+            z-index: 2;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .editor-highlight {
+            position: absolute;
+            inset: 0;
+            padding: 1rem;
+            pointer-events: none;
+            z-index: 1;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #94a3b8;
+        }
+
+
+        .dark .editor-highlight {
+            color: #64748b;
+        }
+
+        .token-var {
+            color: #d946ef;
+            font-weight: 600;
+            text-shadow: 0 0 1px rgba(217, 70, 239, 0.3);
+        }
+
+        .token-op {
+            color: #3b82f6;
+            font-weight: 700;
+        }
+
+        .token-op-neg {
+            color: #ef4444;
+            font-weight: 700;
+        }
+
+        .token-op-and {
+            color: #22c55e;
+            font-weight: 700;
+        }
+
+        .token-op-or {
+            color: #f59e0b;
+            font-weight: 700;
+        }
+
+        .token-op-impl {
+            color: #8b5cf6;
+            font-weight: 700;
+        }
+
+        .token-op-iff {
+            color: #06b6d4;
+            font-weight: 700;
+        }
+
+        .token-op-xor {
+            color: #ec4899;
+            font-weight: 700;
+        }
+
+        .token-paren {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .token-paren-open {
+            color: #f97316;
+        }
+
+        .token-paren-close {
+            color: #f97316;
+        }
+
+        .token-const {
+            color: #f59e0b;
+            font-weight: 700;
+            text-shadow: 0 0 2px rgba(245, 158, 11, 0.4);
+        }
+
+        .editor-input {
+            caret-color: #6366f1;
+            caret-shape: bar;
+        }
+
+        .editor-input::selection {
+            background: rgba(99, 102, 241, 0.3);
+        }
+
+
+        .k-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.15s;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            border-bottom: 2px solid;
+            background: white;
+            border-color: #e2e8f0;
+            color: #475569;
+            min-height: 40px;
+        }
+
+        .dark .k-btn {
+            background: #1e293b;
+            border-color: #0f172a;
+            color: #cbd5e1;
+        }
+
+        .k-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .k-btn:active {
+            transform: translateY(1px);
+            border-bottom-width: 0;
+            margin-top: 2px;
+        }
+
+        .app-layout {
+            display: grid;
+            grid-template-rows: var(--header-height) 1fr var(--footer-height);
+            height: 100dvh;
+            width: 100vw;
+        }
+
+        .truth-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .truth-table th {
+            background: #f1f5f9;
+            color: #475569;
+            position: sticky;
+            top: 0;
+            padding: 0.5rem;
+            border-bottom: 2px solid #cbd5e1;
+            z-index: 5;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            letter-spacing: 0.05em;
+        }
+
+        .dark .truth-table th {
+            background: #1e293b;
+            color: #94a3b8;
+            border-color: #334155;
+        }
+
+        .truth-table td {
+            border-bottom: 1px solid #e2e8f0;
+            text-align: center;
+            padding: 0.4rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .dark .truth-table td {
+            border-color: #1e293b;
+        }
+
+        .val-t {
+            color: #16a34a;
+            font-weight: 700;
+        }
+
+        .val-f {
+            color: #dc2626;
+            font-weight: 600;
+            opacity: 0.7;
+        }
+
+        .row-counter {
+            background: #fef2f2 !important;
+        }
+
+        .dark .row-counter {
+            background: rgba(220, 38, 38, 0.15) !important;
+        }
+
+        .resizer {
+            width: 8px;
+            cursor: col-resize;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            transition: background 0.2s;
+        }
+
+        .resizer:hover,
+        .resizer.active {
+            background: rgba(99, 102, 241, 0.3);
+        }
+
+        .resizer::after {
+            content: '';
+            width: 3px;
+            height: 28px;
+            background: rgba(148, 163, 184, 0.4);
+            border-radius: 2px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.35);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.5);
+        }
+
+        #toast-container {
+            position: fixed;
+            bottom: 36px;
+            right: 16px;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .toast {
+            pointer-events: auto;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideUp 0.25s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .toast-error {
+            background: #ef4444;
+            color: white;
+        }
+
+        .toast-info {
+            background: #3b82f6;
+            color: white;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(12px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .animate-scale-in {
+            animation: scaleIn 0.2s ease-out;
+        }
+
+        .ast-node {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 1px solid transparent;
+        }
+
+        .ast-node:hover {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .ast-node.selected {
+            background: rgba(99, 102, 241, 0.25);
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .accordion-content.open {
+            max-height: 2000px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            :root {
+                --left-width: 280px;
+                --right-width: 260px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --header-height: 50px;
+            }
+
+            .main-workspace {
+                position: relative;
+            }
+
+            .mobile-panel {
+                position: fixed !important;
+                top: var(--header-height);
+                bottom: var(--footer-height);
+                z-index: 60;
+                transition: transform 0.3s ease;
+            }
+
+            #panel-left.mobile-panel {
+                left: 0;
+                width: 85vw !important;
+                max-width: 340px;
+                transform: translateX(-100%);
+            }
+
+            #panel-left.mobile-panel.open {
+                transform: translateX(0);
+                box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+            }
+
+            #panel-right.mobile-panel {
+                right: 0;
+                width: 85vw !important;
+                max-width: 340px;
+                transform: translateX(100%);
+            }
+
+            #panel-right.mobile-panel.open {
+                transform: translateX(0);
+                box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+            }
+
+            .resizer {
+                display: none !important;
+            }
+
+            .mobile-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.4);
+                z-index: 55;
+                display: none;
+            }
+
+            .mobile-overlay.open {
+                display: block;
+            }
+
+            .mobile-nav {
+                display: flex !important;
+            }
+
+            .desktop-only {
+                display: none !important;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-nav {
+                display: none !important;
+            }
+
+            .mobile-overlay {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .k-btn {
+                min-height: 44px;
+                font-size: 1.1rem;
+            }
+
+            .truth-table {
+                font-size: 0.7rem;
+            }
+
+            .truth-table th,
+            .truth-table td {
+                padding: 0.3rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 overflow-hidden">
+    <div id="app" class="app-layout">
+
+        <!-- HEADER -->
+        <header
+            class="glass-panel z-50 flex items-center justify-between px-3 shadow-sm border-b border-slate-200 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+                <button onclick="UI.toggleMobilePanel('left')"
+                    class="mobile-nav p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+                <div class="p-1.5 bg-gradient-to-br from-brand-500 to-purple-600 rounded-lg">
+                    <i data-lucide="brain-circuit" class="w-5 h-5 text-white"></i>
+                </div>
+                <h1 class="text-base font-bold tracking-tight hidden sm:block">Logic<span
+                        class="text-brand-600 dark:text-brand-500">Verse</span> <span
+                        class="text-xs font-normal text-slate-400">Pro</span></h1>
+            </div>
+
+            <div
+                class="flex bg-slate-100 dark:bg-slate-900 rounded-lg p-0.5 border border-slate-200 dark:border-slate-800">
+                <button onclick="App.setMode('A')" id="mode-A-btn"
+                    class="mode-btn px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide transition-all">Expresión</button>
+                <button onclick="App.setMode('B')" id="mode-B-btn"
+                    class="mode-btn px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide transition-all">Inferencia</button>
+                <button onclick="App.setMode('C')" id="mode-C-btn"
+                    class="mode-btn px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide transition-all">Equivalencias</button>
+            </div>
+
+            <div class="flex items-center gap-1">
+                <button onclick="UI.toggleModal('examples')"
+                    class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-fuchsia-600" title="Ejemplos">
+                    <i data-lucide="library" class="w-5 h-5"></i>
+                </button>
+                <button onclick="UI.toggleModal('theory')"
+                    class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-brand-600" title="Teoría">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                </button>
+                <button onclick="UI.toggleModal('help')"
+                    class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-teal-600" title="Ayuda">
+                    <i data-lucide="help-circle" class="w-5 h-5"></i>
+                </button>
+                <div class="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1 desktop-only"></div>
+                <button onclick="UI.togglePanels('left')"
+                    class="desktop-only p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400"
+                    title="Panel izquierdo">
+                    <i data-lucide="panel-left" class="w-5 h-5"></i>
+                </button>
+                <button onclick="UI.togglePanels('right')"
+                    class="desktop-only p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400"
+                    title="Panel derecho">
+                    <i data-lucide="panel-right" class="w-5 h-5"></i>
+                </button>
+                <button onclick="App.toggleTheme()"
+                    class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-amber-500" title="Tema">
+                    <i data-lucide="sun" class="w-5 h-5 dark:hidden"></i>
+                    <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
+                </button>
+                <button onclick="UI.toggleMobilePanel('right')"
+                    class="mobile-nav p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- MOBILE OVERLAY -->
+        <div id="mobile-overlay" class="mobile-overlay" onclick="UI.closeMobilePanels()"></div>
+
+        <!-- MAIN LAYOUT -->
+        <main class="main-workspace flex overflow-hidden">
+
+            <!-- LEFT PANEL -->
+            <aside id="panel-left"
+                class="glass-panel flex flex-col z-30 border-r border-slate-200 dark:border-slate-800"
+                style="width: var(--left-width); min-width: 220px;">
+                <div class="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80">
+                    <div class="flex justify-between items-center">
+                        <h2
+                            class="font-bold text-xs text-slate-600 dark:text-slate-300 flex items-center gap-2 uppercase tracking-wider">
+                            <i data-lucide="terminal" class="w-4 h-4 text-brand-500"></i> Editor
+                        </h2>
+                        <span id="mode-indicator"
+                            class="text-[10px] font-black uppercase bg-brand-100 dark:bg-brand-900/50 text-brand-700 dark:text-brand-300 px-2 py-0.5 rounded">Expresión</span>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-3 flex flex-col gap-3">
+                    <!-- Editor Console -->
+                    <div
+                        class="bg-white dark:bg-slate-950 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col">
+                        <div
+                            class="bg-slate-50 dark:bg-slate-900 px-3 py-2 flex justify-between items-center border-b border-slate-100 dark:border-slate-800">
+                            <label id="input-label"
+                                class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fórmula</label>
+                            <button onclick="Editor.clear()"
+                                class="text-[10px] text-red-500 hover:text-red-600 font-bold uppercase">Limpiar</button>
+                        </div>
+
+                        <div class="editor-container h-28 w-full bg-white dark:bg-slate-950 cursor-text"
+                            onclick="document.getElementById('main-input').focus()">
+                            <pre class="editor-highlight"><code id="highlight-layer"></code></pre>
+                            <textarea id="main-input" class="editor-input" spellcheck="false" autocomplete="off"
+                                placeholder="Escribe aquí... (p ∧ q)"></textarea>
+                        </div>
+
+                        <div id="error-toast"
+                            class="hidden bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 text-xs p-2 border-t border-red-100 dark:border-red-900/50 items-center gap-2">
+                            <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i> <span
+                                id="error-msg">Error</span>
+                        </div>
+
+                        <!-- Keypad -->
+                        <div
+                            class="bg-slate-50 dark:bg-slate-900 p-2 border-t border-slate-100 dark:border-slate-800 grid grid-cols-6 gap-1">
+                            <button class="k-btn text-fuchsia-600 dark:text-fuchsia-400"
+                                onclick="Editor.insert('p')">p</button>
+                            <button class="k-btn text-fuchsia-600 dark:text-fuchsia-400"
+                                onclick="Editor.insert('q')">q</button>
+                            <button class="k-btn text-fuchsia-600 dark:text-fuchsia-400"
+                                onclick="Editor.insert('r')">r</button>
+                            <button class="k-btn text-fuchsia-600 dark:text-fuchsia-400"
+                                onclick="Editor.insert('s')">s</button>
+                            <button class="k-btn text-amber-600 dark:text-amber-400" onclick="Editor.insert('T')"
+                                title="Verdadero">T</button>
+                            <button class="k-btn text-amber-600 dark:text-amber-400" onclick="Editor.insert('F')"
+                                title="Falso">F</button>
+
+                            <button class="k-btn text-blue-600" onclick="Editor.insert('¬')">¬</button>
+                            <button class="k-btn text-blue-600" onclick="Editor.insert('∧')">∧</button>
+                            <button class="k-btn text-blue-600" onclick="Editor.insert('∨')">∨</button>
+                            <button class="k-btn text-blue-600" onclick="Editor.insert('→')">→</button>
+                            <button class="k-btn text-blue-600" onclick="Editor.insert('↔')">↔</button>
+                            <button class="k-btn text-blue-600" onclick="Editor.insert('⊕')" title="XOR">⊕</button>
+
+                            <button class="k-btn text-slate-400" onclick="Editor.insert('(')">(</button>
+                            <button class="k-btn text-slate-400" onclick="Editor.insert(')')">)</button>
+                            <button class="k-btn text-slate-500" onclick="Editor.insert(' ')">␣</button>
+                            <button class="k-btn text-slate-500" onclick="Editor.moveCursor(-1)">←</button>
+                            <button class="k-btn text-slate-500" onclick="Editor.moveCursor(1)">→</button>
+                            <button class="k-btn text-red-500 bg-red-50 dark:bg-red-900/20"
+                                onclick="Editor.backspace()">⌫</button>
+                        </div>
+
+                        <button onclick="App.process()"
+                            class="w-full py-2.5 bg-gradient-to-r from-brand-600 to-purple-600 text-white font-bold text-sm uppercase tracking-wide hover:from-brand-700 hover:to-purple-700 transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="zap" class="w-4 h-4"></i> Evaluar
+                        </button>
+                    </div>
+
+                    <!-- Premises (Mode B) -->
+                    <div id="premises-container" class="hidden flex-col gap-2 animate-fade-in">
+                        <div class="flex justify-between items-center">
+                            <label
+                                class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Premisas</label>
+                            <button onclick="Inference.addPremise()"
+                                class="text-[10px] bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 px-2 py-1 rounded font-bold flex items-center gap-1 hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors">
+                                <i data-lucide="plus" class="w-3 h-3"></i> Añadir
+                            </button>
+                        </div>
+                        <div
+                            class="bg-white dark:bg-slate-900 rounded-lg p-2 border border-slate-200 dark:border-slate-800 min-h-[80px]">
+                            <ul id="premises-list" class="space-y-1.5"></ul>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="resizer" id="resizer-left"></div>
+
+            <!-- CENTER PANEL -->
+            <section id="panel-center"
+                class="flex-1 bg-slate-100/50 dark:bg-slate-950/50 flex flex-col min-w-[280px] overflow-hidden">
+                <!-- Mode C Toolbar -->
+                <div id="mode-c-toolbar"
+                    class="hidden p-2 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex gap-2 overflow-x-auto shadow-sm z-10">
+                    <button onclick="Simplifier.run('simplify')"
+                        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-green-600 hover:bg-green-700 rounded shadow transition-colors">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Simplificar
+                    </button>
+                    <button onclick="Simplifier.run('CNF')"
+                        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 rounded shadow transition-colors">
+                        <i data-lucide="git-merge" class="w-3.5 h-3.5"></i> CNF
+                    </button>
+                    <button onclick="Simplifier.run('DNF')"
+                        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded shadow transition-colors">
+                        <i data-lucide="git-branch" class="w-3.5 h-3.5"></i> DNF
+                    </button>
+                    <div class="h-6 w-px bg-slate-300 dark:bg-slate-700"></div>
+                    <button onclick="EquivMode.undo()"
+                        class="p-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
+                        title="Deshacer">
+                        <i data-lucide="undo" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="EquivMode.reset()"
+                        class="p-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
+                        title="Reiniciar">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-auto p-3 md:p-6" id="workspace-content">
+                    <div id="empty-state"
+                        class="h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 animate-fade-in select-none">
+                        <div
+                            class="w-20 h-20 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center mb-4">
+                            <i data-lucide="brain-circuit" class="w-10 h-10 opacity-50"></i>
+                        </div>
+                        <p class="text-lg font-bold mb-1">LogicVerse Pro</p>
+                        <p class="text-sm text-center px-4">Escribe una fórmula o selecciona un ejemplo para comenzar
+                        </p>
+                    </div>
+
+                    <div id="results-container" class="hidden space-y-4 max-w-4xl mx-auto animate-fade-in">
+                        <!-- Formula Display -->
+                        <div class="glass-panel p-4 md:p-5 rounded-xl shadow-sm border-l-4 border-brand-500">
+                            <div class="flex justify-between items-start mb-3">
+                                <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Resultado
+                                </h3>
+                                <div id="verdict-badge" class="px-3 py-1 rounded-full font-bold text-xs">...</div>
+                            </div>
+                            <div class="flex justify-center py-3 overflow-x-auto">
+                                <div id="render-latex" class="text-2xl md:text-3xl text-slate-800 dark:text-slate-100">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Interactive AST (Mode C) -->
+                        <div id="interactive-ast-area" class="hidden">
+                            <div
+                                class="glass-panel p-4 md:p-5 rounded-xl border-2 border-dashed border-brand-300 dark:border-brand-800/50 bg-brand-50/30 dark:bg-slate-900/50">
+                                <p
+                                    class="text-[10px] font-bold text-brand-600 dark:text-brand-400 mb-4 flex items-center justify-center gap-2 uppercase tracking-wide">
+                                    <i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5"></i> Haz clic en una
+                                    subexpresión para transformar
+                                </p>
+                                <div id="ast-renderer"
+                                    class="text-xl md:text-2xl text-center py-2 font-mono flex flex-wrap justify-center items-center gap-1">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Truth Table -->
+                        <div class="glass-panel rounded-xl overflow-hidden shadow-sm">
+                            <div
+                                class="bg-slate-50 dark:bg-slate-900/80 p-3 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                                <h3
+                                    class="font-bold text-xs flex items-center gap-2 text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                                    <i data-lucide="table-2" class="w-4 h-4 text-brand-500"></i> Tabla de Verdad
+                                </h3>
+                                <div class="flex items-center gap-2">
+                                    <label class="flex items-center gap-1.5 text-[10px] text-slate-500 cursor-pointer">
+                                        <input type="checkbox" id="setting-intermediate" checked
+                                            onchange="App.process()"
+                                            class="w-3.5 h-3.5 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                                        <span>Intermedias</span>
+                                    </label>
+                                    <button onclick="UI.exportCSV()"
+                                        class="text-[10px] font-bold text-brand-600 hover:text-brand-700 flex items-center gap-1">
+                                        <i data-lucide="download" class="w-3 h-3"></i> CSV
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto max-h-[400px] md:max-h-[500px]">
+                                <table id="truth-table" class="truth-table"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="resizer" id="resizer-right"></div>
+
+            <!-- RIGHT PANEL -->
+            <aside id="panel-right"
+                class="glass-panel flex flex-col z-30 border-l border-slate-200 dark:border-slate-800"
+                style="width: var(--right-width); min-width: 220px;">
+                <div class="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80">
+                    <h2
+                        class="font-bold text-xs text-slate-600 dark:text-slate-300 flex items-center gap-2 uppercase tracking-wider">
+                        <i data-lucide="activity" class="w-4 h-4 text-brand-500"></i> Análisis
+                    </h2>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-3 space-y-3">
+                    <!-- Natural Reading -->
+                    <div
+                        class="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                        <button
+                            class="accordion-btn w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800/50 text-left text-[10px] font-bold uppercase tracking-wider flex justify-between items-center text-slate-500"
+                            onclick="UI.toggleAccordion(this)">
+                            <span class="flex items-center gap-2"><i data-lucide="message-square"
+                                    class="w-3.5 h-3.5"></i> Interpretación</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+                        </button>
+                        <div class="accordion-content open">
+                            <div class="p-3 text-sm">
+                                <div
+                                    class="p-2.5 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 rounded-lg border border-slate-100 dark:border-slate-700">
+                                    <div id="natural-reading"
+                                        class="italic text-slate-600 dark:text-slate-300 leading-relaxed text-xs">
+                                        Ingresa una fórmula...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Metrics -->
+                    <div
+                        class="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                        <button
+                            class="accordion-btn w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800/50 text-left text-[10px] font-bold uppercase tracking-wider flex justify-between items-center text-slate-500"
+                            onclick="UI.toggleAccordion(this)">
+                            <span class="flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i>
+                                Métricas</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+                        </button>
+                        <div class="accordion-content open">
+                            <div class="p-3 space-y-2 text-xs">
+                                <div
+                                    class="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800">
+                                    <span class="text-slate-500">Variables</span>
+                                    <span id="meta-vars"
+                                        class="font-mono font-bold text-fuchsia-600 dark:text-fuchsia-400">-</span>
+                                </div>
+                                <div
+                                    class="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800">
+                                    <span class="text-slate-500">Densidad V</span>
+                                    <span id="meta-density" class="font-mono font-bold text-brand-600">-</span>
+                                </div>
+                                <div
+                                    class="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800">
+                                    <span class="text-slate-500">Conectores</span>
+                                    <span id="meta-connectors" class="font-mono font-bold text-blue-600">-</span>
+                                </div>
+                                <div class="flex justify-between items-center py-1.5">
+                                    <span class="text-slate-500">Profundidad</span>
+                                    <span id="meta-depth" class="font-mono font-bold text-orange-500">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AST Tree Visual -->
+                    <div
+                        class="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                        <button
+                            class="accordion-btn w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800/50 text-left text-[10px] font-bold uppercase tracking-wider flex justify-between items-center text-slate-500"
+                            onclick="UI.toggleAccordion(this)">
+                            <span class="flex items-center gap-2"><i data-lucide="git-branch" class="w-3.5 h-3.5"></i>
+                                Árbol Sintáctico</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-3">
+                                <div id="ast-tree"
+                                    class="font-mono text-xs text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950 rounded-lg p-3 border border-slate-100 dark:border-slate-800 overflow-x-auto whitespace-pre">
+                                    ...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LaTeX Export -->
+                    <div
+                        class="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                        <button
+                            class="accordion-btn w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800/50 text-left text-[10px] font-bold uppercase tracking-wider flex justify-between items-center text-slate-500"
+                            onclick="UI.toggleAccordion(this)">
+                            <span class="flex items-center gap-2"><i data-lucide="code" class="w-3.5 h-3.5"></i>
+                                Exportar</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-3 space-y-2">
+                                <div class="relative">
+                                    <input type="text" id="latex-output" readonly
+                                        class="w-full text-xs font-mono bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded p-2 pr-8">
+                                    <button onclick="UI.copyLaTeX()"
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-brand-600">
+                                        <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                                <p class="text-[10px] text-slate-400">LaTeX - Click para copiar</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Proof Steps (Mode B) -->
+                    <div id="proof-container"
+                        class="hidden bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                        <button
+                            class="accordion-btn w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800/50 text-left text-[10px] font-bold uppercase tracking-wider flex justify-between items-center text-slate-500"
+                            onclick="UI.toggleAccordion(this)">
+                            <span class="flex items-center gap-2"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                                Validación</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+                        </button>
+                        <div class="accordion-content open">
+                            <div id="proof-steps" class="p-3 space-y-2 text-xs font-mono"></div>
+                        </div>
+                    </div>
+
+                    <!-- Transform Steps (Mode C) -->
+                    <div id="history-container"
+                        class="hidden bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                        <button
+                            class="accordion-btn w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800/50 text-left text-[10px] font-bold uppercase tracking-wider flex justify-between items-center text-slate-500"
+                            onclick="UI.toggleAccordion(this)">
+                            <span class="flex items-center gap-2"><i data-lucide="history" class="w-3.5 h-3.5"></i>
+                                Pasos</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+                        </button>
+                        <div class="accordion-content open">
+                            <div id="transformation-steps" class="max-h-[300px] overflow-y-auto"></div>
+                        </div>
+                    </div>
+
+                    <!-- Laws Panel (Mode C) -->
+                    <div id="laws-panel"
+                        class="hidden bg-gradient-to-br from-brand-50 to-purple-50 dark:from-slate-900 dark:to-slate-900 border border-brand-200 dark:border-brand-900/50 rounded-xl p-3">
+                        <h4
+                            class="text-[10px] font-bold text-brand-600 dark:text-brand-400 uppercase mb-2 flex items-center gap-2">
+                            <i data-lucide="wand-2" class="w-3.5 h-3.5"></i> Leyes Aplicables
+                        </h4>
+                        <div id="applicable-laws-list" class="space-y-1.5"></div>
+                    </div>
+
+                    <!-- Session History -->
+                    <div
+                        class="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                        <button
+                            class="accordion-btn w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800/50 text-left text-[10px] font-bold uppercase tracking-wider flex justify-between items-center text-slate-500"
+                            onclick="UI.toggleAccordion(this)">
+                            <span class="flex items-center gap-2"><i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                Historial</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <ul id="session-history-list"
+                                class="divide-y divide-slate-100 dark:divide-slate-800 max-h-[200px] overflow-y-auto">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- FOOTER -->
+        <footer
+            class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex items-center justify-center text-[9px] uppercase tracking-widest text-slate-400 z-50 px-2">
+            Creado por Msc Néstor Fabio Montoya Palacios y asistido por Ai
+        </footer>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <!-- MODALS PLACEHOLDER - Will be added in next part -->
+    <div id="modals-container"></div>
+
+    <script>
+        // CORE LOGIC - Part 1
+        const Utils = {
+            $: s => document.querySelector(s),
+            $$: s => document.querySelectorAll(s),
+            uuid: () => Math.random().toString(36).substr(2, 9),
+            deepClone: o => JSON.parse(JSON.stringify(o)),
+            debounce: (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+        };
+
+        const TokenType = { ATOM: 'ATOM', CONST: 'CONST', NOT: 'NOT', AND: 'AND', OR: 'OR', IMPLIES: 'IMPLIES', IFF: 'IFF', XOR: 'XOR', LPAREN: 'LPAREN', RPAREN: 'RPAREN', EOF: 'EOF' };
+
+        class Tokenizer {
+            constructor(input) { this.input = input.replace(/\s+/g, ' '); this.pos = 0; }
+            peek() { return this.input[this.pos] || ''; }
+            advance() { return this.input[this.pos++] || ''; }
+
+            getNextToken() {
+                while (this.pos < this.input.length && this.peek() === ' ') this.pos++;
+                if (this.pos >= this.input.length) return { type: TokenType.EOF };
+
+                // Multi-char tokens
+                if (this.input.startsWith('<->', this.pos)) { this.pos += 3; return { type: TokenType.IFF, value: '↔' }; }
+                if (this.input.startsWith('->', this.pos)) { this.pos += 2; return { type: TokenType.IMPLIES, value: '→' }; }
+
+                const c = this.advance();
+
+                // Constants
+                if (c === 'T' || c === '1') return { type: TokenType.CONST, value: true };
+                if (c === 'F' || c === '0') return { type: TokenType.CONST, value: false };
+
+                // Variables
+                if (/[a-z]/i.test(c) && c !== 'T' && c !== 'F') return { type: TokenType.ATOM, value: c.toLowerCase() };
+
+                // Operators
+                const map = {
+                    '¬': TokenType.NOT, '~': TokenType.NOT, '!': TokenType.NOT,
+                    '∧': TokenType.AND, '&': TokenType.AND, '*': TokenType.AND,
+                    '∨': TokenType.OR, '|': TokenType.OR, '+': TokenType.OR,
+                    '→': TokenType.IMPLIES,
+                    '↔': TokenType.IFF,
+                    '⊕': TokenType.XOR, '^': TokenType.XOR,
+                    '(': TokenType.LPAREN, ')': TokenType.RPAREN
+                };
+
+                if (map[c]) return { type: map[c], value: c };
+                throw new Error(`Carácter desconocido: "${c}"`);
+            }
+
+            tokenize() {
+                const tokens = [];
+                let t;
+                while ((t = this.getNextToken()).type !== TokenType.EOF) tokens.push(t);
+                return tokens;
+            }
+        }
+
+        class ASTNode {
+            constructor(type, value, left = null, right = null) {
+                this.id = Utils.uuid();
+                this.type = type;
+                this.op = value;
+                this.left = left;
+                this.right = right;
+            }
+
+            clone() {
+                const n = new ASTNode(this.type, this.op);
+                n.id = Utils.uuid();
+                if (this.left) n.left = this.left.clone();
+                if (this.right) n.right = this.right.clone();
+                return n;
+            }
+
+            toString() {
+                if (this.type === 'ATOM' || this.type === 'CONST') return String(this.op);
+                if (this.type === 'UNARY') return `¬${this.left.type === 'BINARY' ? '(' + this.left.toString() + ')' : this.left.toString()}`;
+                const l = this.left.type === 'BINARY' && this.getPrecedence(this.left.op) < this.getPrecedence(this.op) ? `(${this.left.toString()})` : this.left.toString();
+                const r = this.right.type === 'BINARY' && this.getPrecedence(this.right.op) <= this.getPrecedence(this.op) ? `(${this.right.toString()})` : this.right.toString();
+                return `${l} ${this.op} ${r}`;
+            }
+
+            getPrecedence(op) {
+                const prec = { '↔': 1, '→': 2, '∨': 3, '⊕': 3, '∧': 4 };
+                return prec[op] || 0;
+            }
+
+            toTeX() {
+                if (this.type === 'ATOM') return this.op.toUpperCase();
+                if (this.type === 'CONST') return this.op ? '\\top' : '\\bot';
+                if (this.type === 'UNARY') return `\\neg ${this.left.toTeX()}`;
+                const ops = { '∧': '\\land', '∨': '\\lor', '→': '\\to', '↔': '\\leftrightarrow', '⊕': '\\oplus' };
+                return `(${this.left.toTeX()} ${ops[this.op] || this.op} ${this.right.toTeX()})`;
+            }
+        }
+
+        class Parser {
+            constructor(tokens) { this.tokens = tokens; this.pos = 0; }
+            peek() { return this.tokens[this.pos] || { type: TokenType.EOF }; }
+            consume() { return this.tokens[this.pos++]; }
+
+            parse() {
+                if (this.tokens.length === 0) throw new Error("Expresión vacía");
+                const r = this.parseIFF();
+                if (this.peek().type !== TokenType.EOF) throw new Error("Entrada inesperada");
+                return r;
+            }
+
+            parseIFF() {
+                let l = this.parseImplies();
+                while (this.peek().type === TokenType.IFF) { this.consume(); l = new ASTNode('BINARY', '↔', l, this.parseImplies()); }
+                return l;
+            }
+
+            parseImplies() {
+                let l = this.parseOr();
+                while (this.peek().type === TokenType.IMPLIES) { this.consume(); l = new ASTNode('BINARY', '→', l, this.parseOr()); }
+                return l;
+            }
+
+            parseOr() {
+                let l = this.parseXor();
+                while (this.peek().type === TokenType.OR) { this.consume(); l = new ASTNode('BINARY', '∨', l, this.parseXor()); }
+                return l;
+            }
+
+            parseXor() {
+                let l = this.parseAnd();
+                while (this.peek().type === TokenType.XOR) { this.consume(); l = new ASTNode('BINARY', '⊕', l, this.parseAnd()); }
+                return l;
+            }
+
+            parseAnd() {
+                let l = this.parseNot();
+                while (this.peek().type === TokenType.AND) { this.consume(); l = new ASTNode('BINARY', '∧', l, this.parseNot()); }
+                return l;
+            }
+
+            parseNot() {
+                if (this.peek().type === TokenType.NOT) { this.consume(); return new ASTNode('UNARY', '¬', this.parseNot()); }
+                return this.parseAtom();
+            }
+
+            parseAtom() {
+                const t = this.peek();
+                if (t.type === TokenType.ATOM) { this.consume(); return new ASTNode('ATOM', t.value); }
+                if (t.type === TokenType.CONST) { this.consume(); return new ASTNode('CONST', t.value); }
+                if (t.type === TokenType.LPAREN) {
+                    this.consume();
+                    const e = this.parseIFF();
+                    if (this.peek().type !== TokenType.RPAREN) throw new Error("Falta ')'");
+                    this.consume();
+                    return e;
+                }
+                throw new Error(`Token inesperado: ${t.value || t.type}`);
+            }
+        }
+
+        const Evaluator = {
+            getVariables(ast) {
+                const s = new Set();
+                const walk = n => { if (!n) return; if (n.type === 'ATOM') s.add(n.op); walk(n.left); walk(n.right); };
+                walk(ast);
+                return [...s].sort();
+            },
+
+            getSubexpressions(ast) {
+                const subs = [], seen = new Set();
+                const walk = n => {
+                    if (!n || n.type === 'ATOM' || n.type === 'CONST') return;
+                    walk(n.left); walk(n.right);
+                    const s = n.toString();
+                    if (!seen.has(s)) { seen.add(s); subs.push({ str: s, node: n }); }
+                };
+                walk(ast);
+                return subs.sort((a, b) => a.str.length - b.str.length);
+            },
+
+            evaluate(node, ctx) {
+                if (!node) return true;
+                if (node.type === 'ATOM') return !!ctx[node.op];
+                if (node.type === 'CONST') return node.op;
+                if (node.type === 'UNARY') return !this.evaluate(node.left, ctx);
+                const l = this.evaluate(node.left, ctx), r = this.evaluate(node.right, ctx);
+                switch (node.op) {
+                    case '∧': return l && r;
+                    case '∨': return l || r;
+                    case '→': return !l || r;
+                    case '↔': return l === r;
+                    case '⊕': return l !== r;
+                    default: return false;
+                }
+            },
+
+            getDepth(n) {
+                if (!n || n.type === 'ATOM' || n.type === 'CONST') return 0;
+                return 1 + Math.max(this.getDepth(n.left), this.getDepth(n.right));
+            },
+
+            countConnectors(n) {
+                if (!n || n.type === 'ATOM' || n.type === 'CONST') return 0;
+                return 1 + this.countConnectors(n.left) + this.countConnectors(n.right);
+            }
+        };
+
+        // LAWS OF EQUIVALENCE
+        const Laws = {
+            'Doble Negación': {
+                match: n => n.type === 'UNARY' && n.left.type === 'UNARY',
+                apply: n => n.left.left.clone(),
+                desc: '¬¬P ≡ P'
+            },
+            'De Morgan (∧)': {
+                match: n => n.type === 'UNARY' && n.left.type === 'BINARY' && n.left.op === '∧',
+                apply: n => new ASTNode('BINARY', '∨', new ASTNode('UNARY', '¬', n.left.left.clone()), new ASTNode('UNARY', '¬', n.left.right.clone())),
+                desc: '¬(P ∧ Q) ≡ ¬P ∨ ¬Q'
+            },
+            'De Morgan (∨)': {
+                match: n => n.type === 'UNARY' && n.left.type === 'BINARY' && n.left.op === '∨',
+                apply: n => new ASTNode('BINARY', '∧', new ASTNode('UNARY', '¬', n.left.left.clone()), new ASTNode('UNARY', '¬', n.left.right.clone())),
+                desc: '¬(P ∨ Q) ≡ ¬P ∧ ¬Q'
+            },
+            'Implicación': {
+                match: n => n.type === 'BINARY' && n.op === '→',
+                apply: n => new ASTNode('BINARY', '∨', new ASTNode('UNARY', '¬', n.left.clone()), n.right.clone()),
+                desc: 'P → Q ≡ ¬P ∨ Q'
+            },
+            'Bicondicional': {
+                match: n => n.type === 'BINARY' && n.op === '↔',
+                apply: n => new ASTNode('BINARY', '∧',
+                    new ASTNode('BINARY', '→', n.left.clone(), n.right.clone()),
+                    new ASTNode('BINARY', '→', n.right.clone(), n.left.clone())),
+                desc: 'P ↔ Q ≡ (P → Q) ∧ (Q → P)'
+            },
+            'Contraposición': {
+                match: n => n.type === 'BINARY' && n.op === '→',
+                apply: n => new ASTNode('BINARY', '→', new ASTNode('UNARY', '¬', n.right.clone()), new ASTNode('UNARY', '¬', n.left.clone())),
+                desc: 'P → Q ≡ ¬Q → ¬P'
+            },
+            'Conmutativa (∧)': {
+                match: n => n.type === 'BINARY' && n.op === '∧',
+                apply: n => new ASTNode('BINARY', '∧', n.right.clone(), n.left.clone()),
+                desc: 'P ∧ Q ≡ Q ∧ P'
+            },
+            'Conmutativa (∨)': {
+                match: n => n.type === 'BINARY' && n.op === '∨',
+                apply: n => new ASTNode('BINARY', '∨', n.right.clone(), n.left.clone()),
+                desc: 'P ∨ Q ≡ Q ∨ P'
+            },
+            'Distributiva (∨/∧)': {
+                match: n => n.type === 'BINARY' && n.op === '∨' && n.right.type === 'BINARY' && n.right.op === '∧',
+                apply: n => new ASTNode('BINARY', '∧',
+                    new ASTNode('BINARY', '∨', n.left.clone(), n.right.left.clone()),
+                    new ASTNode('BINARY', '∨', n.left.clone(), n.right.right.clone())),
+                desc: 'P ∨ (Q ∧ R) ≡ (P ∨ Q) ∧ (P ∨ R)'
+            },
+            'Distributiva (∧/∨)': {
+                match: n => n.type === 'BINARY' && n.op === '∧' && n.right.type === 'BINARY' && n.right.op === '∨',
+                apply: n => new ASTNode('BINARY', '∨',
+                    new ASTNode('BINARY', '∧', n.left.clone(), n.right.left.clone()),
+                    new ASTNode('BINARY', '∧', n.left.clone(), n.right.right.clone())),
+                desc: 'P ∧ (Q ∨ R) ≡ (P ∧ Q) ∨ (P ∧ R)'
+            }
+        };
+
+        const Transformer = {
+            getApplicableLaws(node) {
+                return Object.entries(Laws).filter(([, law]) => law.match(node)).map(([name, law]) => ({ name, desc: law.desc }));
+            },
+            applyLaw(root, targetId, lawName) {
+                const law = Laws[lawName];
+                if (!law) throw new Error('Ley no encontrada');
+                let found = false;
+                const visit = n => {
+                    if (!n) return null;
+                    if (n.id === targetId && law.match(n)) { found = true; return law.apply(n); }
+                    const newNode = new ASTNode(n.type, n.op);
+                    newNode.id = n.id;
+                    newNode.left = visit(n.left);
+                    newNode.right = visit(n.right);
+                    return newNode;
+                };
+                const result = visit(root);
+                if (!found) throw new Error('La ley no aplica a esta selección');
+                return result;
+            }
+        };
+
+        // SIMPLIFIER / CNF / DNF
+        const Simplifier = {
+            steps: [],
+            run(type) {
+                if (!App.currentAST) { UI.showToast('Ingresa una fórmula primero', 'error'); return; }
+                this.steps = [];
+                let ast = App.currentAST.clone();
+                this.steps.push({ ast: ast.clone(), desc: 'Fórmula original' });
+                try {
+                    // Step 1: Eliminate ↔
+                    ast = this.eliminateBicond(ast);
+                    // Step 2: Eliminate →
+                    ast = this.eliminateImpl(ast);
+                    // Step 3: Push negations inward
+                    ast = this.pushNegations(ast);
+                    if (type === 'CNF') {
+                        ast = this.distributeToCNF(ast);
+                    } else if (type === 'DNF') {
+                        ast = this.distributeToDNF(ast);
+                    }
+                    // Final simplification
+                    ast = this.simplifyBasic(ast);
+                    this.steps.push({ ast: ast.clone(), desc: 'Resultado final' });
+                    // Update App state
+                    App.history = this.steps.map(s => ({ ast: s.ast, desc: s.desc, valid: true }));
+                    EquivMode.renderSteps();
+                    App.renderTable([App.history[0].ast, ast]);
+                    EquivMode.render(ast);
+                    UI.showToast(`${type} generado con ${this.steps.length} pasos`, 'success');
+                } catch (e) {
+                    UI.showToast('Error: ' + e.message, 'error');
+                }
+            },
+            eliminateBicond(n) {
+                if (!n) return n;
+                if (n.type === 'BINARY' && n.op === '↔') {
+                    const l = this.eliminateBicond(n.left);
+                    const r = this.eliminateBicond(n.right);
+                    const result = new ASTNode('BINARY', '∧',
+                        new ASTNode('BINARY', '∨', new ASTNode('UNARY', '¬', l.clone()), r.clone()),
+                        new ASTNode('BINARY', '∨', new ASTNode('UNARY', '¬', r.clone()), l.clone()));
+                    this.steps.push({ ast: result.clone(), desc: 'Eliminar ↔' });
+                    return result;
+                }
+                const newN = new ASTNode(n.type, n.op);
+                newN.left = this.eliminateBicond(n.left);
+                newN.right = this.eliminateBicond(n.right);
+                return newN;
+            },
+            eliminateImpl(n) {
+                if (!n) return n;
+                if (n.type === 'BINARY' && n.op === '→') {
+                    const l = this.eliminateImpl(n.left);
+                    const r = this.eliminateImpl(n.right);
+                    const result = new ASTNode('BINARY', '∨', new ASTNode('UNARY', '¬', l), r);
+                    this.steps.push({ ast: result.clone(), desc: 'Eliminar → (Implicación)' });
+                    return result;
+                }
+                const newN = new ASTNode(n.type, n.op);
+                newN.left = this.eliminateImpl(n.left);
+                newN.right = this.eliminateImpl(n.right);
+                return newN;
+            },
+            pushNegations(n) {
+                if (!n) return n;
+                if (n.type === 'UNARY') {
+                    const inner = n.left;
+                    if (inner.type === 'UNARY') {
+                        this.steps.push({ ast: inner.left.clone(), desc: 'Doble negación' });
+                        return this.pushNegations(inner.left);
+                    }
+                    if (inner.type === 'BINARY') {
+                        if (inner.op === '∧') {
+                            const result = new ASTNode('BINARY', '∨',
+                                this.pushNegations(new ASTNode('UNARY', '¬', inner.left)),
+                                this.pushNegations(new ASTNode('UNARY', '¬', inner.right)));
+                            this.steps.push({ ast: result.clone(), desc: 'De Morgan (∧)' });
+                            return result;
+                        }
+                        if (inner.op === '∨') {
+                            const result = new ASTNode('BINARY', '∧',
+                                this.pushNegations(new ASTNode('UNARY', '¬', inner.left)),
+                                this.pushNegations(new ASTNode('UNARY', '¬', inner.right)));
+                            this.steps.push({ ast: result.clone(), desc: 'De Morgan (∨)' });
+                            return result;
+                        }
+                    }
+                    return new ASTNode('UNARY', '¬', this.pushNegations(inner));
+                }
+                const newN = new ASTNode(n.type, n.op);
+                newN.left = this.pushNegations(n.left);
+                newN.right = this.pushNegations(n.right);
+                return newN;
+            },
+            distributeToCNF(n) {
+                if (!n) return n;
+                n.left = this.distributeToCNF(n.left);
+                n.right = this.distributeToCNF(n.right);
+                if (n.type === 'BINARY' && n.op === '∨') {
+                    if (n.left.type === 'BINARY' && n.left.op === '∧') {
+                        const result = new ASTNode('BINARY', '∧',
+                            this.distributeToCNF(new ASTNode('BINARY', '∨', n.left.left, n.right.clone())),
+                            this.distributeToCNF(new ASTNode('BINARY', '∨', n.left.right, n.right.clone())));
+                        this.steps.push({ ast: result.clone(), desc: 'Distributiva ∨/∧' });
+                        return result;
+                    }
+                    if (n.right.type === 'BINARY' && n.right.op === '∧') {
+                        const result = new ASTNode('BINARY', '∧',
+                            this.distributeToCNF(new ASTNode('BINARY', '∨', n.left.clone(), n.right.left)),
+                            this.distributeToCNF(new ASTNode('BINARY', '∨', n.left.clone(), n.right.right)));
+                        this.steps.push({ ast: result.clone(), desc: 'Distributiva ∨/∧' });
+                        return result;
+                    }
+                }
+                return n;
+            },
+            distributeToDNF(n) {
+                if (!n) return n;
+                n.left = this.distributeToDNF(n.left);
+                n.right = this.distributeToDNF(n.right);
+                if (n.type === 'BINARY' && n.op === '∧') {
+                    if (n.left.type === 'BINARY' && n.left.op === '∨') {
+                        const result = new ASTNode('BINARY', '∨',
+                            this.distributeToDNF(new ASTNode('BINARY', '∧', n.left.left, n.right.clone())),
+                            this.distributeToDNF(new ASTNode('BINARY', '∧', n.left.right, n.right.clone())));
+                        this.steps.push({ ast: result.clone(), desc: 'Distributiva ∧/∨' });
+                        return result;
+                    }
+                    if (n.right.type === 'BINARY' && n.right.op === '∨') {
+                        const result = new ASTNode('BINARY', '∨',
+                            this.distributeToDNF(new ASTNode('BINARY', '∧', n.left.clone(), n.right.left)),
+                            this.distributeToDNF(new ASTNode('BINARY', '∧', n.left.clone(), n.right.right)));
+                        this.steps.push({ ast: result.clone(), desc: 'Distributiva ∧/∨' });
+                        return result;
+                    }
+                }
+                return n;
+            },
+            simplifyBasic(n) {
+                if (!n) return n;
+                n.left = this.simplifyBasic(n.left);
+                n.right = this.simplifyBasic(n.right);
+                // Idempotence
+                if (n.type === 'BINARY' && (n.op === '∧' || n.op === '∨')) {
+                    if (n.left.toString() === n.right.toString()) return n.left;
+                }
+                return n;
+            }
+        };
+
+        // NATURAL LANGUAGE
+        const NaturalLang = {
+            generate(n) {
+                if (!n) return '';
+                if (n.type === 'ATOM') return `"${n.op}"`;
+                if (n.type === 'CONST') return n.op ? 'Verdadero' : 'Falso';
+                if (n.type === 'UNARY') return `NO (${this.generate(n.left)})`;
+                const l = this.generate(n.left), r = this.generate(n.right);
+                const ops = { '∧': 'Y', '∨': 'O', '→': 'IMPLICA', '↔': 'SI Y SOLO SI', '⊕': 'XOR' };
+                return `(${l} ${ops[n.op] || n.op} ${r})`;
+            }
+        };
+
+        // AST TREE VISUAL
+        const ASTTree = {
+            render(n, indent = 0) {
+                if (!n) return '';
+                const pad = '  '.repeat(indent);
+                if (n.type === 'ATOM' || n.type === 'CONST') return `${pad}└─ ${n.op}\n`;
+                let s = `${pad}└─ [${n.op}]\n`;
+                if (n.left) s += this.render(n.left, indent + 1);
+                if (n.right) s += this.render(n.right, indent + 1);
+                return s;
+            }
+        };
+
+        // EXAMPLES BANK - 30 ejemplos
+        const Examples = [
+            // Modo A: Tautologías fundamentales
+            { mode: 'A', formula: 'p ∨ ¬p', name: 'Tercero Excluido', cat: 'Tautología' },
+            { mode: 'A', formula: '(p → q) ↔ (¬q → ¬p)', name: 'Contraposición', cat: 'Tautología' },
+            { mode: 'A', formula: '¬(p ∧ q) ↔ (¬p ∨ ¬q)', name: 'De Morgan (AND)', cat: 'Tautología' },
+            { mode: 'A', formula: '¬(p ∨ q) ↔ (¬p ∧ ¬q)', name: 'De Morgan (OR)', cat: 'Tautología' },
+            { mode: 'A', formula: '((p → q) ∧ p) → q', name: 'Modus Ponens', cat: 'Tautología' },
+            { mode: 'A', formula: '((p → q) ∧ ¬q) → ¬p', name: 'Modus Tollens', cat: 'Tautología' },
+            { mode: 'A', formula: 'p → (q → p)', name: 'Axioma 1 Hilbert', cat: 'Tautología' },
+            { mode: 'A', formula: '(p → (q → r)) → ((p → q) → (p → r))', name: 'Axioma 2 Hilbert', cat: 'Tautología' },
+            { mode: 'A', formula: '(¬p → ¬q) → (q → p)', name: 'Axioma 3 Hilbert', cat: 'Tautología' },
+            { mode: 'A', formula: '((p ∨ q) ∧ ¬p) → q', name: 'Silogismo Disyuntivo', cat: 'Tautología' },
+            // Modo A: Contradicciones
+            { mode: 'A', formula: 'p ∧ ¬p', name: 'Contradicción Básica', cat: 'Contradicción' },
+            { mode: 'A', formula: '(p → q) ∧ (p ∧ ¬q)', name: 'Contradicción Implícita', cat: 'Contradicción' },
+            // Modo A: Contingencias interesantes
+            { mode: 'A', formula: 'p → q', name: 'Condicional Simple', cat: 'Contingencia' },
+            { mode: 'A', formula: 'p ↔ q', name: 'Bicondicional', cat: 'Contingencia' },
+            { mode: 'A', formula: '(p ∧ q) ∨ (¬p ∧ ¬q)', name: 'XNOR', cat: 'Contingencia' },
+            { mode: 'A', formula: '(p ∧ ¬q) ∨ (¬p ∧ q)', name: 'XOR', cat: 'Contingencia' },
+            // Modo B: Reglas de inferencia
+            { mode: 'B', premises: ['p → q', 'p'], formula: 'q', name: 'Modus Ponens (PP)' },
+            { mode: 'B', premises: ['p → q', '¬q'], formula: '¬p', name: 'Modus Tollens (TT)' },
+            { mode: 'B', premises: ['p ∨ q', '¬p'], formula: 'q', name: 'Silogismo Disyuntivo (TP)' },
+            { mode: 'B', premises: ['p → q', 'q → r'], formula: 'p → r', name: 'Silogismo Hipotético (SH)' },
+            { mode: 'B', premises: ['p', 'q'], formula: 'p ∧ q', name: 'Adjunción' },
+            { mode: 'B', premises: ['p ∧ q'], formula: 'p', name: 'Simplificación' },
+            { mode: 'B', premises: ['p'], formula: 'p ∨ q', name: 'Adición' },
+            { mode: 'B', premises: ['p ∨ q', 'p → r', 'q → r'], formula: 'r', name: 'Dilema Constructivo' },
+            { mode: 'B', premises: ['p → q', 'r → s', '¬q ∨ ¬s'], formula: '¬p ∨ ¬r', name: 'Dilema Destructivo' },
+            { mode: 'B', premises: ['¬p → p'], formula: 'p', name: 'Clavius (RAA)' },
+            // Modo C: Para transformaciones
+            { mode: 'C', formula: '¬(p ∧ q)', name: 'Para De Morgan (∧)' },
+            { mode: 'C', formula: '¬(p ∨ q)', name: 'Para De Morgan (∨)' },
+            { mode: 'C', formula: 'p → q', name: 'Eliminar Condicional' },
+            { mode: 'C', formula: 'p ↔ q', name: 'Eliminar Bicondicional' },
+            { mode: 'C', formula: '¬¬p', name: 'Doble Negación' },
+            { mode: 'C', formula: 'p ∨ (q ∧ r)', name: 'Para Distributiva CNF' },
+            { mode: 'C', formula: 'p ∧ (q ∨ r)', name: 'Para Distributiva DNF' },
+            { mode: 'C', formula: '(p → q) ∧ (q → r)', name: 'Cadena de Implicaciones' }
+        ];
+
+        // APP CONTROLLER
+        const App = {
+            mode: 'A', premises: [], history: [], currentAST: null, sessionHistory: [],
+            init() {
+                Editor.init();
+                this.setMode('A');
+                this.loadTheme();
+                this.initMobile();
+                initResizers();
+                lucide.createIcons();
+                this.renderExamples();
+                this.createModals();
+            },
+            loadTheme() {
+                const t = localStorage.getItem('logicverse-theme');
+                if (t === 'dark') document.documentElement.classList.add('dark');
+                else document.documentElement.classList.remove('dark');
+            },
+            toggleTheme() {
+                const isDark = document.documentElement.classList.toggle('dark');
+                localStorage.setItem('logicverse-theme', isDark ? 'dark' : 'light');
+                UI.showToast(`Modo ${isDark ? 'oscuro' : 'claro'}`, 'info');
+            },
+            initMobile() {
+                if (window.innerWidth <= 768) {
+                    Utils.$('#panel-left').classList.add('mobile-panel');
+                    Utils.$('#panel-right').classList.add('mobile-panel');
+                }
+                window.addEventListener('resize', () => {
+                    const panels = ['#panel-left', '#panel-right'];
+                    panels.forEach(p => {
+                        const el = Utils.$(p);
+                        if (window.innerWidth <= 768) el.classList.add('mobile-panel');
+                        else { el.classList.remove('mobile-panel', 'open'); }
+                    });
+                });
+            },
+            setMode(m) {
+                this.mode = m;
+                ['A', 'B', 'C'].forEach(x => {
+                    const btn = Utils.$(`#mode-${x}-btn`);
+                    btn.className = x === m
+                        ? 'mode-btn px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide bg-brand-600 text-white shadow'
+                        : 'mode-btn px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide text-slate-500 hover:bg-white dark:hover:bg-slate-800';
+                });
+                Utils.$('#mode-indicator').textContent = m === 'A' ? 'Expresión' : (m === 'B' ? 'Inferencia' : 'Equivalencias');
+                Utils.$('#input-label').textContent = m === 'B' ? 'Conclusión' : 'Fórmula';
+                Utils.$('#premises-container').style.display = m === 'B' ? 'flex' : 'none';
+                Utils.$('#mode-c-toolbar').style.display = m === 'C' ? 'flex' : 'none';
+                Utils.$('#interactive-ast-area').style.display = m === 'C' ? 'block' : 'none';
+                Utils.$('#history-container').style.display = m === 'C' ? 'block' : 'none';
+                Utils.$('#proof-container').style.display = m === 'B' ? 'block' : 'none';
+                Utils.$('#laws-panel').classList.add('hidden');
+                if (m !== 'C') this.history = [];
+                this.process();
+            },
+            renderExamples() {
+                const modal = Utils.$('#modal-examples');
+                if (!modal) return;
+                const container = modal.querySelector('.examples-grid');
+                if (!container) return;
+                container.innerHTML = '';
+                Examples.forEach((ex, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'text-left p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors';
+                    btn.innerHTML = `<div class="text-xs font-bold text-brand-600 dark:text-brand-400">${ex.name}</div><code class="text-[10px] text-slate-500 font-mono">${ex.formula}</code>`;
+                    btn.onclick = () => this.loadExample(i);
+                    container.appendChild(btn);
+                });
+            },
+            loadExample(i) {
+                const ex = Examples[i];
+                this.setMode(ex.mode);
+                this.premises = ex.premises ? [...ex.premises] : [];
+                Utils.$('#main-input').value = ex.formula;
+                if (ex.mode === 'B') Inference.render();
+                Editor.update();
+                this.process();
+                UI.toggleModal('examples');
+                UI.showToast(`Ejemplo: ${ex.name}`, 'info');
+            },
+            process() {
+                const raw = Utils.$('#main-input').value.trim();
+                const errEl = Utils.$('#error-toast');
+                errEl.classList.add('hidden');
+                errEl.classList.remove('flex');
+
+                if (!raw && this.mode !== 'B') {
+                    Utils.$('#results-container').classList.add('hidden');
+                    Utils.$('#empty-state').classList.remove('hidden');
+                    return;
+                }
+
+                try {
+                    let ast = null;
+                    if (raw) ast = new Parser(new Tokenizer(raw).tokenize()).parse();
+                    this.currentAST = ast;
+
+                    if (this.mode === 'A' && ast) {
+                        this.analyzeFormula(ast);
+                    } else if (this.mode === 'B') {
+                        Inference.check(ast);
+                    } else if (this.mode === 'C' && ast) {
+                        if (this.history.length === 0) {
+                            this.history = [{ ast: ast.clone(), desc: 'Inicio', valid: true }];
+                        }
+                        const current = this.history[this.history.length - 1].ast;
+                        EquivMode.render(current);
+                        EquivMode.renderSteps();
+                        this.renderTable([this.history[0].ast, current]);
+                        this.updateMetrics(ast);
+                    }
+
+                    if (ast || (this.mode === 'B' && this.premises.length)) {
+                        Utils.$('#results-container').classList.remove('hidden');
+                        Utils.$('#empty-state').classList.add('hidden');
+                    }
+                } catch (e) {
+                    Utils.$('#error-msg').textContent = e.message;
+                    errEl.classList.remove('hidden');
+                    errEl.classList.add('flex');
+                }
+            },
+            analyzeFormula(ast) {
+                const vars = Evaluator.getVariables(ast);
+                const rows = 1 << vars.length;
+                let trueCount = 0;
+                for (let i = 0; i < rows; i++) {
+                    const ctx = {};
+                    vars.forEach((v, k) => ctx[v] = !!((i >> (vars.length - 1 - k)) & 1));
+                    if (Evaluator.evaluate(ast, ctx)) trueCount++;
+                }
+                const badge = Utils.$('#verdict-badge');
+                let verdict = 'CONTINGENCIA';
+                if (trueCount === rows) {
+                    verdict = 'TAUTOLOGÍA';
+                    badge.textContent = verdict;
+                    badge.className = 'px-3 py-1 rounded-full font-bold text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
+                } else if (trueCount === 0) {
+                    verdict = 'CONTRADICCIÓN';
+                    badge.textContent = verdict;
+                    badge.className = 'px-3 py-1 rounded-full font-bold text-xs bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+                } else {
+                    badge.textContent = verdict;
+                    badge.className = 'px-3 py-1 rounded-full font-bold text-xs bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
+                }
+                Utils.$('#render-latex').innerHTML = `$$${ast.toTeX()}$$`;
+                if (window.MathJax) MathJax.typesetPromise();
+                this.updateMetrics(ast, trueCount, rows);
+                this.renderTable([ast]);
+                this.addToSessionHistory(ast.toString(), verdict);
+            },
+            addToSessionHistory(formula, verdict) {
+                const list = Utils.$('#session-history-list');
+                if (!list) return;
+                const li = document.createElement('li');
+                li.className = 'p-2 text-xs hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer';
+                const time = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+                const vClass = verdict === 'TAUTOLOGÍA' ? 'text-green-600' : (verdict === 'CONTRADICCIÓN' ? 'text-red-600' : 'text-yellow-600');
+                li.innerHTML = `<div class="flex justify-between"><span class="font-mono truncate max-w-[120px]">${formula}</span><span class="${vClass} font-bold text-[10px]">${verdict.slice(0, 4)}</span></div><div class="text-slate-400 text-[10px]">${time}</div>`;
+                li.onclick = () => { Utils.$('#main-input').value = formula; Editor.update(); App.process(); };
+                list.insertBefore(li, list.firstChild);
+                if (list.children.length > 20) list.removeChild(list.lastChild);
+            },
+            updateMetrics(ast, trueCount, totalRows) {
+                const vars = Evaluator.getVariables(ast);
+                Utils.$('#meta-vars').textContent = vars.join(', ') || '-';
+                Utils.$('#meta-depth').textContent = Evaluator.getDepth(ast);
+                Utils.$('#meta-connectors').textContent = Evaluator.countConnectors(ast);
+                if (trueCount !== undefined) {
+                    Utils.$('#meta-density').textContent = `${Math.round(trueCount / totalRows * 100)}%`;
+                }
+                Utils.$('#natural-reading').textContent = NaturalLang.generate(ast);
+                Utils.$('#ast-tree').textContent = ASTTree.render(ast);
+                Utils.$('#latex-output').value = ast.toTeX();
+            },
+            renderTable(asts) {
+                const table = Utils.$('#truth-table');
+                table.innerHTML = '';
+                const main = asts[0];
+                if (!main) return;
+                const vars = Evaluator.getVariables(main);
+                const rows = 1 << vars.length;
+                const showInter = Utils.$('#setting-intermediate')?.checked;
+
+                let heads = [...vars];
+                if (this.mode === 'A' && showInter) {
+                    heads = heads.concat(Evaluator.getSubexpressions(main).map(s => s.str));
+                }
+                heads.push(this.mode === 'C' ? 'Eq?' : 'R');
+
+                const headerRow = document.createElement('tr');
+                heads.forEach(h => {
+                    const th = document.createElement('th');
+                    th.textContent = h;
+                    headerRow.appendChild(th);
+                });
+                table.appendChild(headerRow);
+
+                for (let i = 0; i < rows; i++) {
+                    const ctx = {};
+                    vars.forEach((v, k) => ctx[v] = !!((i >> (vars.length - 1 - k)) & 1));
+                    const tr = document.createElement('tr');
+
+                    vars.forEach(v => {
+                        const td = document.createElement('td');
+                        td.textContent = ctx[v] ? 'V' : 'F';
+                        td.className = ctx[v] ? 'val-t' : 'val-f';
+                        tr.appendChild(td);
+                    });
+
+                    if (this.mode === 'A' && showInter) {
+                        Evaluator.getSubexpressions(main).forEach(s => {
+                            const td = document.createElement('td');
+                            const v = Evaluator.evaluate(s.node, ctx);
+                            td.textContent = v ? 'V' : 'F';
+                            td.className = v ? 'val-t' : 'val-f';
+                            td.style.opacity = '0.6';
+                            tr.appendChild(td);
+                        });
+                    }
+
+                    const resultTd = document.createElement('td');
+                    if (this.mode === 'C' && asts.length > 1) {
+                        const v1 = Evaluator.evaluate(asts[0], ctx);
+                        const v2 = Evaluator.evaluate(asts[1], ctx);
+                        resultTd.textContent = v1 === v2 ? '=' : '≠';
+                        resultTd.className = v1 === v2 ? 'val-t' : 'val-f';
+                        if (v1 !== v2) tr.classList.add('row-counter');
+                    } else {
+                        const r = Evaluator.evaluate(main, ctx);
+                        resultTd.textContent = r ? 'V' : 'F';
+                        resultTd.className = (r ? 'val-t' : 'val-f') + ' font-bold';
+                    }
+                    tr.appendChild(resultTd);
+                    table.appendChild(tr);
+                }
+            },
+            createModals() {
+                const container = Utils.$('#modals-container');
+                container.innerHTML = `
+                <!-- Examples Modal -->
+                <div id="modal-examples" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4" onclick="if(event.target===this)UI.toggleModal('examples')">
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg max-h-[80vh] overflow-hidden shadow-2xl animate-scale-in" onclick="event.stopPropagation()">
+                        <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                            <h3 class="font-bold text-lg">Banco de Ejemplos</h3>
+                            <button onclick="UI.toggleModal('examples')" class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+                        </div>
+                        <div class="p-4 overflow-y-auto max-h-[60vh]">
+                            <div class="examples-grid grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Theory Modal -->
+                <div id="modal-theory" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4" onclick="if(event.target===this)UI.toggleModal('theory')">
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-4xl max-h-[95vh] overflow-hidden shadow-2xl animate-scale-in" onclick="event.stopPropagation()">
+                        <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-gradient-to-r from-brand-50 to-purple-50 dark:from-brand-900/20 dark:to-purple-900/20">
+                            <h3 class="font-bold text-lg flex items-center gap-2"><i data-lucide="book-open" class="w-5 h-5 text-brand-600"></i> Tratado de Lógica Proposicional</h3>
+                            <button onclick="UI.toggleModal('theory')" class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+                        </div>
+                        <div class="p-6 overflow-y-auto max-h-[85vh] space-y-8 text-sm text-slate-600 dark:text-slate-300">
+                            
+                            <!-- 1. PROPOSICIONES -->
+                            <section class="border-l-4 border-brand-500 pl-4">
+                                <h4 class="font-bold text-lg text-slate-800 dark:text-white mb-4 flex items-center gap-2">📖 1. Proposiciones</h4>
+                                <div class="space-y-4">
+                                    <div class="p-4 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 rounded-lg">
+                                        <p class="font-bold text-brand-600 mb-2">Definición Formal:</p>
+                                        <p>Una <strong>proposición</strong> es una oración declarativa que puede ser clasificada como verdadera (V) o falsa (F), pero no ambas simultáneamente. Este es el <em>Principio de Bivalencia</em>.</p>
+                                    </div>
+                                    <div class="grid md:grid-cols-2 gap-4">
+                                        <div class="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border-l-4 border-green-500">
+                                            <p class="font-bold text-green-700 dark:text-green-400 mb-2">✓ Son proposiciones:</p>
+                                            <ul class="text-xs space-y-1 list-disc list-inside">
+                                                <li>"La Tierra es redonda" → V</li>
+                                                <li>"2 + 2 = 5" → F</li>
+                                                <li>"París es la capital de Francia" → V</li>
+                                                <li>"El número π es racional" → F</li>
+                                            </ul>
+                                        </div>
+                                        <div class="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border-l-4 border-red-500">
+                                            <p class="font-bold text-red-700 dark:text-red-400 mb-2">✗ NO son proposiciones:</p>
+                                            <ul class="text-xs space-y-1 list-disc list-inside">
+                                                <li>"¿Qué hora es?" (interrogativa)</li>
+                                                <li>"¡Cierra la puerta!" (imperativa)</li>
+                                                <li>"x + 3 = 7" (función proposicional)</li>
+                                                <li>"Esta oración es falsa" (paradoja)</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
+                                        <p class="font-bold text-amber-700 dark:text-amber-400 mb-1">⚡ Principios Fundamentales:</p>
+                                        <ul class="text-xs space-y-1">
+                                            <li><strong>Identidad:</strong> Toda proposición es idéntica a sí misma (P ≡ P)</li>
+                                            <li><strong>No Contradicción:</strong> Ninguna proposición es V y F a la vez: ¬(P ∧ ¬P)</li>
+                                            <li><strong>Tercero Excluido:</strong> Toda proposición es V o F: P ∨ ¬P</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- 2. CONECTORES LÓGICOS -->
+                            <section class="border-l-4 border-blue-500 pl-4">
+                                <h4 class="font-bold text-lg text-slate-800 dark:text-white mb-4 flex items-center gap-2">🔗 2. Conectores Lógicos (Conectivas)</h4>
+                                
+                                <div class="space-y-6">
+                                    <!-- Negación -->
+                                    <div class="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                                        <div class="flex items-center gap-3 mb-3">
+                                            <span class="text-3xl font-bold text-red-600">¬</span>
+                                            <div><p class="font-bold text-red-700 dark:text-red-400">NEGACIÓN (NOT)</p><p class="text-xs">Operador unario - Invierte el valor de verdad</p></div>
+                                        </div>
+                                        <div class="grid md:grid-cols-2 gap-4">
+                                            <table class="text-xs border-collapse w-full"><thead><tr class="bg-red-100 dark:bg-red-900/40"><th class="p-2 border">P</th><th class="p-2 border">¬P</th></tr></thead>
+                                            <tbody><tr><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-red-600 font-bold">F</td></tr>
+                                            <tr><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-green-600 font-bold">V</td></tr></tbody></table>
+                                            <div class="text-xs"><p class="mb-1"><strong>Símbolos:</strong> ¬, ~, !, NOT</p><p class="mb-1"><strong>Lectura:</strong> "No P", "Es falso que P"</p><p><strong>Ejemplo:</strong> P = "Llueve" → ¬P = "No llueve"</p></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Conjunción -->
+                                    <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                                        <div class="flex items-center gap-3 mb-3">
+                                            <span class="text-3xl font-bold text-green-600">∧</span>
+                                            <div><p class="font-bold text-green-700 dark:text-green-400">CONJUNCIÓN (AND)</p><p class="text-xs">Verdadera solo si AMBAS son verdaderas</p></div>
+                                        </div>
+                                        <div class="grid md:grid-cols-2 gap-4">
+                                            <table class="text-xs border-collapse w-full"><thead><tr class="bg-green-100 dark:bg-green-900/40"><th class="p-2 border">P</th><th class="p-2 border">Q</th><th class="p-2 border">P ∧ Q</th></tr></thead>
+                                            <tbody><tr><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-green-600 font-bold">V</td></tr>
+                                            <tr><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-red-600 font-bold">F</td></tr>
+                                            <tr><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-red-600 font-bold">F</td></tr>
+                                            <tr><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-red-600 font-bold">F</td></tr></tbody></table>
+                                            <div class="text-xs"><p class="mb-1"><strong>Símbolos:</strong> ∧, &, ·, AND</p><p class="mb-1"><strong>Lectura:</strong> "P y Q", "P además Q"</p><p><strong>Ejemplo:</strong> "Estudia Y aprueba"</p></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Disyunción -->
+                                    <div class="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                                        <div class="flex items-center gap-3 mb-3">
+                                            <span class="text-3xl font-bold text-orange-600">∨</span>
+                                            <div><p class="font-bold text-orange-700 dark:text-orange-400">DISYUNCIÓN (OR)</p><p class="text-xs">Verdadera si AL MENOS UNA es verdadera</p></div>
+                                        </div>
+                                        <div class="grid md:grid-cols-2 gap-4">
+                                            <table class="text-xs border-collapse w-full"><thead><tr class="bg-orange-100 dark:bg-orange-900/40"><th class="p-2 border">P</th><th class="p-2 border">Q</th><th class="p-2 border">P ∨ Q</th></tr></thead>
+                                            <tbody><tr><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-green-600 font-bold">V</td></tr>
+                                            <tr><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-green-600 font-bold">V</td></tr>
+                                            <tr><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-green-600 font-bold">V</td></tr>
+                                            <tr><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-red-600 font-bold">F</td></tr></tbody></table>
+                                            <div class="text-xs"><p class="mb-1"><strong>Símbolos:</strong> ∨, |, +, OR</p><p class="mb-1"><strong>Lectura:</strong> "P o Q" (inclusiva)</p><p><strong>Nota:</strong> Es la disyunción DÉBIL (inclusiva)</p></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Condicional -->
+                                    <div class="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                                        <div class="flex items-center gap-3 mb-3">
+                                            <span class="text-3xl font-bold text-purple-600">→</span>
+                                            <div><p class="font-bold text-purple-700 dark:text-purple-400">CONDICIONAL (IMPLICACIÓN)</p><p class="text-xs">Falsa SOLO si el antecedente es V y consecuente F</p></div>
+                                        </div>
+                                        <div class="grid md:grid-cols-2 gap-4">
+                                            <table class="text-xs border-collapse w-full"><thead><tr class="bg-purple-100 dark:bg-purple-900/40"><th class="p-2 border">P</th><th class="p-2 border">Q</th><th class="p-2 border">P → Q</th></tr></thead>
+                                            <tbody><tr><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-green-600 font-bold">V</td></tr>
+                                            <tr><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-red-600 font-bold">F</td></tr>
+                                            <tr><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-green-600 font-bold">V</td></tr>
+                                            <tr><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-green-600 font-bold">V</td></tr></tbody></table>
+                                            <div class="text-xs"><p class="mb-1"><strong>Símbolos:</strong> →, ⇒, ⊃</p><p class="mb-1"><strong>Lectura:</strong> "Si P entonces Q"</p><p class="mb-1"><strong>P:</strong> Antecedente (hipótesis)</p><p><strong>Q:</strong> Consecuente (tesis)</p></div>
+                                        </div>
+                                        <p class="text-xs mt-2 p-2 bg-purple-100 dark:bg-purple-900/40 rounded"><strong>Equivalencia:</strong> P → Q ≡ ¬P ∨ Q</p>
+                                    </div>
+
+                                    <!-- Bicondicional -->
+                                    <div class="p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg">
+                                        <div class="flex items-center gap-3 mb-3">
+                                            <span class="text-3xl font-bold text-cyan-600">↔</span>
+                                            <div><p class="font-bold text-cyan-700 dark:text-cyan-400">BICONDICIONAL (DOBLE IMPLICACIÓN)</p><p class="text-xs">Verdadera si ambas tienen el MISMO valor de verdad</p></div>
+                                        </div>
+                                        <div class="grid md:grid-cols-2 gap-4">
+                                            <table class="text-xs border-collapse w-full"><thead><tr class="bg-cyan-100 dark:bg-cyan-900/40"><th class="p-2 border">P</th><th class="p-2 border">Q</th><th class="p-2 border">P ↔ Q</th></tr></thead>
+                                            <tbody><tr><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-green-600 font-bold">V</td></tr>
+                                            <tr><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-red-600 font-bold">F</td></tr>
+                                            <tr><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-green-600 font-bold">V</td><td class="p-2 border text-center text-red-600 font-bold">F</td></tr>
+                                            <tr><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-red-600 font-bold">F</td><td class="p-2 border text-center text-green-600 font-bold">V</td></tr></tbody></table>
+                                            <div class="text-xs"><p class="mb-1"><strong>Símbolos:</strong> ↔, ⇔, ≡</p><p class="mb-1"><strong>Lectura:</strong> "P si y solo si Q"</p><p><strong>Equivalencia:</strong> (P→Q) ∧ (Q→P)</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- 3. CLASIFICACIÓN DE FÓRMULAS -->
+                            <section class="border-l-4 border-teal-500 pl-4">
+                                <h4 class="font-bold text-lg text-slate-800 dark:text-white mb-4 flex items-center gap-2">📊 3. Clasificación de Fórmulas</h4>
+                                <div class="grid md:grid-cols-3 gap-4">
+                                    <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg text-center">
+                                        <p class="text-2xl mb-2">✓</p>
+                                        <p class="font-bold text-green-700 dark:text-green-400">TAUTOLOGÍA</p>
+                                        <p class="text-xs mt-2">Verdadera en TODAS las interpretaciones</p>
+                                        <p class="font-mono text-xs mt-2 p-1 bg-green-100 dark:bg-green-900/40 rounded">P ∨ ¬P</p>
+                                    </div>
+                                    <div class="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg text-center">
+                                        <p class="text-2xl mb-2">✗</p>
+                                        <p class="font-bold text-red-700 dark:text-red-400">CONTRADICCIÓN</p>
+                                        <p class="text-xs mt-2">Falsa en TODAS las interpretaciones</p>
+                                        <p class="font-mono text-xs mt-2 p-1 bg-red-100 dark:bg-red-900/40 rounded">P ∧ ¬P</p>
+                                    </div>
+                                    <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-center">
+                                        <p class="text-2xl mb-2">~</p>
+                                        <p class="font-bold text-yellow-700 dark:text-yellow-400">CONTINGENCIA</p>
+                                        <p class="text-xs mt-2">V en algunas, F en otras</p>
+                                        <p class="font-mono text-xs mt-2 p-1 bg-yellow-100 dark:bg-yellow-900/40 rounded">P → Q</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- 4. REGLAS DE INFERENCIA -->
+                            <section class="border-l-4 border-indigo-500 pl-4">
+                                <h4 class="font-bold text-lg text-slate-800 dark:text-white mb-4 flex items-center gap-2">⚖️ 4. Reglas de Inferencia</h4>
+                                <p class="text-xs mb-4 p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded">Las reglas de inferencia permiten derivar conclusiones válidas a partir de premisas. Una inferencia es <strong>válida</strong> si la conjunción de las premisas implica la conclusión (es una tautología).</p>
+                                
+                                <div class="grid md:grid-cols-2 gap-3">
+                                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"><div class="font-bold text-xs text-indigo-600 mb-1">1. Modus Ponendo Ponens (PP)</div><div class="font-mono text-xs">P → Q<br>P<br><hr class="my-1">∴ Q</div><p class="text-[10px] text-slate-500 mt-1">[(P→Q) ∧ P] → Q</p></div>
+                                    
+                                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"><div class="font-bold text-xs text-indigo-600 mb-1">2. Modus Tollendo Tollens (TT)</div><div class="font-mono text-xs">P → Q<br>¬Q<br><hr class="my-1">∴ ¬P</div><p class="text-[10px] text-slate-500 mt-1">[(P→Q) ∧ ¬Q] → ¬P</p></div>
+                                    
+                                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"><div class="font-bold text-xs text-indigo-600 mb-1">3. Silogismo Hipotético (SH)</div><div class="font-mono text-xs">P → Q<br>Q → R<br><hr class="my-1">∴ P → R</div><p class="text-[10px] text-slate-500 mt-1">Transitividad del condicional</p></div>
+                                    
+                                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"><div class="font-bold text-xs text-indigo-600 mb-1">4. Tollendo Ponens (TP) - Silogismo Disyuntivo</div><div class="font-mono text-xs">P ∨ Q<br>¬P<br><hr class="my-1">∴ Q</div><p class="text-[10px] text-slate-500 mt-1">[(P∨Q) ∧ ¬P] → Q</p></div>
+                                    
+                                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"><div class="font-bold text-xs text-indigo-600 mb-1">5. Ley de Adjunción (A)</div><div class="font-mono text-xs">P<br>Q<br><hr class="my-1">∴ P ∧ Q</div></div>
+                                    
+                                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"><div class="font-bold text-xs text-indigo-600 mb-1">6. Ley de Simplificación (S)</div><div class="font-mono text-xs">P ∧ Q<br><hr class="my-1">∴ P</div></div>
+                                    
+                                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"><div class="font-bold text-xs text-indigo-600 mb-1">7. Ley de Adición (LA)</div><div class="font-mono text-xs">P<br><hr class="my-1">∴ P ∨ Q</div><p class="text-[10px] text-slate-500 mt-1">P → (P ∨ Q)</p></div>
+                                    
+                                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"><div class="font-bold text-xs text-indigo-600 mb-1">8. Doble Negación (DN)</div><div class="font-mono text-xs">¬¬P<br><hr class="my-1">∴ P</div><p class="text-[10px] text-slate-500 mt-1">¬(¬P) ≡ P</p></div>
+                                    
+                                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"><div class="font-bold text-xs text-indigo-600 mb-1">9. Dilema Constructivo</div><div class="font-mono text-xs">P ∨ Q<br>P → R<br>Q → S<br><hr class="my-1">∴ R ∨ S</div></div>
+                                    
+                                    <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"><div class="font-bold text-xs text-indigo-600 mb-1">10. Dilema Destructivo</div><div class="font-mono text-xs">P → Q<br>R → S<br>¬Q ∨ ¬S<br><hr class="my-1">∴ ¬P ∨ ¬R</div></div>
+                                </div>
+                            </section>
+
+                            <!-- 5. LEYES DE EQUIVALENCIA -->
+                            <section class="border-l-4 border-emerald-500 pl-4">
+                                <h4 class="font-bold text-lg text-slate-800 dark:text-white mb-4 flex items-center gap-2">📐 5. Leyes de Equivalencia Lógica</h4>
+                                <p class="text-xs mb-4">Dos fórmulas son lógicamente equivalentes (≡) si tienen la misma tabla de verdad.</p>
+                                
+                                <div class="space-y-2 text-xs">
+                                    <div class="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded"><strong>Leyes de De Morgan:</strong><br>¬(P ∧ Q) ≡ ¬P ∨ ¬Q<br>¬(P ∨ Q) ≡ ¬P ∧ ¬Q</div>
+                                    <div class="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded"><strong>Leyes Conmutativas:</strong><br>P ∧ Q ≡ Q ∧ P<br>P ∨ Q ≡ Q ∨ P</div>
+                                    <div class="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded"><strong>Leyes Asociativas:</strong><br>(P ∧ Q) ∧ R ≡ P ∧ (Q ∧ R)<br>(P ∨ Q) ∨ R ≡ P ∨ (Q ∨ R)</div>
+                                    <div class="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded"><strong>Leyes Distributivas:</strong><br>P ∧ (Q ∨ R) ≡ (P ∧ Q) ∨ (P ∧ R)<br>P ∨ (Q ∧ R) ≡ (P ∨ Q) ∧ (P ∨ R)</div>
+                                    <div class="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded"><strong>Ley del Condicional:</strong> P → Q ≡ ¬P ∨ Q</div>
+                                    <div class="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded"><strong>Ley de Contraposición:</strong> P → Q ≡ ¬Q → ¬P</div>
+                                    <div class="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded"><strong>Ley de Absorción:</strong><br>P ∧ (P ∨ Q) ≡ P<br>P ∨ (P ∧ Q) ≡ P</div>
+                                    <div class="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded"><strong>Ley de Exportación:</strong> (P ∧ Q) → R ≡ P → (Q → R)</div>
+                                </div>
+                            </section>
+
+                            <!-- 6. FORMAS NORMALES -->
+                            <section class="border-l-4 border-amber-500 pl-4">
+                                <h4 class="font-bold text-lg text-slate-800 dark:text-white mb-4 flex items-center gap-2">🔄 6. Formas Normales (CNF y DNF)</h4>
+                                
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <div class="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                                        <p class="font-bold text-orange-700 dark:text-orange-400 text-base mb-2">CNF - Forma Normal Conjuntiva</p>
+                                        <p class="text-xs mb-2"><strong>Definición:</strong> Conjunción (∧) de cláusulas, donde cada cláusula es una disyunción (∨) de literales.</p>
+                                        <p class="text-xs mb-2"><strong>Literal:</strong> Variable o su negación (P, ¬P)</p>
+                                        <p class="text-xs mb-2"><strong>Cláusula:</strong> Disyunción de literales</p>
+                                        <div class="p-2 bg-orange-100 dark:bg-orange-900/40 rounded font-mono text-xs">(P ∨ Q) ∧ (¬P ∨ R) ∧ (Q ∨ ¬R)</div>
+                                        <p class="text-[10px] text-slate-500 mt-2">Usado en SAT solvers y resolución</p>
+                                    </div>
+                                    
+                                    <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                        <p class="font-bold text-blue-700 dark:text-blue-400 text-base mb-2">DNF - Forma Normal Disyuntiva</p>
+                                        <p class="text-xs mb-2"><strong>Definición:</strong> Disyunción (∨) de términos, donde cada término es una conjunción (∧) de literales.</p>
+                                        <p class="text-xs mb-2"><strong>Término:</strong> Conjunción de literales</p>
+                                        <p class="text-xs mb-2"><strong>También llamado:</strong> Suma de productos</p>
+                                        <div class="p-2 bg-blue-100 dark:bg-blue-900/40 rounded font-mono text-xs">(P ∧ Q) ∨ (¬P ∧ R) ∨ (P ∧ ¬R)</div>
+                                        <p class="text-[10px] text-slate-500 mt-2">Usado en circuitos digitales</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                                    <p class="font-bold text-xs mb-2">Algoritmo de Conversión a CNF/DNF:</p>
+                                    <ol class="text-xs space-y-1 list-decimal list-inside">
+                                        <li>Eliminar bicondicionales: P ↔ Q → (P→Q) ∧ (Q→P)</li>
+                                        <li>Eliminar condicionales: P → Q → ¬P ∨ Q</li>
+                                        <li>Empujar negaciones hacia adentro (De Morgan)</li>
+                                        <li>Eliminar dobles negaciones</li>
+                                        <li>Aplicar distributivas según CNF o DNF</li>
+                                    </ol>
+                                </div>
+                            </section>
+
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Help Modal -->
+                <div id="modal-help" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4" onclick="if(event.target===this)UI.toggleModal('help')">
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-3xl max-h-[95vh] overflow-hidden shadow-2xl animate-scale-in" onclick="event.stopPropagation()">
+                        <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20">
+                            <h3 class="font-bold text-lg flex items-center gap-2"><i data-lucide="help-circle" class="w-5 h-5 text-teal-600"></i> Manual de Usuario Completo</h3>
+                            <button onclick="UI.toggleModal('help')" class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+                        </div>
+                        <div class="p-6 overflow-y-auto max-h-[85vh] space-y-6 text-sm">
+                            
+                            <!-- Inicio Rápido -->
+                            <section class="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border-l-4 border-blue-500">
+                                <h4 class="font-bold text-blue-700 dark:text-blue-400 text-base mb-3 flex items-center gap-2">🚀 Inicio Rápido</h4>
+                                <ol class="space-y-2 text-xs list-decimal list-inside">
+                                    <li>Selecciona un <strong>modo</strong> en la barra superior (Expresión, Inferencia o Equivalencias)</li>
+                                    <li>Escribe tu fórmula usando el <strong>teclado virtual</strong> o el teclado físico</li>
+                                    <li>Pulsa <span class="px-2 py-0.5 bg-brand-600 text-white rounded font-bold">EVALUAR</span> o presiona <kbd class="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">Enter</kbd></li>
+                                    <li>Observa los resultados en el panel central y las métricas en el panel derecho</li>
+                                </ol>
+                            </section>
+
+                            <!-- Modos de Trabajo -->
+                            <section>
+                                <h4 class="font-bold text-base mb-4 flex items-center gap-2 text-slate-800 dark:text-white">📋 Modos de Trabajo</h4>
+                                
+                                <div class="space-y-4">
+                                    <div class="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border-l-4 border-purple-500">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="px-2 py-1 bg-purple-600 text-white text-xs font-bold rounded">A</span>
+                                            <span class="font-bold text-purple-700 dark:text-purple-400">Modo Expresión</span>
+                                        </div>
+                                        <p class="text-xs mb-2">Evalúa fórmulas proposicionales y genera tablas de verdad completas.</p>
+                                        <ul class="text-xs space-y-1 list-disc list-inside text-slate-600 dark:text-slate-400">
+                                            <li>Clasifica la fórmula como Tautología, Contradicción o Contingencia</li>
+                                            <li>Muestra la densidad de verdad (% de filas verdaderas)</li>
+                                            <li>Opción de mostrar subexpresiones intermedias</li>
+                                            <li>Exporta la tabla a CSV</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border-l-4 border-green-500">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="px-2 py-1 bg-green-600 text-white text-xs font-bold rounded">B</span>
+                                            <span class="font-bold text-green-700 dark:text-green-400">Modo Inferencia</span>
+                                        </div>
+                                        <p class="text-xs mb-2">Valida argumentos lógicos verificando si la conclusión se deriva de las premisas.</p>
+                                        <ul class="text-xs space-y-1 list-disc list-inside text-slate-600 dark:text-slate-400">
+                                            <li><strong>Añadir Premisa:</strong> Escribe una fórmula y pulsa "Agregar Premisa"</li>
+                                            <li><strong>Conclusión:</strong> Escribe la conclusión en el editor principal</li>
+                                            <li>Un argumento es <span class="text-green-600 font-bold">VÁLIDO</span> si (P₁ ∧ P₂ ∧ ... ∧ Pₙ) → C es una tautología</li>
+                                            <li>Si encuentra una fila donde las premisas son V y la conclusión F → <span class="text-red-600 font-bold">INVÁLIDO</span></li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border-l-4 border-orange-500">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="px-2 py-1 bg-orange-600 text-white text-xs font-bold rounded">C</span>
+                                            <span class="font-bold text-orange-700 dark:text-orange-400">Modo Equivalencias</span>
+                                        </div>
+                                        <p class="text-xs mb-2">Transforma fórmulas aplicando leyes de equivalencia paso a paso.</p>
+                                        <ul class="text-xs space-y-1 list-disc list-inside text-slate-600 dark:text-slate-400">
+                                            <li>Haz clic en una subexpresión para seleccionarla</li>
+                                            <li>Las leyes aplicables aparecen en el panel derecho</li>
+                                            <li>Cada transformación se registra en el historial</li>
+                                            <li>Usa <strong>Deshacer</strong> para retroceder pasos</li>
+                                            <li>Botones <strong>CNF</strong> y <strong>DNF</strong> convierten automáticamente</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- CNF y DNF -->
+                            <section class="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
+                                <h4 class="font-bold text-amber-700 dark:text-amber-400 text-base mb-3 flex items-center gap-2">🔄 ¿Qué son CNF y DNF?</h4>
+                                
+                                <div class="grid md:grid-cols-2 gap-4 text-xs">
+                                    <div>
+                                        <p class="font-bold text-orange-600 mb-1">CNF (Conjunctive Normal Form)</p>
+                                        <p class="mb-2">Forma Normal Conjuntiva: una fórmula escrita como <strong>∧ de ∨</strong>.</p>
+                                        <div class="p-2 bg-orange-100 dark:bg-orange-900/40 rounded font-mono">(A ∨ B) ∧ (¬A ∨ C) ∧ (B ∨ ¬C)</div>
+                                        <p class="mt-1 text-slate-500">Usada en SAT solvers, demostradores automáticos, y verificación formal.</p>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-blue-600 mb-1">DNF (Disjunctive Normal Form)</p>
+                                        <p class="mb-2">Forma Normal Disyuntiva: una fórmula escrita como <strong>∨ de ∧</strong>.</p>
+                                        <div class="p-2 bg-blue-100 dark:bg-blue-900/40 rounded font-mono">(A ∧ B) ∨ (¬A ∧ C) ∨ (B ∧ ¬C)</div>
+                                        <p class="mt-1 text-slate-500">Usada en diseño de circuitos, mapas de Karnaugh, síntesis lógica.</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Teclado Virtual -->
+                            <section>
+                                <h4 class="font-bold text-base mb-3 text-slate-800 dark:text-white">⌨️ Teclado Virtual y Atajos</h4>
+                                
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-xs font-bold mb-2 text-slate-600">Entrada desde teclado físico:</p>
+                                        <div class="grid grid-cols-2 gap-1 text-xs font-mono">
+                                            <div class="p-1.5 bg-slate-100 dark:bg-slate-800 rounded flex justify-between"><span>~</span><span class="text-red-500">→ ¬</span></div>
+                                            <div class="p-1.5 bg-slate-100 dark:bg-slate-800 rounded flex justify-between"><span>!</span><span class="text-red-500">→ ¬</span></div>
+                                            <div class="p-1.5 bg-slate-100 dark:bg-slate-800 rounded flex justify-between"><span>&</span><span class="text-green-500">→ ∧</span></div>
+                                            <div class="p-1.5 bg-slate-100 dark:bg-slate-800 rounded flex justify-between"><span>*</span><span class="text-green-500">→ ∧</span></div>
+                                            <div class="p-1.5 bg-slate-100 dark:bg-slate-800 rounded flex justify-between"><span>|</span><span class="text-orange-500">→ ∨</span></div>
+                                            <div class="p-1.5 bg-slate-100 dark:bg-slate-800 rounded flex justify-between"><span>+</span><span class="text-orange-500">→ ∨</span></div>
+                                            <div class="p-1.5 bg-slate-100 dark:bg-slate-800 rounded flex justify-between"><span>-></span><span class="text-purple-500">→ →</span></div>
+                                            <div class="p-1.5 bg-slate-100 dark:bg-slate-800 rounded flex justify-between"><span><-></span><span class="text-cyan-500">→ ↔</span></div>
+                                            <div class="p-1.5 bg-slate-100 dark:bg-slate-800 rounded flex justify-between"><span>^</span><span class="text-pink-500">→ ⊕</span></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold mb-2 text-slate-600">Variables disponibles:</p>
+                                        <div class="p-2 bg-slate-50 dark:bg-slate-800 rounded text-xs">
+                                            <span class="text-fuchsia-600 font-bold">p, q, r, s, t, u, v, w, x, y, z</span>
+                                            <p class="mt-1 text-slate-500">Las variables son case-insensitive (P = p)</p>
+                                        </div>
+                                        <p class="text-xs font-bold mb-2 mt-3 text-slate-600">Constantes:</p>
+                                        <div class="p-2 bg-slate-50 dark:bg-slate-800 rounded text-xs">
+                                            <span class="text-amber-600 font-bold">T</span> = Verdadero (True), <span class="text-amber-600 font-bold">F</span> = Falso (False)
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- Panel de Análisis -->
+                            <section>
+                                <h4 class="font-bold text-base mb-3 text-slate-800 dark:text-white">📊 Panel de Análisis (Derecho)</h4>
+                                <div class="space-y-2 text-xs">
+                                    <div class="p-2 bg-slate-50 dark:bg-slate-800 rounded"><strong>Interpretación:</strong> Lectura de la fórmula en lenguaje natural</div>
+                                    <div class="p-2 bg-slate-50 dark:bg-slate-800 rounded"><strong>Variables:</strong> Lista de variables proposicionales encontradas</div>
+                                    <div class="p-2 bg-slate-50 dark:bg-slate-800 rounded"><strong>Densidad V:</strong> Porcentaje de filas con resultado Verdadero</div>
+                                    <div class="p-2 bg-slate-50 dark:bg-slate-800 rounded"><strong>Conectores:</strong> Número total de operadores lógicos</div>
+                                    <div class="p-2 bg-slate-50 dark:bg-slate-800 rounded"><strong>Profundidad:</strong> Niveles de anidación del árbol sintáctico</div>
+                                    <div class="p-2 bg-slate-50 dark:bg-slate-800 rounded"><strong>Árbol Sintáctico:</strong> Representación jerárquica del AST</div>
+                                    <div class="p-2 bg-slate-50 dark:bg-slate-800 rounded"><strong>Exportar LaTeX:</strong> Copia la fórmula en notación LaTeX</div>
+                                    <div class="p-2 bg-slate-50 dark:bg-slate-800 rounded"><strong>Historial:</strong> Fórmulas evaluadas en la sesión actual</div>
+                                </div>
+                            </section>
+
+                            <!-- Solución de Problemas -->
+                            <section class="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                                <h4 class="font-bold text-red-700 dark:text-red-400 text-base mb-3">🔧 Solución de Problemas</h4>
+                                <div class="space-y-2 text-xs">
+                                    <div class="p-2 bg-white dark:bg-slate-800 rounded"><strong>Error "Carácter desconocido":</strong> Usa solo variables (p-z), operadores lógicos y paréntesis</div>
+                                    <div class="p-2 bg-white dark:bg-slate-800 rounded"><strong>Paréntesis desbalanceados:</strong> Verifica que cada ( tenga su ) correspondiente</div>
+                                    <div class="p-2 bg-white dark:bg-slate-800 rounded"><strong>Tabla muy grande:</strong> Con más de 6 variables (64+ filas) puede ser lento</div>
+                                    <div class="p-2 bg-white dark:bg-slate-800 rounded"><strong>Fórmula no se procesa:</strong> Asegúrate de no dejar operadores sin operandos</div>
+                                </div>
+                            </section>
+
+                            <!-- Créditos -->
+                            <section class="text-center text-xs text-slate-400 pt-4 border-t border-slate-200 dark:border-slate-800">
+                                <p>LogicVerse Pro v2.0</p>
+                                <p>Desarrollado por <strong>Msc. Néstor Fabio Montoya Palacios</strong></p>
+                                <p>Asistido por Inteligencia Artificial</p>
+                            </section>
+
+                        </div>
+                    </div>
+                </div>`;
+                lucide.createIcons();
+                this.renderExamples();
+            }
+        };
+
+        // EDITOR
+        const Editor = {
+            init() {
+                const input = Utils.$('#main-input');
+                input.addEventListener('input', () => { this.update(); App.process(); });
+                input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); App.process(); } });
+            },
+            update() {
+                const txt = Utils.$('#main-input').value;
+                let html = txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    .replace(/([p-z])/gi, '<span class="token-var">$1</span>')
+                    .replace(/([TF])/g, '<span class="token-const">$1</span>')
+                    .replace(/¬/g, '<span class="token-op-neg">¬</span>')
+                    .replace(/∧/g, '<span class="token-op-and">∧</span>')
+                    .replace(/∨/g, '<span class="token-op-or">∨</span>')
+                    .replace(/→/g, '<span class="token-op-impl">→</span>')
+                    .replace(/↔/g, '<span class="token-op-iff">↔</span>')
+                    .replace(/⊕/g, '<span class="token-op-xor">⊕</span>')
+                    .replace(/\(/g, '<span class="token-paren-open">(</span>')
+                    .replace(/\)/g, '<span class="token-paren-close">)</span>');
+                Utils.$('#highlight-layer').innerHTML = html;
+            },
+            insert(t) {
+                const el = Utils.$('#main-input');
+                const [s, e] = [el.selectionStart, el.selectionEnd];
+                el.value = el.value.substring(0, s) + t + el.value.substring(e);
+                el.selectionStart = el.selectionEnd = s + t.length;
+                el.focus(); this.update(); App.process();
+            },
+            backspace() {
+                const el = Utils.$('#main-input');
+                const [s, e] = [el.selectionStart, el.selectionEnd];
+                if (s === e && s > 0) el.value = el.value.substring(0, s - 1) + el.value.substring(e);
+                else el.value = el.value.substring(0, s) + el.value.substring(e);
+                el.selectionStart = el.selectionEnd = Math.max(0, s - 1);
+                el.focus(); this.update(); App.process();
+            },
+            moveCursor(d) {
+                const el = Utils.$('#main-input');
+                el.selectionStart = el.selectionEnd = Math.max(0, Math.min(el.value.length, el.selectionStart + d));
+                el.focus();
+            },
+            clear() { Utils.$('#main-input').value = ''; this.update(); App.history = []; App.process(); UI.showToast('Limpiado', 'info'); }
+        };
+
+        // INFERENCE MODE
+        const Inference = {
+            addPremise() {
+                const v = Utils.$('#main-input').value.trim();
+                if (!v) return;
+                App.premises.push(v);
+                Utils.$('#main-input').value = '';
+                Editor.update();
+                this.render();
+                UI.showToast('Premisa añadida', 'success');
+            },
+            render() {
+                const list = Utils.$('#premises-list');
+                list.innerHTML = '';
+                if (!App.premises.length) {
+                    list.innerHTML = '<li class="text-xs text-slate-400 text-center py-3 italic">Sin premisas</li>';
+                    return;
+                }
+                App.premises.forEach((p, i) => {
+                    const li = document.createElement('li');
+                    li.className = 'flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-2 rounded text-xs';
+                    li.innerHTML = `<span class="font-mono"><span class="text-slate-400">P${i + 1}:</span> ${p}</span><button onclick="App.premises.splice(${i},1);Inference.render();App.process();" class="text-red-400 hover:text-red-600 p-1">×</button>`;
+                    list.appendChild(li);
+                });
+            },
+            check(concl) {
+                if (!App.premises.length && !concl) return;
+                const pStr = App.premises.map(p => `(${p})`).join(' ∧ ') || 'T';
+                const cStr = Utils.$('#main-input').value.trim() || 'T';
+                const full = `(${pStr}) → (${cStr})`;
+                try {
+                    const ast = new Parser(new Tokenizer(full).tokenize()).parse();
+                    App.analyzeFormula(ast);
+                    const badge = Utils.$('#verdict-badge');
+                    if (badge.textContent === 'TAUTOLOGÍA') {
+                        badge.textContent = 'VÁLIDO';
+                        badge.className = 'px-3 py-1 rounded-full font-bold text-xs bg-green-600 text-white';
+                    } else {
+                        badge.textContent = 'INVÁLIDO';
+                        badge.className = 'px-3 py-1 rounded-full font-bold text-xs bg-red-600 text-white';
+                    }
+                } catch (e) { }
+            }
+        };
+
+        // EQUIVALENCE MODE
+        const EquivMode = {
+            selectedId: null,
+            render(ast) {
+                const el = Utils.$('#ast-renderer');
+                el.innerHTML = '';
+                const build = n => {
+                    const span = document.createElement('span');
+                    span.className = 'ast-node';
+                    span.dataset.id = n.id;
+                    span.onclick = e => { e.stopPropagation(); this.select(n); };
+                    if (n.type === 'ATOM' || n.type === 'CONST') {
+                        span.textContent = String(n.op);
+                        span.classList.add(n.type === 'CONST' ? 'token-const' : 'token-var');
+                    } else if (n.type === 'UNARY') {
+                        const op = document.createElement('span');
+                        op.textContent = n.op;
+                        op.className = 'token-op';
+                        span.appendChild(op);
+                        span.appendChild(build(n.left));
+                    } else {
+                        span.appendChild(document.createTextNode('('));
+                        span.appendChild(build(n.left));
+                        const op = document.createElement('span');
+                        op.textContent = ` ${n.op} `;
+                        op.className = 'token-op';
+                        span.appendChild(op);
+                        span.appendChild(build(n.right));
+                        span.appendChild(document.createTextNode(')'));
+                    }
+                    return span;
+                };
+                el.appendChild(build(ast));
+            },
+            select(node) {
+                this.selectedId = node.id;
+                Utils.$$('.ast-node').forEach(el => el.classList.remove('selected'));
+                const el = Utils.$(`[data-id="${node.id}"]`);
+                if (el) el.classList.add('selected');
+
+                const lawsPanel = Utils.$('#laws-panel');
+                const lawsList = Utils.$('#applicable-laws-list');
+                lawsList.innerHTML = '';
+
+                const applicable = Transformer.getApplicableLaws(node);
+                if (applicable.length === 0) {
+                    lawsPanel.classList.add('hidden');
+                    return;
+                }
+
+                lawsPanel.classList.remove('hidden');
+                applicable.forEach(law => {
+                    const btn = document.createElement('button');
+                    btn.className = 'w-full text-left p-2 bg-white dark:bg-slate-800 rounded-lg text-xs hover:bg-brand-50 dark:hover:bg-brand-900/30 transition-colors border border-slate-200 dark:border-slate-700';
+                    btn.innerHTML = `<div class="font-bold text-brand-600 dark:text-brand-400">${law.name}</div><div class="text-slate-500 font-mono text-[10px]">${law.desc}</div>`;
+                    btn.onclick = () => this.applyLaw(law.name);
+                    lawsList.appendChild(btn);
+                });
+            },
+            applyLaw(lawName) {
+                try {
+                    const current = App.history[App.history.length - 1].ast;
+                    const newAst = Transformer.applyLaw(current, this.selectedId, lawName);
+                    App.history.push({ ast: newAst, desc: lawName, valid: true });
+                    this.render(newAst);
+                    this.renderSteps();
+                    App.renderTable([App.history[0].ast, newAst]);
+                    Utils.$('#laws-panel').classList.add('hidden');
+                    UI.showToast(`Aplicado: ${lawName}`, 'success');
+                } catch (e) {
+                    UI.showToast(e.message, 'error');
+                }
+            },
+            renderSteps() {
+                const container = Utils.$('#transformation-steps');
+                container.innerHTML = '';
+                App.history.forEach((step, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'p-3 border-b border-slate-100 dark:border-slate-800 last:border-0';
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] font-bold text-slate-400">Paso ${i}</span>
+                            <span class="text-[10px] px-1.5 py-0.5 rounded ${step.valid ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700'}">${step.valid ? '✓' : '✗'}</span>
+                        </div>
+                        <div class="font-mono text-xs text-slate-600 dark:text-slate-300">${step.ast.toString()}</div>
+                        ${i > 0 ? `<div class="text-[10px] text-brand-600 dark:text-brand-400 mt-1">↑ ${step.desc}</div>` : ''}
+                    `;
+                    container.appendChild(div);
+                });
+            },
+            undo() {
+                if (App.history.length > 1) {
+                    App.history.pop();
+                    const current = App.history[App.history.length - 1].ast;
+                    this.render(current);
+                    this.renderSteps();
+                    App.renderTable([App.history[0].ast, current]);
+                    UI.showToast('Deshecho', 'info');
+                }
+            },
+            reset() {
+                if (App.history.length > 1) {
+                    App.history = [App.history[0]];
+                    this.render(App.history[0].ast);
+                    this.renderSteps();
+                    App.renderTable([App.history[0].ast]);
+                    UI.showToast('Reiniciado', 'info');
+                }
+            }
+        };
+
+        // UI HELPERS
+        const UI = {
+            toggleModal(id) {
+                const m = Utils.$(`#modal-${id}`);
+                if (m) { m.classList.toggle('hidden'); m.classList.toggle('flex'); }
+            },
+            togglePanels(side) {
+                const p = Utils.$(`#panel-${side}`);
+                const r = Utils.$(`#resizer-${side}`);
+                const isHidden = p.style.display === 'none';
+                p.style.display = isHidden ? 'flex' : 'none';
+                if (r) r.style.display = isHidden ? 'flex' : 'none';
+            },
+            toggleMobilePanel(side) {
+                const p = Utils.$(`#panel-${side}`);
+                const overlay = Utils.$('#mobile-overlay');
+                const isOpen = p.classList.contains('open');
+                UI.closeMobilePanels();
+                if (!isOpen) { p.classList.add('open'); overlay.classList.add('open'); }
+            },
+            closeMobilePanels() {
+                Utils.$$('.mobile-panel').forEach(p => p.classList.remove('open'));
+                Utils.$('#mobile-overlay').classList.remove('open');
+            },
+            toggleAccordion(btn) {
+                const content = btn.nextElementSibling;
+                const icon = btn.querySelector('[data-lucide="chevron-down"]');
+                content.classList.toggle('open');
+                if (icon) icon.style.transform = content.classList.contains('open') ? '' : 'rotate(-90deg)';
+            },
+            showToast(msg, type = 'info') {
+                const container = Utils.$('#toast-container');
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type}`;
+                toast.textContent = msg;
+                container.appendChild(toast);
+                setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2500);
+            },
+            exportCSV() {
+                const rows = [...Utils.$('#truth-table').rows].map(r => [...r.cells].map(c => c.textContent).join(','));
+                const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'tabla_verdad.csv';
+                a.click();
+                this.showToast('CSV exportado', 'success');
+            },
+            copyLaTeX() {
+                const latex = Utils.$('#latex-output').value;
+                navigator.clipboard.writeText(latex);
+                this.showToast('LaTeX copiado', 'success');
+            }
+        };
+
+        // RESIZERS
+        function initResizers() {
+            const setup = (resizerId, panelId, isRight) => {
+                const resizer = document.getElementById(resizerId);
+                const panel = document.getElementById(panelId);
+                if (!resizer || !panel) return;
+                let startX, startW;
+                const start = e => {
+                    startX = e.clientX;
+                    startW = panel.getBoundingClientRect().width;
+                    resizer.classList.add('active');
+                    document.addEventListener('mousemove', move);
+                    document.addEventListener('mouseup', stop);
+                    document.body.style.cursor = 'col-resize';
+                    document.body.style.userSelect = 'none';
+                };
+                const move = e => {
+                    const dx = e.clientX - startX;
+                    const newW = isRight ? startW - dx : startW + dx;
+                    if (newW > 200 && newW < 500) panel.style.width = newW + 'px';
+                };
+                const stop = () => {
+                    resizer.classList.remove('active');
+                    document.removeEventListener('mousemove', move);
+                    document.removeEventListener('mouseup', stop);
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                };
+                resizer.addEventListener('mousedown', start);
+            };
+            setup('resizer-left', 'panel-left', false);
+            setup('resizer-right', 'panel-right', true);
+        }
+
+        // INIT
+        document.addEventListener('DOMContentLoaded', () => {
+            App.init();
+            Utils.$('#main-input').focus();
+        });
+
+        // Escape key closes modals
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                ['examples', 'theory', 'help'].forEach(id => {
+                    const m = Utils.$(`#modal-${id}`);
+                    if (m && !m.classList.contains('hidden')) UI.toggleModal(id);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

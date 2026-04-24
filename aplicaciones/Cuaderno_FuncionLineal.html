@@ -1,0 +1,2621 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuaderno Interactivo · Función Lineal y Geometría Analítica</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Cinzel:wght@600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\\(','\\)']] },
+    svg: { fontCache: 'global' },
+    startup: { typeset: false }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-svg.js"></script>
+<style>
+:root{
+  --bg-body:#eef4ff; --paper-color:#ffffff; --paper-line:#dce7f7;
+  --primary:#1d4ed8; --primary-dark:#1e3a8a; --secondary:#0ea5e9;
+  --accent:#f59e0b; --success:#10b981; --warning:#ef4444;
+  --cyan:#06b6d4; --purple:#8b5cf6; --pink:#ec4899;
+  --text-main:#0f172a; --text-muted:#475569;
+  --shadow-dark:6px 6px 16px rgba(29,78,216,.18);
+  --clay-shadow:8px 8px 16px rgba(29,78,216,.18),-8px -8px 16px rgba(255,255,255,.9);
+  --glass-bg:rgba(255,255,255,.75); --glass-border:1px solid rgba(255,255,255,.6);
+  --ggrid-major:#94a3b8; --ggrid-minor:#e2e8f0; --ggrid-axis:#0f172a;
+}
+body.dark-mode{
+  --bg-body:#04081a; --paper-color:#0d1330; --paper-line:#1e3a8a;
+  --text-main:#e0e7ff; --text-muted:#94a3b8;
+  --shadow-dark:4px 4px 10px rgba(0,0,0,.6);
+  --clay-shadow:6px 6px 12px rgba(0,0,0,.5),-6px -6px 12px rgba(45,65,140,.25);
+  --glass-bg:rgba(20,30,70,.55);
+  --ggrid-major:#475569; --ggrid-minor:#1e293b; --ggrid-axis:#e0e7ff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Nunito',sans-serif;background:var(--bg-body);color:var(--text-main);height:100vh;display:flex;flex-direction:column;overflow:hidden;transition:background .4s}
+#app-container{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;perspective:2000px;padding:10px;gap:15px}
+.book-wrapper{width:96%;max-width:1400px;height:85vh;position:relative;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.book{width:100%;height:100%;display:flex;background:transparent;position:relative}
+.page{flex:1;background:var(--paper-color);position:relative;display:flex;flex-direction:column;overflow:hidden;background-image:linear-gradient(var(--paper-line) 1px,transparent 1px),linear-gradient(90deg,var(--paper-line) 1px,transparent 1px);background-size:22px 22px}
+.page-left{border-radius:12px 0 0 12px;box-shadow:inset -15px 0 25px -10px rgba(0,0,0,.1),var(--shadow-dark);border-right:1px solid rgba(0,0,0,.05)}
+.page-right{border-radius:0 12px 12px 0;box-shadow:inset 15px 0 25px -10px rgba(0,0,0,.1),var(--shadow-dark);border-left:1px solid rgba(0,0,0,.05)}
+.page-content{padding:28px 42px;overflow-y:auto;height:100%;scrollbar-width:thin;scrollbar-color:var(--primary) transparent}
+.page-content::-webkit-scrollbar{width:6px}
+.page-content::-webkit-scrollbar-thumb{background:var(--primary);border-radius:3px}
+.binding-spine{position:absolute;left:50%;top:30px;bottom:30px;width:40px;transform:translateX(-50%);z-index:20;pointer-events:none;display:flex;flex-direction:column;justify-content:space-evenly}
+.metal-ring{width:100%;height:12px;background:linear-gradient(90deg,#888 0%,#eee 40%,#ddd 60%,#555 100%);border-radius:6px;box-shadow:0 4px 6px rgba(0,0,0,.2);position:relative}
+.metal-ring::before,.metal-ring::after{content:'';position:absolute;top:2px;bottom:2px;width:5px;background:#2c3e50;border-radius:50%;opacity:.9}
+.metal-ring::before{left:-3px}.metal-ring::after{right:-3px}
+.holes-strip{position:absolute;top:30px;bottom:30px;width:15px;display:flex;flex-direction:column;justify-content:space-evenly;z-index:15;pointer-events:none}
+.page-left .holes-strip{right:6px;align-items:flex-end}
+.page-right .holes-strip{left:6px;align-items:flex-start}
+.paper-hole{width:10px;height:10px;background:#2c3e50;border-radius:50%;box-shadow:inset 1px 1px 2px rgba(0,0,0,.6)}
+h1,h2,h3,h4{color:var(--text-main);margin-bottom:.7rem}
+h2{position:relative;display:inline-block;color:var(--primary);font-weight:800;font-size:1.55rem;margin-top:0}
+h2::after{content:'';position:absolute;bottom:-5px;left:0;width:60%;height:4px;background:var(--accent);border-radius:2px}
+h3{color:var(--primary-dark);font-size:1.12rem;margin-top:14px}
+h4{color:var(--secondary);font-size:1rem;margin-top:10px}
+p,li{line-height:1.6;font-size:.92rem;margin-bottom:7px;text-align:justify}
+strong{color:var(--primary-dark)} em{color:var(--secondary)}
+code{font-family:'JetBrains Mono',monospace;background:rgba(30,58,138,.08);padding:2px 6px;border-radius:4px;font-size:.85em;color:var(--primary)}
+.clay-card{background:var(--paper-color);border-radius:16px;padding:14px;margin:10px 0;box-shadow:var(--clay-shadow);border:1px solid rgba(255,255,255,.2);transition:transform .2s}
+.clay-card:hover{transform:translateY(-2px)}
+.glass-panel{background:var(--glass-bg);backdrop-filter:blur(10px);border:var(--glass-border);border-radius:12px;padding:13px;margin:10px 0}
+.def-box{border-left:5px solid var(--secondary);background:rgba(14,165,233,.08);padding:12px 14px;border-radius:0 12px 12px 0;margin:11px 0}
+.def-title{font-weight:800;color:var(--secondary);display:block;margin-bottom:5px;text-transform:uppercase;font-size:.78rem;letter-spacing:1px}
+.concept-box{border-left:5px solid var(--primary);background:rgba(29,78,216,.08);padding:12px 14px;border-radius:0 12px 12px 0;margin:11px 0}
+.example-box{border-left:5px solid var(--success);background:rgba(16,185,129,.08);padding:12px 14px;border-radius:0 12px 12px 0;margin:11px 0}
+.example-title{font-weight:800;color:var(--success);display:block;margin-bottom:5px;font-size:.85rem}
+.warning-box{border-left:5px solid var(--warning);background:rgba(239,68,68,.08);padding:12px 14px;border-radius:0 12px 12px 0;margin:11px 0}
+.formula-box{background:linear-gradient(135deg,rgba(14,165,233,.12),rgba(29,78,216,.12));border:2px solid var(--secondary);border-radius:12px;padding:11px;margin:11px 0;text-align:center}
+.app-box{border-left:5px solid var(--purple);background:rgba(139,92,246,.08);padding:12px 14px;border-radius:0 12px 12px 0;margin:11px 0}
+.app-title{font-weight:800;color:var(--purple);display:block;margin-bottom:5px;font-size:.85rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:10px 0}
+th{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);color:#fff;padding:8px;text-align:center;font-weight:700}
+td{padding:7px;border-bottom:1px solid rgba(0,0,0,.08);text-align:center}
+tr:nth-child(even){background:rgba(0,0,0,.02)}
+tr:hover{background:rgba(29,78,216,.05)}
+body.dark-mode td{border-bottom-color:rgba(255,255,255,.08)}
+ul,ol{padding-left:22px}
+ul li,ol li{margin-bottom:4px}
+
+.nav-dock{display:flex;gap:10px;align-items:center;background:var(--glass-bg);backdrop-filter:blur(15px);padding:8px 20px;border-radius:50px;box-shadow:0 10px 30px rgba(0,0,0,.1);z-index:100;border:var(--glass-border);flex-shrink:0}
+.btn-circle{width:44px;height:44px;border-radius:50%;border:none;background:var(--bg-body);color:var(--primary);font-size:1rem;box-shadow:var(--clay-shadow);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.btn-circle:hover:not(:disabled){transform:scale(1.1);color:var(--accent)}
+.btn-circle:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+.page-badge{font-family:'JetBrains Mono',monospace;font-weight:bold;background:var(--primary);color:#fff;padding:6px 14px;border-radius:20px;box-shadow:inset 0 2px 5px rgba(0,0,0,.2);font-size:.8rem}
+.num-page{position:absolute;bottom:10px;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--text-muted);opacity:.6}
+.page-left .num-page{left:20px}.page-right .num-page{right:20px}
+.footer{text-align:center;color:var(--text-muted);font-size:.72rem;font-style:italic;opacity:.85}
+
+/* PORTADA */
+.cover-page{height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:linear-gradient(135deg,#0a1a3e 0%,#1e3a8a 25%,#1d4ed8 50%,#2563eb 75%,#60a5fa 100%);color:#fff;margin:-28px -42px;width:calc(100% + 84px);height:calc(100% + 56px);position:relative;overflow:hidden}
+.cover-page::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg at 50% 50%,transparent 0deg,rgba(245,158,11,.1) 60deg,transparent 120deg,rgba(96,165,250,.08) 180deg,transparent 240deg,rgba(14,165,233,.08) 300deg,transparent 360deg);animation:coverRotate 22s linear infinite;pointer-events:none}
+.cover-page::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(245,158,11,.2) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(14,165,233,.18) 0%,transparent 50%);pointer-events:none}
+@keyframes coverRotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes float{0%,100%{transform:translateY(0) scale(1);opacity:.6}50%{transform:translateY(-18px) scale(1.1);opacity:1}}
+@keyframes pulse-ring{0%{transform:translate(-50%,-50%) scale(.8);opacity:.4}50%{transform:translate(-50%,-50%) scale(1.1);opacity:.15}100%{transform:translate(-50%,-50%) scale(.8);opacity:.4}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.cover-particles{position:absolute;inset:0;pointer-events:none;z-index:1}
+.cover-particle{position:absolute;border-radius:50%;background:rgba(245,158,11,.6);animation:float 6s ease-in-out infinite}
+.cover-particle:nth-child(1){width:4px;height:4px;top:15%;left:10%;animation-delay:0s}
+.cover-particle:nth-child(2){width:6px;height:6px;top:25%;left:80%;animation-delay:1s}
+.cover-particle:nth-child(3){width:3px;height:3px;top:60%;left:15%;animation-delay:2s}
+.cover-particle:nth-child(4){width:5px;height:5px;top:70%;left:75%;animation-delay:.5s}
+.cover-particle:nth-child(5){width:3px;height:3px;top:40%;left:90%;animation-delay:3s}
+.cover-particle:nth-child(6){width:4px;height:4px;top:85%;left:45%;animation-delay:1.5s}
+.cover-particle:nth-child(7){width:5px;height:5px;top:10%;left:50%;animation-delay:2.5s}
+.cover-particle:nth-child(8){width:3px;height:3px;top:50%;left:30%;animation-delay:4s}
+.cover-orbit{position:absolute;top:50%;left:50%;border-radius:50%;border:1px solid rgba(245,158,11,.15);animation:pulse-ring 8s ease-in-out infinite;pointer-events:none;z-index:1}
+.cover-orbit:nth-of-type(1){width:460px;height:460px}
+.cover-orbit:nth-of-type(2){width:340px;height:340px;animation-delay:1s}
+.cover-orbit:nth-of-type(3){width:220px;height:220px;animation-delay:2s}
+.cover-symbol{position:absolute;font-family:'Cinzel',serif;font-size:2.2rem;color:rgba(245,158,11,.35);z-index:1;pointer-events:none;animation:fadeInUp 2s ease}
+.cover-symbol:nth-of-type(1){top:18%;left:12%;font-size:2.8rem}
+.cover-symbol:nth-of-type(2){top:22%;right:10%;font-size:2.4rem}
+.cover-symbol:nth-of-type(3){bottom:18%;left:14%;font-size:2.6rem}
+.cover-symbol:nth-of-type(4){bottom:22%;right:12%;font-size:2.2rem}
+.cover-symbol:nth-of-type(5){top:48%;left:6%;font-size:2rem}
+.cover-symbol:nth-of-type(6){top:45%;right:8%;font-size:2.2rem}
+.cover-content{position:relative;z-index:5;animation:fadeInUp 1s ease;padding:20px}
+.cover-icon-wrapper{margin-bottom:16px}
+.cover-icon{width:86px;height:86px;border-radius:50%;background:rgba(245,158,11,.18);display:inline-flex;align-items:center;justify-content:center;font-size:2.3rem;color:#f59e0b;box-shadow:0 0 60px rgba(245,158,11,.5),inset 0 0 30px rgba(255,255,255,.1);border:2px solid rgba(245,158,11,.5)}
+.cover-subtitle{font-size:.95rem;letter-spacing:8px;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:10px;font-weight:300}
+.cover-page h1{font-family:'Cinzel',serif;font-size:3.2rem;font-weight:800;letter-spacing:6px;background:linear-gradient(135deg,#fff 20%,#fbbf24 50%,#fff 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 10px;text-shadow:0 0 40px rgba(251,191,36,.4)}
+.cover-page h2{color:#fde68a;font-size:1rem;font-weight:300;letter-spacing:2px;text-align:center;border:none;margin:0 0 20px}
+.cover-page h2::after{display:none}
+.cover-separator{width:160px;height:2px;background:linear-gradient(90deg,transparent,#f59e0b 50%,transparent);margin:16px auto}
+.cover-badge{display:inline-block;padding:8px 22px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.5);border-radius:30px;color:#fde68a;font-family:'JetBrains Mono',monospace;font-size:.9rem;margin-top:8px;backdrop-filter:blur(10px);box-shadow:0 4px 20px rgba(245,158,11,.3)}
+.cover-footer{font-size:.82rem;opacity:.65;margin-top:22px;letter-spacing:2px}
+
+/* LÍNEA DE TIEMPO */
+.timeline{position:relative;padding-left:28px}
+.timeline::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--secondary),var(--primary));border-radius:2px}
+.tl-item{position:relative;padding:8px 0 14px 18px;animation:fadeInUp .6s ease}
+.tl-dot{position:absolute;left:-26px;top:6px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.7rem;box-shadow:0 0 0 3px var(--paper-color),0 0 0 5px var(--secondary)}
+.tl-year{font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--accent);font-size:.78rem}
+.tl-title{font-weight:800;color:var(--primary);margin:3px 0;font-size:.95rem}
+.tl-desc{font-size:.84rem;color:var(--text-main)}
+
+/* MAPA CONCEPTUAL */
+.concept-map{position:relative;width:100%;height:420px;margin:10px 0}
+.cm-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.cm-node{position:absolute;transform:translate(-50%,-50%);padding:8px 14px;border-radius:12px;font-weight:800;font-size:.78rem;text-align:center;box-shadow:var(--shadow-dark);background:var(--paper-color);border:2px solid var(--primary);color:var(--primary);max-width:150px;z-index:2}
+.cm-node.root{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;font-size:.95rem;padding:10px 18px;border:none;box-shadow:0 10px 24px rgba(29,78,216,.4)}
+.cm-node.sub{background:var(--secondary);color:#fff;border-color:var(--secondary)}
+.cm-node.leaf{background:rgba(14,165,233,.12);font-size:.72rem;padding:5px 10px}
+
+/* PLANO CARTESIANO ESTILO GEOGEBRA */
+.cart-frame{position:relative;width:100%;background:#fff;border-radius:12px;overflow:hidden;box-shadow:var(--shadow-dark);border:1px solid rgba(148,163,184,.35);margin:10px 0}
+body.dark-mode .cart-frame{background:#0b1228;border-color:rgba(71,85,105,.4)}
+.cart-canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
+.cart-canvas:active{cursor:grabbing}
+.cart-toolbar{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);padding:8px;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.14);border:1px solid rgba(29,78,216,.18);z-index:4}
+body.dark-mode .cart-toolbar{background:rgba(13,19,48,.94);border-color:rgba(96,165,250,.22)}
+.cart-btn{width:36px;height:36px;border:none;border-radius:10px;background:linear-gradient(145deg,#fff,#eef4ff);color:var(--primary);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:2px 2px 6px rgba(148,163,184,.35),-2px -2px 6px rgba(255,255,255,.85);transition:all .2s}
+body.dark-mode .cart-btn{background:linear-gradient(145deg,#1e3a8a,#0f1a3e);color:#93c5fd;box-shadow:2px 2px 6px rgba(0,0,0,.55),-2px -2px 6px rgba(60,90,160,.2)}
+.cart-btn:hover{transform:scale(1.08);color:var(--accent)}
+.cart-btn:active{transform:scale(.94)}
+.cart-btn.on{background:linear-gradient(145deg,var(--accent),#d97706);color:#fff}
+.cart-info{position:absolute;bottom:8px;left:10px;font-size:.72rem;background:rgba(255,255,255,.82);padding:3px 9px;border-radius:6px;color:#475569;pointer-events:none;font-family:'JetBrains Mono',monospace;z-index:4}
+body.dark-mode .cart-info{background:rgba(13,19,48,.82);color:#94a3b8}
+.cart-title{position:absolute;top:10px;left:12px;font-size:.78rem;font-weight:800;color:var(--primary);background:rgba(255,255,255,.85);padding:4px 10px;border-radius:8px;z-index:3;border:1px solid rgba(29,78,216,.2)}
+body.dark-mode .cart-title{background:rgba(13,19,48,.85);color:#93c5fd;border-color:rgba(96,165,250,.25)}
+
+/* SLIDERS Y CONTROLES INTERACTIVOS */
+.interactive-controls{background:var(--glass-bg);backdrop-filter:blur(10px);border:var(--glass-border);border-radius:12px;padding:12px;margin:10px 0}
+.control-row{display:flex;align-items:center;gap:10px;margin:6px 0;flex-wrap:wrap}
+.control-label{font-weight:800;color:var(--primary);font-family:'JetBrains Mono',monospace;font-size:.9rem;min-width:45px}
+.control-slider{flex:1;min-width:120px;height:6px;border-radius:4px;background:linear-gradient(90deg,var(--primary),var(--secondary));-webkit-appearance:none;appearance:none;cursor:pointer}
+.control-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 2px 6px rgba(245,158,11,.5);cursor:pointer;transition:transform .2s}
+.control-slider::-webkit-slider-thumb:hover{transform:scale(1.2)}
+.control-slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 2px 6px rgba(245,158,11,.5);cursor:pointer}
+.control-value{font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--accent);background:rgba(245,158,11,.1);padding:3px 8px;border-radius:6px;min-width:52px;text-align:center;font-size:.85rem}
+.result-display{background:linear-gradient(135deg,var(--success),var(--primary));color:#fff;padding:10px 14px;border-radius:12px;margin:8px 0;text-align:center;box-shadow:var(--shadow-dark)}
+.result-display .result-title{font-size:.72rem;opacity:.9;text-transform:uppercase;letter-spacing:1.5px}
+.result-display .result-value{font-size:1.15rem;font-weight:800;margin-top:3px;font-family:'JetBrains Mono',monospace}
+
+/* INPUTS Y BOTONES LAB */
+.lab-input{padding:7px 11px;border-radius:10px;border:2px solid var(--paper-line);background:var(--paper-color);color:var(--text-main);font-family:'JetBrains Mono',monospace;font-size:.9rem;font-weight:700;margin:3px;width:70px;text-align:center}
+.lab-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(29,78,216,.2)}
+.lab-btn{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;border:none;padding:8px 16px;border-radius:10px;font-weight:700;cursor:pointer;box-shadow:0 4px 10px rgba(29,78,216,.3);transition:all .2s;font-size:.86rem;margin:3px;font-family:'Nunito',sans-serif}
+.lab-btn:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(29,78,216,.4)}
+.lab-btn.accent{background:linear-gradient(135deg,var(--accent),#d97706)}
+.lab-btn.success{background:linear-gradient(135deg,var(--success),#047857)}
+.lab-btn.warn{background:linear-gradient(135deg,var(--warning),#b91c1c)}
+
+/* QUIZ */
+.quiz-option{display:block;width:100%;padding:9px 13px;margin:5px 0;border-radius:10px;background:var(--paper-color);border:2px solid var(--paper-line);cursor:pointer;text-align:left;font-family:inherit;font-size:.9rem;font-weight:600;color:var(--text-main);transition:all .2s}
+.quiz-option:hover{border-color:var(--primary);background:rgba(29,78,216,.05);transform:translateX(4px)}
+.quiz-option.correct{background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-color:#047857}
+.quiz-option.wrong{background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;border-color:#991b1b}
+.quiz-score{display:inline-block;padding:5px 13px;background:var(--accent);color:#fff;border-radius:20px;font-weight:800;font-family:'JetBrains Mono',monospace;font-size:.85rem}
+
+/* HISTÓRICO / IMÁGENES */
+.historic-img{width:100%;max-width:340px;border-radius:14px;box-shadow:0 10px 28px rgba(29,78,216,.3);margin:8px auto;display:block;border:3px solid rgba(245,158,11,.35)}
+.caption{font-size:.74rem;font-style:italic;color:var(--text-muted);text-align:center;margin-top:-2px;margin-bottom:10px}
+
+/* MODAL ÍNDICE */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:300}
+.modal-overlay.active{display:flex}
+.modal-content{background:var(--paper-color);border-radius:16px;padding:22px;max-width:640px;max-height:82vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-close{position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.4rem;color:var(--text-muted);cursor:pointer}
+.index-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:7px}
+.index-item{padding:9px 11px;background:rgba(29,78,216,.05);border-radius:8px;cursor:pointer;transition:all .2s;border-left:3px solid transparent;font-size:.84rem}
+.index-item:hover{background:rgba(29,78,216,.14);border-left-color:var(--primary);transform:translateX(4px)}
+
+/* MÓVIL */
+#mobile-fab{display:none;position:fixed;bottom:80px;right:12px;z-index:210;padding:9px 14px;border-radius:30px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;border:none;box-shadow:0 4px 14px rgba(29,78,216,.4);font-weight:700;font-size:.82rem;cursor:pointer;display:none;align-items:center;gap:6px}
+@media (max-width:900px){
+  .book-wrapper{width:100%;height:75vh}
+  .page-right{display:none}
+  .page-left{width:100%;border-radius:12px;border:none;box-shadow:var(--clay-shadow)}
+  .binding-spine{display:none}
+  .cover-page{margin:-20px -20px;width:calc(100% + 40px);height:calc(100% + 40px)}
+  .cover-page h1{font-size:2rem}
+  #mobile-fab{display:flex}
+  .page-content{padding:18px 20px}
+  .nav-dock{padding:5px 14px;gap:6px}
+  .btn-circle{width:38px;height:38px}
+  h2{font-size:1.25rem}
+  .concept-map{height:340px}
+}
+
+/* SWITCH VERDADERO/FALSO */
+.sw-chip{display:inline-block;padding:4px 12px;margin:3px;background:var(--paper-line);color:var(--primary);border-radius:14px;font-weight:800;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:all .2s;font-size:.84rem;user-select:none;border:2px solid var(--paper-line)}
+.sw-chip.on{background:linear-gradient(135deg,var(--success),#047857);color:#fff;border-color:var(--success)}
+.sw-chip.off{background:linear-gradient(135deg,var(--warning),#b91c1c);color:#fff;border-color:var(--warning)}
+</style>
+</head>
+<body>
+<button class="btn-circle" onclick="toggleTheme()" style="position:fixed;top:20px;left:20px;z-index:200;width:40px;height:40px"><i class="fas fa-moon" id="theme-icon"></i></button>
+<button class="btn-circle" onclick="showIndex()" style="position:fixed;top:20px;left:70px;z-index:200;width:40px;height:40px" title="Índice"><i class="fas fa-list"></i></button>
+<button id="mobile-fab" onclick="toggleMobileSide()"><i class="fas fa-columns"></i> <span id="fab-text">Ver Der.</span></button>
+
+<div id="app-container">
+  <div class="book-wrapper"><div class="book" id="book-el">
+    <div class="binding-spine" id="spine"></div>
+    <div class="page page-left"  id="p-left"><div class="holes-strip" id="holes-l"></div>
+      <div class="page-content" id="c-left"></div><span class="num-page" id="num-left"></span></div>
+    <div class="page page-right" id="p-right"><div class="holes-strip" id="holes-r"></div>
+      <div class="page-content" id="c-right"></div><span class="num-page" id="num-right"></span></div>
+  </div></div>
+  <div class="nav-dock">
+    <button class="btn-circle" onclick="goToPage(0)" title="Inicio"><i class="fas fa-home"></i></button>
+    <button class="btn-circle" onclick="prevPage()"  id="btn-prev"><i class="fas fa-chevron-left"></i></button>
+    <div class="page-badge" id="page-num">PORTADA</div>
+    <button class="btn-circle" onclick="nextPage()"  id="btn-next"><i class="fas fa-chevron-right"></i></button>
+    <button class="btn-circle" onclick="showIndex()" title="Índice"><i class="fas fa-th-list"></i></button>
+  </div>
+  <div class="footer">Msc. Néstor Fabio Montoya Palacios · Cuaderno Interactivo de Función Lineal · 2026</div>
+</div>
+
+<div id="index-modal" class="modal-overlay"><div class="modal-content">
+  <button class="modal-close" onclick="hideIndex()"><i class="fas fa-times"></i></button>
+  <h2 style="margin-bottom:16px"><i class="fas fa-book-open"></i> Índice del Cuaderno</h2>
+  <div id="index-list" class="index-grid"></div>
+</div></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════════
+   🎨 MOTOR CartPlot — PLANO CARTESIANO ESTILO GEOGEBRA (Canvas puro)
+   ══════════════════════════════════════════════════════════════════════════
+   Dibuja: cuadrícula menor (subdivisiones) + mayor (unidades) + ejes con
+   flechas y números tradicionales, reglas con marcas mayores/menores,
+   puntos, segmentos, líneas, polígonos, círculos, triángulos rellenos,
+   texto LaTeX sencillo y etiquetas. Soporta pan con mouse/touch, zoom con
+   rueda (preservando el punto bajo el cursor), y tiene un panel flotante
+   con botones: zoom+, zoom-, arrastre, restablecer vista, pantalla completa.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+class CartPlot {
+  constructor(canvas, opts = {}) {
+    this.cv   = canvas;
+    this.ctx  = canvas.getContext('2d');
+    this.opts = Object.assign({
+      xMin: -10, xMax: 10, yMin: -7, yMax: 7,
+      scale: 32,         // px por unidad (automático si null)
+      minorDiv: 5,       // subdivisiones por unidad mayor
+      showAxes: true, showNumbers: true, showGrid: true, showTicks: true,
+      title: '',
+      objects: []        // lista de {kind, ...params}
+    }, opts);
+    this.state = { ox: 0, oy: 0, scale: this.opts.scale, dragging: false, lx: 0, ly: 0, panMode: false };
+    this._fit();
+    this._bind();
+    this.draw();
+  }
+  _fit() {
+    // Ajusta resolución al DPR y al tamaño físico del contenedor.
+    const dpr = window.devicePixelRatio || 1;
+    const r = this.cv.getBoundingClientRect();
+    this.cv.width  = Math.max(200, Math.round(r.width  * dpr));
+    this.cv.height = Math.max(160, Math.round(r.height * dpr));
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // Centrar la vista respecto a los límites pedidos
+    const cw = r.width, ch = r.height;
+    const autoScale = Math.min(cw / (this.opts.xMax - this.opts.xMin), ch / (this.opts.yMax - this.opts.yMin));
+    if (!this.opts.scale) this.state.scale = autoScale;
+    this.state.ox = cw / 2 - (this.opts.xMin + this.opts.xMax) / 2 * this.state.scale;
+    this.state.oy = ch / 2 + (this.opts.yMin + this.opts.yMax) / 2 * this.state.scale;
+  }
+  // Transformaciones
+  X(x) { return this.state.ox + x * this.state.scale; }
+  Y(y) { return this.state.oy - y * this.state.scale; }
+  invX(px){ return (px - this.state.ox) / this.state.scale; }
+  invY(py){ return (this.state.oy - py) / this.state.scale; }
+
+  _bind() {
+    // Zoom con rueda (conservando el punto bajo el cursor)
+    this.cv.addEventListener('wheel', e => {
+      e.preventDefault();
+      const r = this.cv.getBoundingClientRect();
+      const mx = e.clientX - r.left, my = e.clientY - r.top;
+      const wx = this.invX(mx), wy = this.invY(my);
+      const k = e.deltaY < 0 ? 1.15 : 1/1.15;
+      this.state.scale = Math.max(4, Math.min(400, this.state.scale * k));
+      this.state.ox = mx - wx * this.state.scale;
+      this.state.oy = my + wy * this.state.scale;
+      this.draw();
+    }, { passive:false });
+
+    const down = (x, y) => { this.state.dragging = true; this.state.lx = x; this.state.ly = y; this.cv.style.cursor = 'grabbing'; };
+    const move = (x, y) => {
+      if (!this.state.dragging) return;
+      this.state.ox += x - this.state.lx;
+      this.state.oy += y - this.state.ly;
+      this.state.lx = x; this.state.ly = y;
+      this.draw();
+    };
+    const up = () => { this.state.dragging = false; this.cv.style.cursor = 'grab'; };
+
+    this.cv.addEventListener('mousedown', e => { const r = this.cv.getBoundingClientRect(); down(e.clientX - r.left, e.clientY - r.top); });
+    window.addEventListener('mousemove', e => { const r = this.cv.getBoundingClientRect(); move(e.clientX - r.left, e.clientY - r.top); });
+    window.addEventListener('mouseup', up);
+
+    this.cv.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) { e.preventDefault(); const r = this.cv.getBoundingClientRect(); const t = e.touches[0]; down(t.clientX - r.left, t.clientY - r.top); }
+    }, { passive:false });
+    this.cv.addEventListener('touchmove', e => {
+      if (e.touches.length === 1) { e.preventDefault(); const r = this.cv.getBoundingClientRect(); const t = e.touches[0]; move(t.clientX - r.left, t.clientY - r.top); }
+    }, { passive:false });
+    this.cv.addEventListener('touchend', up);
+
+    window.addEventListener('resize', () => { this._fit(); this.draw(); });
+  }
+  // CONTROLES EXTERNOS
+  zoom(k){
+    const r = this.cv.getBoundingClientRect();
+    const cx = r.width/2, cy = r.height/2;
+    const wx = this.invX(cx), wy = this.invY(cy);
+    this.state.scale = Math.max(4, Math.min(400, this.state.scale * k));
+    this.state.ox = cx - wx * this.state.scale;
+    this.state.oy = cy + wy * this.state.scale;
+    this.draw();
+  }
+  reset(){ this.state.scale = this.opts.scale || 32; this._fit(); this.draw(); }
+
+  // Decidir paso de unidad mayor según el zoom (1, 2, 5, 10, 20, 50 ...)
+  _niceStep(){
+    const target = 60; // px deseados entre marcas mayores
+    const raw = target / this.state.scale;
+    const pow = Math.pow(10, Math.floor(Math.log10(raw)));
+    const frac = raw / pow;
+    let m;
+    if (frac < 1.5)      m = 1;
+    else if (frac < 3.5) m = 2;
+    else if (frac < 7.5) m = 5;
+    else                 m = 10;
+    return m * pow;
+  }
+
+  draw() {
+    const ctx = this.ctx;
+    const r = this.cv.getBoundingClientRect();
+    const W = r.width, H = r.height;
+    // Fondo
+    const bg = getComputedStyle(document.body).getPropertyValue('--paper-color').trim() || '#fff';
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+    const gMinor = getComputedStyle(document.body).getPropertyValue('--ggrid-minor').trim() || '#e5e7eb';
+    const gMajor = getComputedStyle(document.body).getPropertyValue('--ggrid-major').trim() || '#94a3b8';
+    const axisC  = getComputedStyle(document.body).getPropertyValue('--ggrid-axis').trim()  || '#0f172a';
+
+    const step = this._niceStep();
+    const sub  = step / this.opts.minorDiv;
+    const xMinW = this.invX(0), xMaxW = this.invX(W);
+    const yMinW = this.invY(H), yMaxW = this.invY(0);
+
+    // -- CUADRÍCULA MENOR --
+    if (this.opts.showGrid) {
+      ctx.strokeStyle = gMinor; ctx.lineWidth = 1;
+      const x0 = Math.ceil(xMinW / sub) * sub;
+      for (let x = x0; x <= xMaxW; x += sub) {
+        const px = this.X(x);
+        ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, H); ctx.stroke();
+      }
+      const y0 = Math.ceil(yMinW / sub) * sub;
+      for (let y = y0; y <= yMaxW; y += sub) {
+        const py = this.Y(y);
+        ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(W, py); ctx.stroke();
+      }
+      // -- CUADRÍCULA MAYOR --
+      ctx.strokeStyle = gMajor; ctx.lineWidth = 1.1;
+      const X0 = Math.ceil(xMinW / step) * step;
+      for (let x = X0; x <= xMaxW; x += step) {
+        const px = this.X(x);
+        ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, H); ctx.stroke();
+      }
+      const Y0 = Math.ceil(yMinW / step) * step;
+      for (let y = Y0; y <= yMaxW; y += step) {
+        const py = this.Y(y);
+        ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(W, py); ctx.stroke();
+      }
+    }
+
+    // -- EJES --
+    if (this.opts.showAxes) {
+      ctx.strokeStyle = axisC; ctx.fillStyle = axisC; ctx.lineWidth = 1.6;
+      const oxP = this.X(0), oyP = this.Y(0);
+      // Eje X
+      ctx.beginPath(); ctx.moveTo(0, oyP); ctx.lineTo(W, oyP); ctx.stroke();
+      // Flecha derecha
+      ctx.beginPath(); ctx.moveTo(W - 1, oyP); ctx.lineTo(W - 11, oyP - 5); ctx.lineTo(W - 11, oyP + 5); ctx.closePath(); ctx.fill();
+      // Eje Y
+      ctx.beginPath(); ctx.moveTo(oxP, 0); ctx.lineTo(oxP, H); ctx.stroke();
+      // Flecha arriba
+      ctx.beginPath(); ctx.moveTo(oxP, 1); ctx.lineTo(oxP - 5, 11); ctx.lineTo(oxP + 5, 11); ctx.closePath(); ctx.fill();
+      // Etiquetas X e Y
+      ctx.font = 'bold 12px "Nunito", sans-serif';
+      ctx.fillText('X', W - 14, oyP + 16);
+      ctx.fillText('Y', oxP + 8, 14);
+
+      // -- MARCAS (ticks) --
+      if (this.opts.showTicks) {
+        ctx.lineWidth = 1;
+        // Menores en X
+        const x0 = Math.ceil(xMinW / sub) * sub;
+        for (let x = x0; x <= xMaxW; x += sub) {
+          const px = this.X(x);
+          ctx.beginPath(); ctx.moveTo(px, oyP - 3); ctx.lineTo(px, oyP + 3); ctx.stroke();
+        }
+        const y0 = Math.ceil(yMinW / sub) * sub;
+        for (let y = y0; y <= yMaxW; y += sub) {
+          const py = this.Y(y);
+          ctx.beginPath(); ctx.moveTo(oxP - 3, py); ctx.lineTo(oxP + 3, py); ctx.stroke();
+        }
+        // Mayores en X
+        ctx.lineWidth = 1.4;
+        const X0 = Math.ceil(xMinW / step) * step;
+        for (let x = X0; x <= xMaxW; x += step) {
+          if (Math.abs(x) < 1e-9) continue;
+          const px = this.X(x);
+          ctx.beginPath(); ctx.moveTo(px, oyP - 6); ctx.lineTo(px, oyP + 6); ctx.stroke();
+        }
+        const Y0 = Math.ceil(yMinW / step) * step;
+        for (let y = Y0; y <= yMaxW; y += step) {
+          if (Math.abs(y) < 1e-9) continue;
+          const py = this.Y(y);
+          ctx.beginPath(); ctx.moveTo(oxP - 6, py); ctx.lineTo(oxP + 6, py); ctx.stroke();
+        }
+      }
+
+      // -- NÚMEROS --
+      if (this.opts.showNumbers) {
+        ctx.font = '11px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+        const X0 = Math.ceil(xMinW / step) * step;
+        for (let x = X0; x <= xMaxW; x += step) {
+          if (Math.abs(x) < 1e-9) continue;
+          const lbl = Math.abs(x) < 1e-6 ? '0' : (+x.toFixed(4)).toString();
+          const px = this.X(x);
+          ctx.fillText(lbl, px, oyP + 6);
+        }
+        ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+        const Y0 = Math.ceil(yMinW / step) * step;
+        for (let y = Y0; y <= yMaxW; y += step) {
+          if (Math.abs(y) < 1e-9) continue;
+          const lbl = Math.abs(y) < 1e-6 ? '0' : (+y.toFixed(4)).toString();
+          const py = this.Y(y);
+          ctx.fillText(lbl, oxP - 7, py);
+        }
+        // Origen
+        ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+        ctx.fillText('O', oxP - 6, oyP + 4);
+      }
+    }
+
+    // -- OBJETOS --
+    (this.opts.objects || []).forEach(o => this._drawObj(o));
+  }
+
+  _drawObj(o) {
+    const ctx = this.ctx;
+    const c = o.color || '#1d4ed8';
+    const lw = o.lineWidth || 2;
+    switch (o.kind) {
+      case 'point': {
+        const px = this.X(o.x), py = this.Y(o.y);
+        ctx.fillStyle = c; ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(px, py, o.r || 5, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+        if (o.label) {
+          ctx.fillStyle = c;
+          ctx.font = 'bold 12px "Nunito", sans-serif';
+          ctx.textAlign = o.labelAlign || 'left'; ctx.textBaseline = o.labelBase || 'bottom';
+          const dx = o.labelDx ?? 8, dy = o.labelDy ?? -8;
+          ctx.fillText(o.label, px + dx, py + dy);
+        }
+        break;
+      }
+      case 'segment': {
+        ctx.strokeStyle = c; ctx.lineWidth = lw; ctx.setLineDash(o.dashed ? [6,4] : []);
+        ctx.beginPath(); ctx.moveTo(this.X(o.x1), this.Y(o.y1)); ctx.lineTo(this.X(o.x2), this.Y(o.y2)); ctx.stroke();
+        ctx.setLineDash([]);
+        if (o.label) {
+          const mx = (this.X(o.x1) + this.X(o.x2)) / 2;
+          const my = (this.Y(o.y1) + this.Y(o.y2)) / 2;
+          ctx.fillStyle = c;
+          ctx.font = 'bold 12px "Nunito", sans-serif';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText(o.label, mx + (o.labelDx||0), my + (o.labelDy||-10));
+        }
+        break;
+      }
+      case 'line': {
+        // y = m x + b, o "vertical" con x = a
+        ctx.strokeStyle = c; ctx.lineWidth = lw; ctx.setLineDash(o.dashed ? [6,4] : []);
+        const r = this.cv.getBoundingClientRect();
+        if (o.vertical !== undefined) {
+          const px = this.X(o.vertical);
+          ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, r.height); ctx.stroke();
+        } else {
+          const xa = this.invX(0), xb = this.invX(r.width);
+          const ya = o.m * xa + o.b, yb = o.m * xb + o.b;
+          ctx.beginPath(); ctx.moveTo(this.X(xa), this.Y(ya)); ctx.lineTo(this.X(xb), this.Y(yb)); ctx.stroke();
+        }
+        ctx.setLineDash([]);
+        if (o.label) {
+          // Dibuja etiqueta cerca del centro visible
+          const mx = (o.labelX !== undefined) ? o.labelX : (this.invX(r.width/2));
+          const my = (o.vertical !== undefined) ? this.invY(r.height/2) : (o.m * mx + o.b);
+          ctx.fillStyle = c; ctx.font = 'bold 13px "Nunito", sans-serif';
+          ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+          ctx.fillText(o.label, this.X(mx) + 6, this.Y(my) - 6);
+        }
+        break;
+      }
+      case 'polygon': {
+        // o.pts = [[x1,y1],[x2,y2],...]
+        ctx.fillStyle = o.fill || 'rgba(245,158,11,.22)';
+        ctx.strokeStyle = c; ctx.lineWidth = lw;
+        ctx.beginPath();
+        o.pts.forEach((p, i) => { const px = this.X(p[0]), py = this.Y(p[1]); if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); });
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        break;
+      }
+      case 'circle': {
+        ctx.strokeStyle = c; ctx.lineWidth = lw; ctx.setLineDash(o.dashed ? [5,4] : []);
+        ctx.beginPath(); ctx.arc(this.X(o.cx), this.Y(o.cy), o.r * this.state.scale, 0, Math.PI*2); ctx.stroke();
+        ctx.setLineDash([]);
+        break;
+      }
+      case 'text': {
+        ctx.fillStyle = c; ctx.font = o.font || 'bold 13px "Nunito", sans-serif';
+        ctx.textAlign = o.align || 'left'; ctx.textBaseline = o.base || 'alphabetic';
+        ctx.fillText(o.t, this.X(o.x), this.Y(o.y));
+        break;
+      }
+      case 'rect': {
+        ctx.strokeStyle = c; ctx.lineWidth = lw;
+        ctx.fillStyle = o.fill || 'transparent';
+        const px = this.X(o.x), py = this.Y(o.y + o.h);
+        const w = o.w * this.state.scale, h = o.h * this.state.scale;
+        ctx.fillRect(px, py, w, h); ctx.strokeRect(px, py, w, h);
+        break;
+      }
+      case 'rightAngle': {
+        // pequeño cuadrado ángulo recto en el vértice v, con lados hacia a y b
+        const s = 10 / this.state.scale;
+        const vx = o.v[0], vy = o.v[1];
+        const ax = o.a[0] - vx, ay = o.a[1] - vy; const la = Math.hypot(ax, ay);
+        const bx = o.b[0] - vx, by = o.b[1] - vy; const lb = Math.hypot(bx, by);
+        const ux = ax/la*s, uy = ay/la*s;
+        const wx = bx/lb*s, wy = by/lb*s;
+        ctx.strokeStyle = c; ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(this.X(vx+ux), this.Y(vy+uy));
+        ctx.lineTo(this.X(vx+ux+wx), this.Y(vy+uy+wy));
+        ctx.lineTo(this.X(vx+wx), this.Y(vy+wy));
+        ctx.stroke();
+        break;
+      }
+    }
+  }
+}
+
+/* -----------------------------------------------------------------
+   Fábrica: crea un contenedor con canvas + toolbar + título.
+   Luego createCartPlot(id, opts) devuelve la instancia.
+----------------------------------------------------------------- */
+function buildCartFrame(id, heightPx, title) {
+  return `<div class="cart-frame" style="height:${heightPx}px">
+    ${title?`<div class="cart-title"><i class="fa-solid fa-chart-line"></i> ${title}</div>`:''}
+    <canvas class="cart-canvas" id="${id}"></canvas>
+    <div class="cart-toolbar">
+      <button class="cart-btn" data-act="zin"  title="Acercar (+)"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+      <button class="cart-btn" data-act="zout" title="Alejar (−)"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+      <button class="cart-btn" data-act="pan"  title="Arrastrar"><i class="fa-solid fa-up-down-left-right"></i></button>
+      <button class="cart-btn" data-act="rst"  title="Restablecer vista"><i class="fa-solid fa-compress-arrows-alt"></i></button>
+      <button class="cart-btn" data-act="fs"   title="Pantalla completa"><i class="fa-solid fa-expand"></i></button>
+    </div>
+    <div class="cart-info" id="${id}-info">x: 0.00 · y: 0.00</div>
+  </div>`;
+}
+
+function createCartPlot(id, opts) {
+  const cv = document.getElementById(id);
+  if (!cv) return null;
+  const plot = new CartPlot(cv, opts);
+  // Cursor info al mover
+  cv.addEventListener('mousemove', e => {
+    const r = cv.getBoundingClientRect();
+    const x = plot.invX(e.clientX - r.left), y = plot.invY(e.clientY - r.top);
+    const info = document.getElementById(id + '-info');
+    if (info) info.textContent = `x: ${x.toFixed(2)} · y: ${y.toFixed(2)}`;
+  });
+  // Botones de la toolbar
+  const frame = cv.closest('.cart-frame');
+  frame.querySelectorAll('.cart-btn').forEach(btn => {
+    btn.onclick = () => {
+      const a = btn.dataset.act;
+      if (a === 'zin')  plot.zoom(1.25);
+      else if (a === 'zout') plot.zoom(1/1.25);
+      else if (a === 'rst')  plot.reset();
+      else if (a === 'fs')   { if (!document.fullscreenElement) frame.requestFullscreen(); else document.exitFullscreen(); setTimeout(()=>{plot._fit(); plot.draw();}, 250); }
+      else if (a === 'pan')  { btn.classList.toggle('on'); }
+    };
+  });
+  return plot;
+}
+window._plots = {};
+window._makePlot = (id, opts) => { window._plots[id] = createCartPlot(id, opts); };
+</script>
+
+<script id="book-script">
+/* ══════════════════════════════════════════════════════════════════════════
+   📖 BOOK_DATA — 30 páginas del Cuaderno Interactivo de Función Lineal
+   ══════════════════════════════════════════════════════════════════════════ */
+const BOOK_DATA = [
+
+/* ═════ 0 · PORTADA ═════ */
+{ title:"Portada", left:{ type:'cover', html:`
+<div class="cover-page">
+  <div class="cover-particles">
+    <div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div>
+    <div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div>
+  </div>
+  <div class="cover-orbit"></div><div class="cover-orbit"></div><div class="cover-orbit"></div>
+  <div class="cover-symbol">X</div><div class="cover-symbol">Y</div><div class="cover-symbol">m</div>
+  <div class="cover-symbol">y=mx+b</div><div class="cover-symbol">△</div><div class="cover-symbol">∡</div>
+  <div class="cover-content">
+    <div class="cover-icon-wrapper"><div class="cover-icon"><i class="fa-solid fa-chart-line"></i></div></div>
+    <div class="cover-subtitle">Cuaderno Interactivo de</div>
+    <h1>FUNCIÓN LINEAL</h1>
+    <h2>Geometría Analítica · Plano · Recta</h2>
+    <div class="cover-separator"></div>
+    <div class="cover-badge"><i class="fas fa-square-root-variable" style="margin-right:8px"></i> y = m·x + b</div>
+    <p class="cover-footer">Descartes · Plano · Distancia · Pendiente · Ecuaciones</p>
+  </div>
+</div>`}, right:{ html:`
+<h2 style="text-align:center"><i class="fas fa-list-ol"></i> Contenidos</h2>
+<div class="concept-box" style="font-size:.86rem">
+  <p><strong>1.</strong> Biografía de René Descartes</p>
+  <p><strong>2.</strong> Reseña histórica</p>
+  <p><strong>3.</strong> Línea de tiempo</p>
+  <p><strong>4.</strong> Mapa conceptual</p>
+  <p><strong>5.</strong> Plano cartesiano y cuadrantes</p>
+  <p><strong>6.</strong> Coordenadas (localizador interactivo)</p>
+  <p><strong>7.</strong> Distancia entre dos puntos</p>
+  <p><strong>8.</strong> Casos especiales + calculadora</p>
+  <p><strong>9.</strong> Punto medio de un segmento</p>
+  <p><strong>10.</strong> División en razón dada</p>
+  <p><strong>11.</strong> Pendiente de una recta</p>
+  <p><strong>12.</strong> Explorador de pendiente</p>
+  <p><strong>13-17.</strong> 5 formas de la ecuación de la recta</p>
+  <p><strong>18-20.</strong> Horizontal · Vertical · Paralelas · Perpendiculares</p>
+  <p><strong>21.</strong> Distancia de un punto a una recta</p>
+  <p><strong>22.</strong> Área de un triángulo (Herón)</p>
+  <p><strong>23-25.</strong> Aplicaciones</p>
+  <p><strong>26-27.</strong> Quiz · Evaluador</p>
+  <p><strong>28.</strong> Referencias y créditos</p>
+</div>
+<div class="warning-box" style="margin-top:8px">
+  <strong><i class="fa-solid fa-lightbulb"></i> ¿Cómo usarlo?</strong>
+  <p>Navega con <i class="fas fa-chevron-left"></i> <i class="fas fa-chevron-right"></i> o con las flechas del teclado. Pulsa <i class="fas fa-list"></i> para el índice rápido. En los planos cartesianos: <b>arrastra</b>, <b>usa la rueda</b> para zoom, y los botones laterales para acercar/alejar/restablecer.</p>
+</div>`} },
+
+/* ═════ 1 · BIOGRAFÍA DE DESCARTES ═════ */
+{ title:"1. Biografía de Descartes", left:{ html:`
+<h2>1. René Descartes (1596 – 1650)</h2>
+<div style="text-align:center">
+  <img src="../imagenes/FuncionLineal/Descartes1.png" alt="Retrato de René Descartes" class="historic-img" style="max-width:100%;width:460px">
+  <p class="caption"><strong>René Descartes</strong>, el <em>Cartesius</em> latino, padre de la geometría analítica.</p>
+</div>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-scroll"></i> Filósofo y matemático francés</span>
+  <p>Nacido en <strong>La Haye</strong>, Turena (Francia), el <strong>31 de marzo de 1596</strong>. Recibió una formación jesuita en el Colegio Real de La Flèche y estudió derecho en Poitiers. Viajó por Europa como soldado y, desde 1628, vivió más de 20 años en los Países Bajos, donde escribió sus obras fundamentales.</p>
+</div>
+<h3>"Pienso, luego existo"</h3>
+<p>La célebre frase <em>«Cogito, ergo sum»</em> resume el método cartesiano: <strong>dudar de todo para reconstruir el conocimiento sobre bases indudables</strong>.</p>`}, right:{ html:`
+<h3>Aportes clave</h3>
+<div class="clay-card">
+  <ul style="font-size:.88rem">
+    <li><strong>Discurso del método</strong> (1637): 4 reglas del razonamiento científico.</li>
+    <li><strong>La geometría</strong> (apéndice del Discurso): <b>funda la geometría analítica</b> al asociar pares de números a puntos en un plano, traduciendo problemas geométricos a ecuaciones algebraicas.</li>
+    <li><strong>Meditaciones metafísicas</strong> (1641): fundamentos del racionalismo moderno.</li>
+    <li><strong>Notación exponencial</strong>: $x^2,\\ x^3$ y las primeras letras del alfabeto ($a,b,c$) para parámetros conocidos, y las últimas ($x,y,z$) para incógnitas — convención que aún usamos.</li>
+  </ul>
+</div>
+<h3>Leyenda: la mosca en el techo</h3>
+<div style="text-align:center;margin:8px 0">
+  <img src="../imagenes/FuncionLineal/MoscaTecho.png"
+       alt="Descartes observa una mosca caminando por el techo cuadriculado"
+       class="historic-img"
+       style="max-width:100%;width:420px;border-color:rgba(139,92,246,.45)"
+       loading="lazy">
+  <p class="caption">La <em>mosca de Descartes</em> — origen legendario del plano cartesiano.</p>
+</div>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-bug"></i> Origen del plano cartesiano</span>
+  <p>Cuenta la tradición que Descartes, enfermo en cama, observó una mosca caminando por el techo y se preguntó: <em>¿cómo describir su posición exacta?</em>. Midió la distancia a dos paredes contiguas y descubrió que con <strong>dos números bastaba</strong> para localizarla. Había nacido el sistema de coordenadas.</p>
+</div>
+<div class="warning-box">
+  <strong><i class="fa-solid fa-quote-left"></i> Frase célebre</strong>
+  <p><em>«No hay nada tan alejado de la razón y de la justicia como el sentido común.»</em> — R. Descartes</p>
+</div>`} },
+
+/* ═════ 2 · RESEÑA HISTÓRICA ═════ */
+{ title:"2. Reseña histórica", left:{ html:`
+<h2>2. De Euclides a Descartes</h2>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-landmark"></i> ¿Qué es la geometría analítica?</span>
+  <p>Es la rama de las matemáticas que <strong>estudia las figuras geométricas mediante un sistema de coordenadas</strong> y las herramientas del álgebra. Gracias a ella, cada punto se representa con un par ordenado $(x,y)$ y cada curva con una ecuación.</p>
+</div>
+<h3>Los griegos: pura geometría sintética</h3>
+<p>Durante más de 1900 años, la geometría se estudió al estilo de <strong>Euclides</strong> (ca. 300 a.C.): demostraciones visuales con regla y compás, sin coordenadas. Apolonio estudió las <em>cónicas</em> (elipse, parábola, hipérbola) con ese enfoque.</p>
+<h3>El álgebra crece en Oriente</h3>
+<p>Al-Khwarizmi (siglo IX) sistematiza el álgebra, y Viète (s. XVI) introduce los símbolos. Pero aún no existía un puente entre álgebra y geometría.</p>`}, right:{ html:`
+<h3>El giro cartesiano (1637)</h3>
+<div class="concept-box">
+  <p>Descartes publica <em>La Géométrie</em> como apéndice del <em>Discurso del método</em>. Allí expone la idea revolucionaria: <strong>toda curva puede describirse por una ecuación entre dos variables</strong> $x$ e $y$.</p>
+  <p>Simultáneamente, <strong>Pierre de Fermat</strong> llegaba a conclusiones similares (<em>Ad locos planos et solidos isagoge</em>, 1636). Fermat es coinventor, aunque su obra se publicó póstumamente.</p>
+</div>
+<h3>Consecuencias inmediatas</h3>
+<ul style="font-size:.88rem">
+  <li>Newton y Leibniz pueden desarrollar el <strong>cálculo infinitesimal</strong> (1670s) usando coordenadas.</li>
+  <li>La mecánica celeste de <strong>Kepler y Newton</strong> se formula con ecuaciones de cónicas.</li>
+  <li>Euler define formalmente la noción de <strong>función</strong> (s. XVIII).</li>
+</ul>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-rocket"></i> Aplicaciones modernas</span>
+  <p>Hoy, toda simulación por computadora (videojuegos, GPS, robótica, impresión 3D, aprendizaje automático) se sustenta en la idea cartesiana: <strong>representar objetos geométricos con números</strong>.</p>
+</div>`} },
+
+/* ═════ 3 · LÍNEA DE TIEMPO ═════ */
+{ title:"3. Línea de tiempo", left:{ html:`
+<h2>3. Línea de tiempo de la geometría analítica</h2>
+<p style="font-size:.85rem">Un recorrido por los hitos que dieron forma al estudio algebraico de la geometría.</p>
+<div class="timeline">
+  <div class="tl-item"><div class="tl-dot">I</div>
+    <div class="tl-year">300 a.C.</div>
+    <div class="tl-title">Euclides — <em>Elementos</em></div>
+    <div class="tl-desc">Sistematiza la geometría sintética. 13 libros, axiomas y teoremas sin coordenadas.</div></div>
+  <div class="tl-item"><div class="tl-dot">II</div>
+    <div class="tl-year">200 a.C.</div>
+    <div class="tl-title">Apolonio de Perga</div>
+    <div class="tl-desc">Tratado <em>Cónicas</em>. Precursor del uso de "diámetros" como ejes de referencia.</div></div>
+  <div class="tl-item"><div class="tl-dot">III</div>
+    <div class="tl-year">s. XIV</div>
+    <div class="tl-title">Nicole Oresme</div>
+    <div class="tl-desc">Grafica la velocidad en función del tiempo — primera representación de una magnitud en función de otra.</div></div>
+  <div class="tl-item"><div class="tl-dot">IV</div>
+    <div class="tl-year">1591</div>
+    <div class="tl-title">François Viète</div>
+    <div class="tl-desc">Introduce el álgebra simbólica: letras para variables y constantes.</div></div>
+  <div class="tl-item"><div class="tl-dot">V</div>
+    <div class="tl-year">1636</div>
+    <div class="tl-title">Pierre de Fermat</div>
+    <div class="tl-desc"><em>Ad locos planos</em>. Coinventor de la geometría analítica, publicado póstumo en 1679.</div></div>
+</div>`}, right:{ html:`
+<div class="timeline">
+  <div class="tl-item"><div class="tl-dot">VI</div>
+    <div class="tl-year">1637</div>
+    <div class="tl-title">René Descartes — <em>La Géométrie</em></div>
+    <div class="tl-desc">Publica el apéndice que funda formalmente la geometría analítica o <em>cartesiana</em>.</div></div>
+  <div class="tl-item"><div class="tl-dot">VII</div>
+    <div class="tl-year">1665 – 1684</div>
+    <div class="tl-title">Newton y Leibniz</div>
+    <div class="tl-desc">Desarrollan el cálculo infinitesimal usando coordenadas y funciones.</div></div>
+  <div class="tl-item"><div class="tl-dot">VIII</div>
+    <div class="tl-year">1748</div>
+    <div class="tl-title">Leonhard Euler</div>
+    <div class="tl-desc"><em>Introductio in analysin infinitorum</em>: formaliza el concepto de función $y=f(x)$ y la notación moderna.</div></div>
+  <div class="tl-item"><div class="tl-dot">IX</div>
+    <div class="tl-year">1827</div>
+    <div class="tl-title">Möbius y Plücker</div>
+    <div class="tl-desc">Coordenadas homogéneas y proyectivas. Extensión del plano cartesiano.</div></div>
+  <div class="tl-item"><div class="tl-dot">X</div>
+    <div class="tl-year">1899</div>
+    <div class="tl-title">David Hilbert</div>
+    <div class="tl-desc"><em>Fundamentos de la geometría</em>: axiomatización moderna y equivalencia geometría↔álgebra.</div></div>
+  <div class="tl-item"><div class="tl-dot">XI</div>
+    <div class="tl-year">s. XX–XXI</div>
+    <div class="tl-title">Era digital</div>
+    <div class="tl-desc">GeoGebra, Desmos, CAD, gráficos por computador y GPS: todo se sustenta en las ideas de Descartes.</div></div>
+</div>`} },
+
+/* ═════ 4 · MAPA CONCEPTUAL ═════ */
+{ title:"4. Mapa conceptual", left:{ html:`
+<h2>4. Mapa conceptual</h2>
+<p style="font-size:.85rem">Los grandes bloques de conocimiento de este cuaderno:</p>
+<div class="concept-map" id="concept-map">
+  <svg class="cm-svg" id="cm-svg" viewBox="0 0 600 420"></svg>
+  <div class="cm-node root" style="top:10%;left:50%">FUNCIÓN LINEAL</div>
+  <div class="cm-node sub"  style="top:36%;left:18%">Plano y Puntos</div>
+  <div class="cm-node sub"  style="top:36%;left:50%">La Recta</div>
+  <div class="cm-node sub"  style="top:36%;left:82%">Aplicaciones</div>
+  <div class="cm-node leaf" style="top:70%;left:8%">Coordenadas</div>
+  <div class="cm-node leaf" style="top:70%;left:22%">Distancia</div>
+  <div class="cm-node leaf" style="top:92%;left:15%">Punto medio</div>
+  <div class="cm-node leaf" style="top:70%;left:42%">Pendiente</div>
+  <div class="cm-node leaf" style="top:70%;left:58%">5 Ecuaciones</div>
+  <div class="cm-node leaf" style="top:92%;left:50%">Paralelas · ⊥</div>
+  <div class="cm-node leaf" style="top:70%;left:76%">Temperaturas</div>
+  <div class="cm-node leaf" style="top:70%;left:92%">MRU · Física</div>
+  <div class="cm-node leaf" style="top:92%;left:84%">Economía</div>
+</div>`}, right:{ html:`
+<h3>Flujo de aprendizaje</h3>
+<div class="clay-card">
+  <ol style="font-size:.88rem">
+    <li><strong>Situar</strong>: qué son el plano cartesiano y sus cuadrantes.</li>
+    <li><strong>Localizar</strong>: asociar un punto a un par ordenado.</li>
+    <li><strong>Medir</strong>: distancia entre dos puntos (Pitágoras).</li>
+    <li><strong>Relacionar</strong>: punto medio y división en razón dada.</li>
+    <li><strong>Inclinar</strong>: la pendiente como tasa de cambio.</li>
+    <li><strong>Describir</strong>: 5 formas de escribir una recta.</li>
+    <li><strong>Comparar</strong>: paralelismo y perpendicularidad.</li>
+    <li><strong>Aplicar</strong>: temperaturas, física, economía.</li>
+  </ol>
+</div>
+<div class="warning-box">
+  <strong><i class="fa-solid fa-hat-wizard"></i> Analogía útil</strong>
+  <p>Piensa el plano cartesiano como un <em>GPS matemático</em>: cada punto tiene dos coordenadas (latitud y longitud). Una recta es el camino <strong>con dirección constante</strong> entre dos lugares. La pendiente mide <em>qué tan empinada es la ruta</em>.</p>
+</div>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-bullseye"></i> Objetivo general</span>
+  <p>Al finalizar este cuaderno serás capaz de <strong>representar, medir y describir</strong> cualquier recta del plano, y de <strong>resolver problemas reales</strong> donde la relación entre dos variables sea lineal.</p>
+</div>`} },
+
+/* ═════ 5 · PLANO CARTESIANO ═════ */
+{ title:"5. Plano cartesiano", left:{ html:`
+<h2>5. El plano cartesiano</h2>
+<div style="text-align:center;margin:6px 0">
+  <img src="../imagenes/FuncionLineal/PlanoCuadrantes.png"
+       alt="Plano cartesiano con sus cuatro cuadrantes numerados"
+       class="historic-img"
+       style="max-width:100%;width:360px;border-color:rgba(16,185,129,.45)"
+       loading="lazy" onerror="this.style.display='none'">
+  <p class="caption">Plano cartesiano: dos ejes perpendiculares dividen el plano en cuatro cuadrantes.</p>
+</div>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-grip"></i> Definición</span>
+  <p>Un <strong>sistema coordenado rectangular</strong> se forma con dos rectas numéricas perpendiculares (forman un ángulo recto 90°) que se cruzan en un punto <strong>O</strong> llamado <em>origen</em>. La recta horizontal (<strong>abscisas</strong>) y la vertical (<strong>ordenadas</strong>) se representan con las letras <strong>X</strong> y <strong>Y</strong>.</p>
+</div>
+<h3>Los cuatro cuadrantes</h3>
+<p>Los ejes X e Y dividen el plano en cuatro regiones llamadas <strong>cuadrantes</strong>, numeradas en sentido antihorario:</p>
+<table>
+  <thead><tr><th>Cuadrante</th><th>Signo x</th><th>Signo y</th><th>Región</th></tr></thead>
+  <tbody>
+    <tr><td><strong>I</strong></td><td>+</td><td>+</td><td>Superior derecha</td></tr>
+    <tr><td><strong>II</strong></td><td>−</td><td>+</td><td>Superior izquierda</td></tr>
+    <tr><td><strong>III</strong></td><td>−</td><td>−</td><td>Inferior izquierda</td></tr>
+    <tr><td><strong>IV</strong></td><td>+</td><td>−</td><td>Inferior derecha</td></tr>
+  </tbody>
+</table>
+<div class="warning-box">
+  <strong><i class="fa-solid fa-exclamation"></i> Cuidado</strong>
+  <p>Los puntos sobre los ejes (donde $x=0$ ó $y=0$) <em>no pertenecen a ningún cuadrante</em>.</p>
+</div>`}, right:{ html:`
+<h3>Plano interactivo con cuadrantes</h3>
+<p style="font-size:.85rem">Los colores identifican cada cuadrante. Arrastra con el mouse y usa la rueda para hacer zoom.</p>
+${buildCartFrame('plot-5', 380, 'Plano cartesiano con cuadrantes')}
+<div class="glass-panel" style="font-size:.84rem">
+  <p>🟢 <strong>I</strong>: $x>0,\\ y>0$ &nbsp; 🟩 <strong>II</strong>: $x<0,\\ y>0$</p>
+  <p>🟡 <strong>III</strong>: $x<0,\\ y<0$ &nbsp; 🟧 <strong>IV</strong>: $x>0,\\ y<0$</p>
+</div>
+<div class="formula-box">Un punto se denota $P(x, y)$</div>
+<p style="font-size:.85rem"><em>x</em> es la <strong>abscisa</strong> (distancia al eje Y). <em>y</em> es la <strong>ordenada</strong> (distancia al eje X).</p>`} },
+
+/* ═════ 6 · COORDENADAS ═════ */
+{ title:"6. Coordenadas", left:{ html:`
+<h2>6. Coordenadas de un punto</h2>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-location-crosshairs"></i> Pareja ordenada</span>
+  <p>A cada punto $P$ del plano le asociamos una <strong>pareja ordenada</strong> $(x,y)$ de números reales. El primer número es la distancia horizontal al eje Y (la <em>abscisa</em>) y el segundo es la distancia vertical al eje X (la <em>ordenada</em>).</p>
+</div>
+<div class="formula-box">$P = (x,\\ y)$</div>
+<h3>Ejemplo guiado</h3>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-star"></i> Localiza 4 puntos</span>
+  <p>Ubica en el plano los puntos $A(3,4)$, $B(-3,2)$, $C(-5,-3)$ y $D(2,-1)$. ¿En qué cuadrante está cada uno?</p>
+</div>
+<div class="warning-box">
+  <strong>Respuesta:</strong>
+  <p>A en <strong>I</strong>, B en <strong>II</strong>, C en <strong>III</strong>, D en <strong>IV</strong>.</p>
+</div>`}, right:{ html:`
+<h3>Localizador interactivo</h3>
+${buildCartFrame('plot-6', 360, 'Ubica puntos')}
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">x:</span>
+    <input type="number" class="lab-input" id="loc-x" value="3" step="0.5">
+    <span class="control-label">y:</span>
+    <input type="number" class="lab-input" id="loc-y" value="4" step="0.5">
+    <button class="lab-btn" onclick="addLocPoint()"><i class="fa-solid fa-plus"></i> Agregar</button>
+    <button class="lab-btn warn" onclick="clearLocPoints()"><i class="fa-solid fa-trash"></i></button>
+  </div>
+</div>
+<div class="result-display">
+  <div class="result-title">Cuadrante</div>
+  <div class="result-value" id="loc-quad">I · (+, +)</div>
+</div>`} },
+
+/* ═════ 7 · DISTANCIA ENTRE DOS PUNTOS ═════ */
+{ title:"7. Distancia entre dos puntos", left:{ html:`
+<h2>7. Distancia entre dos puntos</h2>
+<div style="text-align:center;margin:6px 0">
+  <img src="../imagenes/FuncionLineal/PitagorasHipotenusa.png"
+       alt="Triángulo rectángulo con catetos Δx y Δy e hipotenusa d"
+       class="historic-img"
+       style="max-width:100%;width:360px;border-color:rgba(245,158,11,.45)"
+       loading="lazy" onerror="this.style.display='none'">
+  <p class="caption">Teorema de Pitágoras: la distancia $d$ es la hipotenusa del triángulo formado por $\\Delta x$ y $\\Delta y$.</p>
+</div>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-ruler"></i> Fórmula</span>
+  <p>La distancia entre $P_1(x_1,y_1)$ y $P_2(x_2,y_2)$ se obtiene mediante el <strong>teorema de Pitágoras</strong>:</p>
+</div>
+<div class="formula-box">$d = \\sqrt{\\Delta x^2 + \\Delta y^2} = \\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}$</div>
+<h3>El símbolo Δ (delta)</h3>
+<p>Δ es la letra griega <em>delta</em> mayúscula. Representa <strong>variaciones</strong> o restas:</p>
+<div class="formula-box" style="font-size:.9rem">
+  $\\Delta x = x_2 - x_1$ <br> $\\Delta y = y_2 - y_1$
+</div>
+<h3>Ejemplo resuelto</h3>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-pencil"></i> $P_1(-4,2)$ y $P_2(3,5)$</span>
+  <p>
+    $\\Delta x = 3-(-4) = 7$<br>
+    $\\Delta y = 5-2 = 3$<br>
+    $d = \\sqrt{7^2 + 3^2} = \\sqrt{49+9} = \\sqrt{58} \\approx 7{,}62$
+  </p>
+</div>`}, right:{ html:`
+<h3>Visualización</h3>
+${buildCartFrame('plot-7', 380, 'Triángulo rectángulo de Pitágoras')}
+<div class="glass-panel">
+  <p style="font-size:.86rem"><strong>Interpretación geométrica:</strong> al trazar los catetos horizontales y verticales entre los dos puntos, formamos un <strong>triángulo rectángulo</strong> cuya hipotenusa es precisamente la distancia $d$.</p>
+</div>
+<div class="concept-box">
+  <h4>Procedimiento paso a paso</h4>
+  <ol style="font-size:.86rem">
+    <li>Identifica $x_1, y_1, x_2, y_2$.</li>
+    <li>Calcula $\\Delta x$ y $\\Delta y$.</li>
+    <li>Eleva al cuadrado (<em>los signos desaparecen</em>).</li>
+    <li>Suma y saca raíz cuadrada.</li>
+    <li>Escribe la respuesta con unidades.</li>
+  </ol>
+</div>`} },
+
+/* ═════ 8 · CASOS ESPECIALES + CALCULADORA ═════ */
+{ title:"8. Distancia — Calculadora", left:{ html:`
+<h2>8. Casos especiales</h2>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-arrows-left-right"></i> Puntos alineados horizontalmente</span>
+  <p>Si $y_1 = y_2$ (los puntos están en la misma línea horizontal):</p>
+  <div class="formula-box">$d = |\\Delta x| = |x_2 - x_1|$</div>
+</div>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-arrows-up-down"></i> Puntos alineados verticalmente</span>
+  <p>Si $x_1 = x_2$ (los puntos están en la misma línea vertical):</p>
+  <div class="formula-box">$d = |\\Delta y| = |y_2 - y_1|$</div>
+</div>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-star"></i> Ejemplo horizontal</span>
+  <p>$P_1(6,3)$ y $P_2(-4,3)$. Como $y$ es igual: $d = |{-4}-6| = 10$.</p>
+</div>
+<div class="warning-box">
+  <strong><i class="fa-solid fa-lightbulb"></i> Observa</strong>
+  <p>Ambos casos especiales son consecuencia directa de la fórmula general: al anularse uno de los deltas, la raíz queda simplificada.</p>
+</div>`}, right:{ html:`
+<h3>🧮 Calculadora interactiva de distancia</h3>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">P₁:</span>
+    (<input type="number" class="lab-input" id="d-x1" value="-4" step="0.5">,
+     <input type="number" class="lab-input" id="d-y1" value="2"  step="0.5">)
+  </div>
+  <div class="control-row">
+    <span class="control-label">P₂:</span>
+    (<input type="number" class="lab-input" id="d-x2" value="3" step="0.5">,
+     <input type="number" class="lab-input" id="d-y2" value="5" step="0.5">)
+  </div>
+  <div class="control-row">
+    <button class="lab-btn" onclick="calcDist()"><i class="fa-solid fa-calculator"></i> Calcular</button>
+  </div>
+</div>
+${buildCartFrame('plot-8', 300, 'Calculadora de distancia')}
+<div class="result-display">
+  <div class="result-title">Desarrollo</div>
+  <div class="result-value" id="d-out">d = √(7² + 3²) = √58 ≈ 7,62</div>
+</div>`} },
+
+/* ═════ 9 · PUNTO MEDIO ═════ */
+{ title:"9. Punto medio", left:{ html:`
+<h2>9. Punto medio de un segmento</h2>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-dot-circle"></i> Fórmula</span>
+  <p>El punto medio $M$ del segmento que une $P_1(x_1,y_1)$ con $P_2(x_2,y_2)$ es:</p>
+  <div class="formula-box">$M = \\left( \\dfrac{x_1+x_2}{2},\\ \\dfrac{y_1+y_2}{2} \\right)$</div>
+</div>
+<h3>Interpretación</h3>
+<p>El punto medio es simplemente el <strong>promedio aritmético</strong> de las coordenadas: promedio de las abscisas y promedio de las ordenadas.</p>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-star"></i> $P_1(-4,2)$ y $P_2(3,5)$</span>
+  <p>
+    $\\bar x = \\dfrac{-4+3}{2} = -\\dfrac{1}{2} = -0{,}5$<br>
+    $\\bar y = \\dfrac{2+5}{2} = \\dfrac{7}{2} = 3{,}5$<br>
+    $M = (-0{,}5;\\ 3{,}5)$
+  </p>
+</div>
+<div class="warning-box">
+  <strong><i class="fa-solid fa-brain"></i> Truco mental</strong>
+  <p>Si uno de los puntos es el origen $(0,0)$, el punto medio es simplemente <em>la mitad de las coordenadas del otro punto</em>.</p>
+</div>`}, right:{ html:`
+<h3>Laboratorio del punto medio</h3>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">P₁:</span>
+    (<input type="number" class="lab-input" id="m-x1" value="-4" step="0.5">,
+     <input type="number" class="lab-input" id="m-y1" value="2"  step="0.5">)
+  </div>
+  <div class="control-row">
+    <span class="control-label">P₂:</span>
+    (<input type="number" class="lab-input" id="m-x2" value="3" step="0.5">,
+     <input type="number" class="lab-input" id="m-y2" value="5" step="0.5">)
+  </div>
+  <div class="control-row"><button class="lab-btn success" onclick="calcMid()"><i class="fa-solid fa-crosshairs"></i> Hallar punto medio</button></div>
+</div>
+${buildCartFrame('plot-9', 330, 'Punto medio M')}
+<div class="result-display">
+  <div class="result-title">Punto medio</div>
+  <div class="result-value" id="m-out">M = (−0.5, 3.5)</div>
+</div>`} },
+
+/* ═════ 10 · DIVISIÓN DE UN SEGMENTO EN RAZÓN DADA ═════ */
+{ title:"10. División en razón dada", left:{ html:`
+<h2>10. División de un segmento en una razón dada</h2>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-divide"></i> Razón k = P₁P / PP₂</span>
+  <p>Sea $P(x,y)$ el punto que divide al segmento dirigido $\\overline{P_1P_2}$ en la razón $k = \\dfrac{P_1P}{PP_2}$. Sus coordenadas son:</p>
+  <div class="formula-box">
+    $x = \\dfrac{x_1 + k\\, x_2}{1 + k} \\qquad y = \\dfrac{y_1 + k\\, y_2}{1 + k}$
+  </div>
+</div>
+<h3>Observaciones clave</h3>
+<ul style="font-size:.88rem">
+  <li>Si $k = 1$, $P$ es el <strong>punto medio</strong> ($M$).</li>
+  <li>Si $k = 2$, $P$ divide al segmento de forma que $P_1P$ vale el <em>doble</em> de $PP_2$.</li>
+  <li>Si $k < 0$ (división externa), $P$ cae <em>fuera</em> del segmento.</li>
+  <li>El caso $k \\to \\infty$ lleva a $P \\to P_2$.</li>
+</ul>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-star"></i> Caso k = 2</span>
+  <p>Si $P_1(-2,1)$ y $P_2(4,7)$ y queremos dividir en razón $k=2$:<br>
+  $x = \\dfrac{-2 + 2(4)}{1+2} = \\dfrac{6}{3} = 2$<br>
+  $y = \\dfrac{1 + 2(7)}{1+2} = \\dfrac{15}{3} = 5$<br>
+  $\\therefore P(2, 5)$</p>
+</div>`}, right:{ html:`
+<h3>Laboratorio de división</h3>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">P₁:</span>
+    (<input type="number" class="lab-input" id="r-x1" value="-2" step="0.5">,
+     <input type="number" class="lab-input" id="r-y1" value="1" step="0.5">)
+  </div>
+  <div class="control-row">
+    <span class="control-label">P₂:</span>
+    (<input type="number" class="lab-input" id="r-x2" value="4" step="0.5">,
+     <input type="number" class="lab-input" id="r-y2" value="7" step="0.5">)
+  </div>
+  <div class="control-row">
+    <span class="control-label">k:</span>
+    <input type="range" class="control-slider" id="r-k" min="-3" max="5" value="2" step="0.1" oninput="calcRazon()">
+    <span class="control-value" id="r-k-val">2.0</span>
+  </div>
+</div>
+${buildCartFrame('plot-10', 330, 'División P en razón k')}
+<div class="result-display">
+  <div class="result-title">Punto P</div>
+  <div class="result-value" id="r-out">P = (2.00, 5.00)</div>
+</div>`} },
+
+/* ═════ 11 · PENDIENTE DE UNA RECTA ═════ */
+{ title:"11. Pendiente", left:{ html:`
+<h2>11. Pendiente de una recta</h2>
+<div style="text-align:center;margin:6px 0">
+  <img src="../imagenes/FuncionLineal/TechoPendiente.png"
+       alt="Techo a dos aguas con la pendiente como razón Δy/Δx"
+       class="historic-img"
+       style="max-width:100%;width:360px;border-color:rgba(220,38,38,.45)"
+       loading="lazy" onerror="this.style.display='none'">
+  <p class="caption">La pendiente en la vida real: el techo de una casa tiene una inclinación $m = \\Delta y / \\Delta x$.</p>
+</div>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-angle-up"></i> Definición</span>
+  <p>La <strong>pendiente</strong> de una recta es una medida de su <em>inclinación</em>. Se calcula como la razón entre el desplazamiento vertical y el desplazamiento horizontal:</p>
+</div>
+<div class="formula-box">$m = \\dfrac{\\Delta y}{\\Delta x} = \\dfrac{y_2 - y_1}{x_2 - x_1}$</div>
+<h3>Interpretación de la pendiente</h3>
+<ul style="font-size:.88rem">
+  <li>Si $m > 0$: recta <strong>creciente</strong> (sube de izquierda a derecha) 📈</li>
+  <li>Si $m < 0$: recta <strong>decreciente</strong> (baja de izquierda a derecha) 📉</li>
+  <li>Si $m = 0$: recta <strong>horizontal</strong> ➖</li>
+  <li>Si $m$ <em>no existe</em> ($x_1 = x_2$): recta <strong>vertical</strong> ⏐</li>
+</ul>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-star"></i> $P_1(-4,1)$ y $P_2(4,5)$</span>
+  <p>
+    $m = \\dfrac{5-1}{4-(-4)} = \\dfrac{4}{8} = \\dfrac{1}{2}$<br>
+    Por cada <strong>2 unidades que avanzamos horizontalmente</strong>, la recta <strong>sube 1 unidad</strong>.
+  </p>
+</div>`}, right:{ html:`
+<h3>Visualización de la pendiente</h3>
+${buildCartFrame('plot-11', 360, 'Pendiente como razón Δy/Δx')}
+<div class="glass-panel">
+  <p style="font-size:.85rem"><strong>Interpretación física:</strong> la pendiente es la <em>tasa de cambio</em> de $y$ respecto a $x$. En un gráfico posición–tiempo, es la <b>velocidad</b>. En un gráfico costo–cantidad, es el <b>costo marginal</b>.</p>
+</div>
+<div class="warning-box">
+  <strong><i class="fa-solid fa-triangle-exclamation"></i> Errores comunes</strong>
+  <ul style="font-size:.84rem">
+    <li>Invertir el orden: $\\dfrac{x_2-x_1}{y_2-y_1}$ ❌ — eso sería la pendiente recíproca.</li>
+    <li>Olvidar el signo: si bajas, la pendiente es <strong>negativa</strong>.</li>
+    <li>Dividir por cero: si $x_1 = x_2$, la pendiente <em>no existe</em>.</li>
+  </ul>
+</div>`} },
+
+/* ═════ 12 · EXPLORADOR DE PENDIENTE ═════ */
+{ title:"12. Explorador de pendiente", left:{ html:`
+<h2>12. Explorador interactivo</h2>
+<p style="font-size:.88rem">Arrastra los deslizadores y observa cómo cambia la recta. Fíjate en el <strong>signo</strong> y <strong>magnitud</strong> de la pendiente.</p>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">x₁:</span>
+    <input type="range" class="control-slider" id="e-x1" min="-8" max="8" value="-4" step="0.5" oninput="explPend()">
+    <span class="control-value" id="e-x1-val">-4.0</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">y₁:</span>
+    <input type="range" class="control-slider" id="e-y1" min="-6" max="6" value="1" step="0.5" oninput="explPend()">
+    <span class="control-value" id="e-y1-val">1.0</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">x₂:</span>
+    <input type="range" class="control-slider" id="e-x2" min="-8" max="8" value="4" step="0.5" oninput="explPend()">
+    <span class="control-value" id="e-x2-val">4.0</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">y₂:</span>
+    <input type="range" class="control-slider" id="e-y2" min="-6" max="6" value="5" step="0.5" oninput="explPend()">
+    <span class="control-value" id="e-y2-val">5.0</span>
+  </div>
+</div>
+<div class="result-display">
+  <div class="result-title">Pendiente m</div>
+  <div class="result-value" id="e-m">m = 1/2 = 0.50</div>
+</div>
+<div class="result-display" style="background:linear-gradient(135deg,var(--accent),#d97706)">
+  <div class="result-title">Tipo de recta</div>
+  <div class="result-value" id="e-tipo">Creciente 📈</div>
+</div>`}, right:{ html:`
+<h3>Gráfica en tiempo real</h3>
+${buildCartFrame('plot-12', 440, 'Pendiente en tiempo real')}
+<div class="concept-box" style="font-size:.84rem">
+  <p>🟢 <strong>Verde</strong>: recta creciente ($m>0$)</p>
+  <p>🔴 <strong>Rojo</strong>: recta decreciente ($m<0$)</p>
+  <p>🔵 <strong>Azul</strong>: horizontal ($m=0$)</p>
+  <p>🟣 <strong>Violeta</strong>: vertical ($m$ indefinida)</p>
+</div>`} },
+
+/* ═════ 13 · ECUACIÓN PENDIENTE-INTERCEPTO ═════ */
+{ title:"13. y = mx + b", left:{ html:`
+<h2>13. Ecuación pendiente–intercepto</h2>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-chart-line"></i> Forma 1</span>
+  <p>La ecuación de la recta que <strong>intercepta al eje Y</strong> en el punto $(0,b)$ y tiene pendiente $m$ es:</p>
+</div>
+<div class="formula-box">$y = m \\cdot x + b$</div>
+<h3>Significado de cada parámetro</h3>
+<ul style="font-size:.9rem">
+  <li>$m$ = <strong>pendiente</strong> (inclinación).</li>
+  <li>$b$ = <strong>intercepto vertical</strong> (dónde la recta corta al eje Y).</li>
+</ul>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-star"></i> Ejemplo</span>
+  <p>Ecuación de la recta que intercepta al eje Y en $B(0,-4)$ y tiene pendiente $m=3$:<br><br>
+  $y = m \\cdot x + b$<br>
+  $y = 3 \\cdot x + (-4)$<br>
+  $\\boxed{y = 3x - 4}$</p>
+</div>
+<div class="warning-box">
+  <strong><i class="fa-solid fa-lightbulb"></i> Observa</strong>
+  <p>El valor de $b$ es la <em>distancia vertical</em> (positiva o negativa) donde la recta corta el eje Y.</p>
+</div>`}, right:{ html:`
+<h3>Laboratorio pendiente–intercepto</h3>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">m =</span>
+    <input type="range" class="control-slider" id="y1-m" min="-5" max="5" value="3" step="0.1" oninput="updY1()">
+    <span class="control-value" id="y1-m-val">3.0</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">b =</span>
+    <input type="range" class="control-slider" id="y1-b" min="-6" max="6" value="-4" step="0.1" oninput="updY1()">
+    <span class="control-value" id="y1-b-val">-4.0</span>
+  </div>
+</div>
+${buildCartFrame('plot-13', 360, 'y = m·x + b')}
+<div class="result-display">
+  <div class="result-title">Ecuación</div>
+  <div class="result-value" id="y1-eq">y = 3x − 4</div>
+</div>`} },
+
+/* ═════ 14 · ECUACIÓN PUNTO-PENDIENTE ═════ */
+{ title:"14. Punto–pendiente", left:{ html:`
+<h2>14. Ecuación punto–pendiente</h2>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-arrow-right-long"></i> Forma 2</span>
+  <p>La ecuación de la recta que pasa por el punto $P_1(x_1, y_1)$ y tiene pendiente $m$ es:</p>
+</div>
+<div class="formula-box">$y = m(x - x_1) + y_1$</div>
+<p style="font-size:.88rem">Es la forma más útil cuando se conoce la pendiente y <strong>un punto cualquiera</strong> (no necesariamente el intercepto con el eje Y).</p>
+<h3>Ejemplo paso a paso</h3>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-star"></i> Recta por $A(-5,-2)$ con pendiente $m=2$</span>
+  <p>
+    $y = m(x - x_1) + y_1$<br>
+    $y = 2(x - (-5)) + (-2)$<br>
+    $y = 2(x + 5) - 2$<br>
+    $y = 2x + 10 - 2$<br>
+    $\\boxed{y = 2x + 8}$
+  </p>
+</div>`}, right:{ html:`
+<h3>Laboratorio punto–pendiente</h3>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">x₁:</span>
+    <input type="range" class="control-slider" id="pp-x1" min="-8" max="8" value="-5" step="0.5" oninput="updPP()">
+    <span class="control-value" id="pp-x1-val">-5.0</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">y₁:</span>
+    <input type="range" class="control-slider" id="pp-y1" min="-6" max="6" value="-2" step="0.5" oninput="updPP()">
+    <span class="control-value" id="pp-y1-val">-2.0</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">m =</span>
+    <input type="range" class="control-slider" id="pp-m"  min="-5" max="5" value="2"  step="0.1" oninput="updPP()">
+    <span class="control-value" id="pp-m-val">2.0</span>
+  </div>
+</div>
+${buildCartFrame('plot-14', 380, 'y = m(x − x₁) + y₁')}
+<div class="result-display">
+  <div class="result-title">Ecuación simplificada</div>
+  <div class="result-value" id="pp-eq">y = 2x + 8</div>
+</div>`} },
+
+/* ═════ 15 · ECUACIÓN DOS PUNTOS ═════ */
+{ title:"15. Por dos puntos", left:{ html:`
+<h2>15. Recta que pasa por dos puntos</h2>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-arrows-to-dot"></i> Forma 3</span>
+  <p>Si conocemos $P_1(x_1,y_1)$ y $P_2(x_2,y_2)$, primero calculamos la pendiente y luego usamos la forma punto–pendiente:</p>
+</div>
+<div class="formula-box">
+  $m = \\dfrac{y_2 - y_1}{x_2 - x_1}$ <br><br>
+  $y = \\left( \\dfrac{y_2 - y_1}{x_2 - x_1} \\right)(x - x_1) + y_1$
+</div>
+<h3>Ejemplo guiado</h3>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-star"></i> $P_1(-4,1)$ y $P_2(4,5)$</span>
+  <p>Paso 1 — Pendiente:<br>
+  $m = \\dfrac{5-1}{4-(-4)} = \\dfrac{4}{8} = \\dfrac{1}{2}$</p>
+  <p>Paso 2 — Sustituir en punto–pendiente:<br>
+  $y = \\tfrac{1}{2}(x - 4) + 5$<br>
+  $y = \\tfrac{1}{2}x - 2 + 5$<br>
+  $\\boxed{y = \\tfrac{1}{2}x + 3}$</p>
+</div>`}, right:{ html:`
+<h3>Laboratorio: recta por dos puntos</h3>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">P₁:</span>
+    (<input type="number" class="lab-input" id="dp-x1" value="-4" step="0.5" onchange="updDP()">,
+     <input type="number" class="lab-input" id="dp-y1" value="1"  step="0.5" onchange="updDP()">)
+  </div>
+  <div class="control-row">
+    <span class="control-label">P₂:</span>
+    (<input type="number" class="lab-input" id="dp-x2" value="4" step="0.5" onchange="updDP()">,
+     <input type="number" class="lab-input" id="dp-y2" value="5" step="0.5" onchange="updDP()">)
+  </div>
+  <div class="control-row"><button class="lab-btn" onclick="updDP()"><i class="fa-solid fa-play"></i> Graficar</button></div>
+</div>
+${buildCartFrame('plot-15', 380, 'Recta por P₁ y P₂')}
+<div class="result-display">
+  <div class="result-title">Ecuación simplificada</div>
+  <div class="result-value" id="dp-eq">y = 0.50 x + 3</div>
+</div>`} },
+
+/* ═════ 16 · ECUACIÓN GENERAL ═════ */
+{ title:"16. Ecuación general", left:{ html:`
+<h2>16. Ecuación general de la recta</h2>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-vector-square"></i> Forma 4</span>
+  <p>Toda recta del plano puede expresarse en la <strong>forma general</strong>:</p>
+</div>
+<div class="formula-box">$A \\cdot x + B \\cdot y + C = 0$</div>
+<p style="font-size:.88rem">Si $B \\neq 0$, podemos despejar $y$ y obtener la forma pendiente–intercepto:</p>
+<div class="formula-box" style="font-size:.95rem">
+  $y = -\\dfrac{A}{B} \\cdot x - \\dfrac{C}{B}$
+</div>
+<p style="font-size:.88rem">Comparando con $y = m x + b$ se concluye:</p>
+<div class="formula-box" style="font-size:.95rem">
+  $m = -\\dfrac{A}{B}\\qquad b = -\\dfrac{C}{B}$
+</div>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-star"></i> Ejemplo</span>
+  <p>$6x + 2y + 9 = 0$<br>
+  $2y = -6x - 9$<br>
+  $y = -3x - \\tfrac{9}{2}$<br>
+  Así $m = -3$ y $b = -4{,}5$.</p>
+</div>`}, right:{ html:`
+<h3>Laboratorio A·x + B·y + C = 0</h3>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">A =</span>
+    <input type="range" class="control-slider" id="g-A" min="-6" max="6" value="6" step="0.5" oninput="updGen()">
+    <span class="control-value" id="g-A-val">6.0</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">B =</span>
+    <input type="range" class="control-slider" id="g-B" min="-6" max="6" value="2" step="0.5" oninput="updGen()">
+    <span class="control-value" id="g-B-val">2.0</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">C =</span>
+    <input type="range" class="control-slider" id="g-C" min="-10" max="10" value="9" step="0.5" oninput="updGen()">
+    <span class="control-value" id="g-C-val">9.0</span>
+  </div>
+</div>
+${buildCartFrame('plot-16', 340, 'A·x + B·y + C = 0')}
+<div class="result-display">
+  <div class="result-title">Pendiente-Intercepto equivalente</div>
+  <div class="result-value" id="g-eq">y = −3x − 4.5 &nbsp; m=−3, b=−4.5</div>
+</div>`} },
+
+/* ═════ 17 · ECUACIÓN CANÓNICA / SEGMENTARIA ═════ */
+{ title:"17. Canónica o segmentaria", left:{ html:`
+<h2>17. Ecuación canónica (segmentaria)</h2>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-divide"></i> Forma 5</span>
+  <p>Es la expresión de la recta en función de los <strong>segmentos</strong> que determina sobre los ejes coordenados:</p>
+</div>
+<div class="formula-box">$\\dfrac{x}{a} + \\dfrac{y}{b} = 1$</div>
+<p style="font-size:.88rem">Donde:</p>
+<ul style="font-size:.88rem">
+  <li>$a$ = valor de $x$ donde la recta corta al eje X, es decir el punto $(a, 0)$.</li>
+  <li>$b$ = valor de $y$ donde la recta corta al eje Y, es decir el punto $(0, b)$.</li>
+</ul>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-star"></i> Recta que corta en $A(6,0)$ y $B(0,4)$</span>
+  <p>
+    $a = 6,\\ b = 4$<br>
+    Canónica: $\\dfrac{x}{6} + \\dfrac{y}{4} = 1$<br><br>
+    Pendiente–intercepto: despejando $y$:<br>
+    $\\tfrac{y}{4} = -\\tfrac{x}{6} + 1 \\Rightarrow y = -\\tfrac{2}{3} x + 4$
+  </p>
+</div>`}, right:{ html:`
+<h3>Laboratorio segmentario</h3>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">a =</span>
+    <input type="range" class="control-slider" id="s-a" min="-8" max="8" value="6" step="0.5" oninput="updSeg()">
+    <span class="control-value" id="s-a-val">6.0</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">b =</span>
+    <input type="range" class="control-slider" id="s-b" min="-8" max="8" value="4" step="0.5" oninput="updSeg()">
+    <span class="control-value" id="s-b-val">4.0</span>
+  </div>
+</div>
+${buildCartFrame('plot-17', 360, 'x/a + y/b = 1')}
+<div class="result-display">
+  <div class="result-title">Canónica</div>
+  <div class="result-value" id="s-can">x/6 + y/4 = 1</div>
+</div>
+<div class="result-display" style="background:linear-gradient(135deg,var(--accent),#d97706)">
+  <div class="result-title">Pendiente-Intercepto</div>
+  <div class="result-value" id="s-mb">y = −0.667 x + 4</div>
+</div>`} },
+
+/* ═════ 18 · RECTAS HORIZONTALES Y VERTICALES ═════ */
+{ title:"18. Horizontales y verticales", left:{ html:`
+<h2>18. Rectas horizontales y verticales</h2>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-minus"></i> Recta horizontal</span>
+  <p>Tiene pendiente $m = 0$. Todos los puntos tienen la <strong>misma ordenada $y$</strong>. Su ecuación es:</p>
+  <div class="formula-box">$y = k$</div>
+</div>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-grip-lines-vertical"></i> Recta vertical</span>
+  <p>Tiene pendiente <strong>indefinida</strong> (división por cero). Todos los puntos tienen la misma <strong>abscisa $x$</strong>. Su ecuación es:</p>
+  <div class="formula-box">$x = h$</div>
+</div>
+<div class="warning-box">
+  <strong><i class="fa-solid fa-ban"></i> ¡Atención!</strong>
+  <p>La recta vertical <em>no es una función</em>: al valor $x = h$ le corresponden infinitos valores de $y$. No se puede escribir en la forma $y = f(x)$.</p>
+</div>
+<h3>Ejemplos</h3>
+<ul style="font-size:.88rem">
+  <li>$y = 3$ → horizontal que pasa por $(0,3)$.</li>
+  <li>$x = -2$ → vertical que pasa por $(-2, 0)$.</li>
+  <li>El eje X es $y=0$; el eje Y es $x=0$.</li>
+</ul>`}, right:{ html:`
+<h3>Explorador de horizontales y verticales</h3>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">y = k:</span>
+    <input type="range" class="control-slider" id="hv-k" min="-6" max="6" value="3" step="0.5" oninput="updHV()">
+    <span class="control-value" id="hv-k-val">3.0</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">x = h:</span>
+    <input type="range" class="control-slider" id="hv-h" min="-6" max="6" value="-2" step="0.5" oninput="updHV()">
+    <span class="control-value" id="hv-h-val">-2.0</span>
+  </div>
+</div>
+${buildCartFrame('plot-18', 400, 'y = k (verde) · x = h (rojo)')}
+<div class="glass-panel">
+  <p style="font-size:.84rem">🟢 Horizontal: $y = k$ (pendiente $m=0$)<br>🔴 Vertical: $x = h$ (pendiente indefinida)</p>
+</div>`} },
+
+/* ═════ 19 · RECTAS PARALELAS ═════ */
+{ title:"19. Rectas paralelas", left:{ html:`
+<h2>19. Rectas paralelas</h2>
+<div style="text-align:center;margin:6px 0">
+  <img src="../imagenes/FuncionLineal/PuenteColgante.png"
+       alt="Puente colgante con cables paralelos y pilares perpendiculares"
+       class="historic-img"
+       style="max-width:100%;width:360px;border-color:rgba(29,78,216,.45)"
+       loading="lazy" onerror="this.style.display='none'">
+  <p class="caption">Un puente colgante: cables <strong>paralelos</strong> entre sí y <strong>perpendiculares</strong> a la plataforma.</p>
+</div>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-equals"></i> Criterio</span>
+  <p>Dos rectas $L_1$ y $L_2$ son <strong>paralelas</strong> si y solo si tienen la <strong>misma pendiente</strong>:</p>
+  <div class="formula-box">$L_1 \\parallel L_2 \\iff m_1 = m_2$</div>
+</div>
+<p style="font-size:.88rem">Geometricamente, dos rectas paralelas <strong>no se cruzan nunca</strong> (no tienen puntos en común) o son <em>la misma recta</em>. Son equidistantes: siempre mantienen la misma distancia entre sí.</p>
+<h3>Ejemplo resuelto</h3>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-star"></i> Recta paralela a $4x + 2y - 5 = 0$ que pasa por $A(3,4)$</span>
+  <p>Despejando: $y = -2x + \\tfrac{5}{2}\\ \\Rightarrow\\ m_1 = -2$.<br>
+  Como la nueva recta es paralela: $m_2 = -2$.<br>
+  Usando punto–pendiente:<br>
+  $y = -2(x-3) + 4$<br>
+  $y = -2x + 6 + 4$<br>
+  $\\boxed{y = -2x + 10}$</p>
+</div>`}, right:{ html:`
+<h3>Laboratorio de paralelas</h3>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">m =</span>
+    <input type="range" class="control-slider" id="pa-m" min="-4" max="4" value="-2" step="0.1" oninput="updPar()">
+    <span class="control-value" id="pa-m-val">-2.0</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">b₁:</span>
+    <input type="range" class="control-slider" id="pa-b1" min="-8" max="8" value="2.5" step="0.1" oninput="updPar()">
+    <span class="control-value" id="pa-b1-val">2.5</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">b₂:</span>
+    <input type="range" class="control-slider" id="pa-b2" min="-8" max="8" value="10" step="0.1" oninput="updPar()">
+    <span class="control-value" id="pa-b2-val">10.0</span>
+  </div>
+</div>
+${buildCartFrame('plot-19', 380, 'L₁ y L₂ paralelas')}
+<div class="result-display">
+  <div class="result-title">Condición</div>
+  <div class="result-value" id="pa-ok">✓ m₁ = m₂ = −2.0</div>
+</div>`} },
+
+/* ═════ 20 · RECTAS PERPENDICULARES ═════ */
+{ title:"20. Rectas perpendiculares", left:{ html:`
+<h2>20. Rectas perpendiculares</h2>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-square"></i> Criterio</span>
+  <p>Dos rectas $L_1$ y $L_2$ son <strong>perpendiculares</strong> (se cruzan formando un ángulo de 90°) si y solo si el producto de sus pendientes es $-1$:</p>
+  <div class="formula-box">$L_1 \\perp L_2 \\iff m_1 \\cdot m_2 = -1$</div>
+</div>
+<p style="font-size:.88rem">Equivalentemente, $m_2$ es el <strong>inverso cambiado de signo</strong> de $m_1$:</p>
+<div class="formula-box">$m_2 = -\\dfrac{1}{m_1}$</div>
+<h3>Ejemplo resuelto</h3>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-star"></i> Recta perpendicular a $4x + 2y - 5 = 0$ por $A(3,4)$</span>
+  <p>$m_1 = -2$ (obtenida al despejar $y$).<br>
+  $m_2 = -\\dfrac{1}{-2} = \\dfrac{1}{2}$<br><br>
+  Usando punto–pendiente:<br>
+  $y = \\tfrac{1}{2}(x-3) + 4 = \\tfrac{1}{2}x - \\tfrac{3}{2} + 4$<br>
+  $\\boxed{y = \\tfrac{1}{2} x + \\tfrac{5}{2}}$</p>
+</div>
+<div class="warning-box">
+  <strong><i class="fa-solid fa-circle-info"></i> Casos especiales</strong>
+  <p>Una recta horizontal ($m=0$) es perpendicular a cualquier recta vertical ($m$ indefinida). En este caso la fórmula $m_1 m_2 = -1$ no aplica literalmente, pero la perpendicularidad sigue siendo cierta.</p>
+</div>`}, right:{ html:`
+<h3>Laboratorio de perpendiculares</h3>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">m₁:</span>
+    <input type="range" class="control-slider" id="pe-m" min="-4" max="4" value="-2" step="0.1" oninput="updPerp()">
+    <span class="control-value" id="pe-m-val">-2.0</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">b₁:</span>
+    <input type="range" class="control-slider" id="pe-b1" min="-6" max="6" value="2.5" step="0.1" oninput="updPerp()">
+    <span class="control-value" id="pe-b1-val">2.5</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">b₂:</span>
+    <input type="range" class="control-slider" id="pe-b2" min="-6" max="6" value="2.5" step="0.1" oninput="updPerp()">
+    <span class="control-value" id="pe-b2-val">2.5</span>
+  </div>
+</div>
+${buildCartFrame('plot-20', 380, 'L₁ ⊥ L₂  (ángulo 90°)')}
+<div class="result-display">
+  <div class="result-title">Verificación</div>
+  <div class="result-value" id="pe-ok">m₁·m₂ = −2 · 0.5 = −1 ✓</div>
+</div>`} },
+
+/* ═════ 21 · DISTANCIA DE UN PUNTO A UNA RECTA ═════ */
+{ title:"21. Punto a recta", left:{ html:`
+<h2>21. Distancia de un punto a una recta</h2>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-ruler-combined"></i> Fórmula</span>
+  <p>La distancia del punto $P_1(x_1, y_1)$ a la recta $A \\cdot x + B \\cdot y + C = 0$ es:</p>
+  <div class="formula-box">$d = \\dfrac{|\\, A \\cdot x_1 + B \\cdot y_1 + C\\,|}{\\sqrt{A^2 + B^2}}$</div>
+</div>
+<p style="font-size:.86rem">Esta fórmula devuelve <strong>siempre un valor positivo</strong> (el valor absoluto en el numerador) y mide la <em>distancia perpendicular</em> entre el punto y la recta.</p>
+<h3>Ejemplo resuelto</h3>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-star"></i> Distancia del punto $P_1(3,4)$ a la recta $1 \\cdot x + 1 \\cdot y - 2 = 0$</span>
+  <p>Identificamos $A=1,\\ B=1,\\ C=-2$.<br>
+  $d = \\dfrac{|1(3) + 1(4) - 2|}{\\sqrt{1^2 + 1^2}} = \\dfrac{|5|}{\\sqrt{2}} = \\dfrac{5}{\\sqrt 2} \\approx 3{,}54$</p>
+</div>
+<div class="warning-box">
+  <strong><i class="fa-solid fa-lightbulb"></i> Tip</strong>
+  <p>Si la recta está en la forma $y = mx + b$, primero se pasa a general: $mx - y + b = 0$, con $A=m$, $B=-1$, $C=b$.</p>
+</div>`}, right:{ html:`
+<h3>Laboratorio punto–recta</h3>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">A:</span>
+    <input type="number" class="lab-input" id="dr-A" value="1" step="0.5" onchange="updDR()">
+    <span class="control-label">B:</span>
+    <input type="number" class="lab-input" id="dr-B" value="1" step="0.5" onchange="updDR()">
+    <span class="control-label">C:</span>
+    <input type="number" class="lab-input" id="dr-C" value="-2" step="0.5" onchange="updDR()">
+  </div>
+  <div class="control-row">
+    <span class="control-label">P:</span>
+    (<input type="number" class="lab-input" id="dr-x" value="3" step="0.5" onchange="updDR()">,
+     <input type="number" class="lab-input" id="dr-y" value="4" step="0.5" onchange="updDR()">)
+  </div>
+  <div class="control-row"><button class="lab-btn" onclick="updDR()"><i class="fa-solid fa-calculator"></i> Calcular</button></div>
+</div>
+${buildCartFrame('plot-21', 340, 'd = |Ax₁+By₁+C|/√(A²+B²)')}
+<div class="result-display">
+  <div class="result-title">Distancia</div>
+  <div class="result-value" id="dr-out">d = |5| / √2 ≈ 3.54</div>
+</div>`} },
+
+/* ═════ 22 · ÁREA DE TRIÁNGULO (HERÓN) ═════ */
+{ title:"22. Área — Herón", left:{ html:`
+<h2>22. Área de un triángulo · Fórmula de Herón</h2>
+<div class="def-box">
+  <span class="def-title"><i class="fa-solid fa-draw-polygon"></i> Método</span>
+  <p>Dados tres vértices $A, B, C$ del triángulo:</p>
+  <ol style="font-size:.88rem">
+    <li>Calcula las longitudes de los <strong>tres lados</strong> con la fórmula de distancia: $a, b, c$.</li>
+    <li>Calcula el <strong>perímetro</strong>: $P = a + b + c$.</li>
+    <li>Calcula el <strong>semiperímetro</strong>: $s = \\dfrac{P}{2}$.</li>
+    <li>Aplica la fórmula de Herón para el área:</li>
+  </ol>
+</div>
+<div class="formula-box">$\\text{Área} = \\sqrt{ s(s-a)(s-b)(s-c) }$</div>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-star"></i> Triángulo con vértices $A(0,0)$, $B(6,0)$, $C(3,5)$</span>
+  <p>
+    $a = |BC| = \\sqrt{9 + 25} \\approx 5{,}83$<br>
+    $b = |AC| = \\sqrt{9 + 25} \\approx 5{,}83$<br>
+    $c = |AB| = 6$<br>
+    $P = 17{,}66$ &nbsp; $s = 8{,}83$<br>
+    $\\text{Área} = \\sqrt{8{,}83 \\cdot 3 \\cdot 3 \\cdot 2{,}83} \\approx 15$
+  </p>
+</div>`}, right:{ html:`
+<h3>Laboratorio: triángulo interactivo</h3>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">A:</span>
+    (<input type="number" class="lab-input" id="h-ax" value="0" step="0.5" onchange="updHeron()">,
+     <input type="number" class="lab-input" id="h-ay" value="0" step="0.5" onchange="updHeron()">)
+  </div>
+  <div class="control-row">
+    <span class="control-label">B:</span>
+    (<input type="number" class="lab-input" id="h-bx" value="6" step="0.5" onchange="updHeron()">,
+     <input type="number" class="lab-input" id="h-by" value="0" step="0.5" onchange="updHeron()">)
+  </div>
+  <div class="control-row">
+    <span class="control-label">C:</span>
+    (<input type="number" class="lab-input" id="h-cx" value="3" step="0.5" onchange="updHeron()">,
+     <input type="number" class="lab-input" id="h-cy" value="5" step="0.5" onchange="updHeron()">)
+  </div>
+</div>
+${buildCartFrame('plot-22', 300, 'Triángulo ABC')}
+<div class="result-display">
+  <div class="result-title">Lados a · b · c</div>
+  <div class="result-value" id="h-lados">a=5.83 · b=5.83 · c=6.00</div>
+</div>
+<div class="result-display" style="background:linear-gradient(135deg,var(--accent),#d97706)">
+  <div class="result-title">Perímetro / Semiperímetro</div>
+  <div class="result-value" id="h-perim">P=17.66 · s=8.83</div>
+</div>
+<div class="result-display" style="background:linear-gradient(135deg,var(--purple),#6d28d9)">
+  <div class="result-title">Área</div>
+  <div class="result-value" id="h-area">A ≈ 15.00 u²</div>
+</div>`} },
+
+/* ═════ 23 · APLICACIÓN 1 — ESCALAS DE TEMPERATURA ═════ */
+{ title:"23. Aplicación — Temperaturas", left:{ html:`
+<h2>23. Aplicación: Escalas de temperatura</h2>
+<div style="text-align:center;margin:6px 0">
+  <img src="../imagenes/FuncionLineal/TermometrosEscalas.png"
+       alt="Tres termómetros: Kelvin, Celsius y Fahrenheit con puntos de congelación y ebullición"
+       class="historic-img"
+       style="max-width:100%;width:340px;border-color:rgba(14,165,233,.45)"
+       loading="lazy" onerror="this.style.display='none'">
+  <p class="caption">Tres escalas termométricas: <strong>Kelvin</strong>, <strong>Celsius</strong> y <strong>Fahrenheit</strong>, relacionadas linealmente.</p>
+</div>
+<div class="app-box">
+  <span class="app-title"><i class="fa-solid fa-temperature-high"></i> Problema</span>
+  <p>Las escalas <strong>Celsius (°C)</strong> y <strong>Fahrenheit (°F)</strong> están relacionadas linealmente. Sabemos que el punto de congelación del agua es $0\\,°C = 32\\,°F$ y el de ebullición es $100\\,°C = 212\\,°F$. ¿Cuál es la ecuación que las relaciona?</p>
+</div>
+<h3>Solución</h3>
+<p style="font-size:.88rem">Graficamos en el plano con $°C$ en el eje X y $°F$ en el eje Y. Tenemos los puntos $(0, 32)$ y $(100, 212)$.</p>
+<div class="concept-box">
+  <p>Pendiente:<br>
+  $m = \\dfrac{212 - 32}{100 - 0} = \\dfrac{180}{100} = \\dfrac{9}{5}$</p>
+  <p>Intercepto $b = 32$ (el valor en $°C = 0$).</p>
+  <p>Ecuación:<br>
+  $\\boxed{\\,°F = \\dfrac{9}{5} \\cdot °C + 32\\,}$</p>
+</div>
+<p style="font-size:.86rem"><strong>Inversa:</strong> despejando $°C$:<br>
+$°C = \\dfrac{5}{9}(°F - 32)$</p>
+<div class="warning-box">
+  <strong>Kelvin:</strong> $K = °C + 273{,}15$. Tres rectas paralelas con la misma pendiente.
+</div>`}, right:{ html:`
+<h3>Conversor interactivo °C ↔ °F</h3>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">°C:</span>
+    <input type="range" class="control-slider" id="tc" min="-40" max="200" value="25" step="0.5" oninput="updTemp()">
+    <span class="control-value" id="tc-val">25</span>
+  </div>
+</div>
+<div class="result-display">
+  <div class="result-title">Fahrenheit</div>
+  <div class="result-value" id="tf-out">°F = (9/5)(25) + 32 = 77</div>
+</div>
+<div class="result-display" style="background:linear-gradient(135deg,var(--cyan),#0891b2)">
+  <div class="result-title">Kelvin</div>
+  <div class="result-value" id="tk-out">K = 25 + 273.15 = 298.15</div>
+</div>
+${buildCartFrame('plot-23', 330, '°F = (9/5) °C + 32')}
+<p style="font-size:.82rem;font-style:italic;color:var(--text-muted);text-align:center">Eje X: Celsius · Eje Y: Fahrenheit</p>`} },
+
+/* ═════ 24 · APLICACIÓN 2 — MRU (FÍSICA) ═════ */
+{ title:"24. Aplicación — MRU", left:{ html:`
+<h2>24. Aplicación: Movimiento rectilíneo uniforme</h2>
+<div class="app-box">
+  <span class="app-title"><i class="fa-solid fa-car"></i> Problema</span>
+  <p>Dos automóviles se mueven en línea recta sobre una carretera. El auto <strong>A</strong> parte del kilómetro 0 a 20 km/h. El auto <strong>B</strong> parte del kilómetro 300 hacia <em>A</em> a 10 km/h (en sentido contrario). ¿En qué momento y lugar se encuentran?</p>
+</div>
+<h3>Modelado con rectas</h3>
+<div class="concept-box">
+  <p>Las ecuaciones de posición–tiempo son rectas con pendiente igual a la velocidad:</p>
+  <p>Auto A: $x_A(t) = 20\\, t$ &nbsp; (sale de 0 y avanza)<br>
+  Auto B: $x_B(t) = 300 - 10\\, t$ &nbsp; (sale de 300 y retrocede)</p>
+  <p>Se encuentran cuando $x_A = x_B$:<br>
+  $20 t = 300 - 10 t$<br>
+  $30 t = 300 \\Rightarrow t = 10\\,\\text{h}$<br>
+  $x = 20(10) = 200\\,\\text{km}$</p>
+  <p><strong>Respuesta:</strong> se encuentran a las <strong>10 horas</strong> en el <strong>kilómetro 200</strong>.</p>
+</div>`}, right:{ html:`
+<h3>Visualización posición–tiempo</h3>
+${buildCartFrame('plot-24', 360, 'MRU — dos autos')}
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">vA:</span>
+    <input type="range" class="control-slider" id="mru-va" min="5" max="40" value="20" step="1" oninput="updMRU()">
+    <span class="control-value" id="mru-va-val">20</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">x₀B:</span>
+    <input type="range" class="control-slider" id="mru-x0b" min="100" max="500" value="300" step="10" oninput="updMRU()">
+    <span class="control-value" id="mru-x0b-val">300</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">vB:</span>
+    <input type="range" class="control-slider" id="mru-vb" min="-30" max="0" value="-10" step="1" oninput="updMRU()">
+    <span class="control-value" id="mru-vb-val">-10</span>
+  </div>
+</div>
+<div class="result-display">
+  <div class="result-title">Punto de encuentro</div>
+  <div class="result-value" id="mru-out">t = 10 h · x = 200 km</div>
+</div>`} },
+
+/* ═════ 25 · APLICACIÓN 3 — ECONOMÍA (OFERTA Y DEMANDA) ═════ */
+{ title:"25. Aplicación — Economía", left:{ html:`
+<h2>25. Aplicación: Oferta y demanda</h2>
+<div style="text-align:center;margin:6px 0">
+  <img src="../imagenes/FuncionLineal/OfertaDemanda.png"
+       alt="Gráfica de oferta y demanda cruzándose en el punto de equilibrio"
+       class="historic-img"
+       style="max-width:100%;width:360px;border-color:rgba(139,92,246,.45)"
+       loading="lazy" onerror="this.style.display='none'">
+  <p class="caption">Mercado en equilibrio: oferta (creciente) y demanda (decreciente) se cruzan en el punto $E$.</p>
+</div>
+<div class="app-box">
+  <span class="app-title"><i class="fa-solid fa-dollar-sign"></i> Modelo clásico</span>
+  <p>En economía, cuando el precio de un producto sube, los consumidores compran menos (<strong>demanda</strong> decreciente) y los productores venden más (<strong>oferta</strong> creciente). Ambas se modelan como rectas:</p>
+</div>
+<div class="concept-box">
+  <p><strong>Demanda:</strong> $q_D = -a\\, p + b$ &nbsp; (pendiente negativa)<br>
+  <strong>Oferta:</strong> &nbsp; $q_O = c\\, p + d$ &nbsp; (pendiente positiva)</p>
+  <p>El <strong>equilibrio del mercado</strong> está en el punto donde las dos rectas se cortan: $q_D = q_O$.</p>
+</div>
+<div class="example-box">
+  <span class="example-title"><i class="fa-solid fa-star"></i> Ejemplo</span>
+  <p>Si $q_D = -4 p + 100$ y $q_O = 2 p + 10$, el equilibrio es:<br>
+  $-4p + 100 = 2p + 10\\ \\Rightarrow\\ 6p = 90\\ \\Rightarrow\\ p^* = 15$<br>
+  $q^* = 2(15) + 10 = 40$<br>
+  <strong>Precio de equilibrio:</strong> $15$ · <strong>cantidad:</strong> $40$.</p>
+</div>`}, right:{ html:`
+<h3>Laboratorio de equilibrio de mercado</h3>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">a:</span>
+    <input type="range" class="control-slider" id="ec-a" min="1" max="8" value="4" step="0.1" oninput="updEco()">
+    <span class="control-value" id="ec-a-val">4.0</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">b:</span>
+    <input type="range" class="control-slider" id="ec-b" min="50" max="150" value="100" step="5" oninput="updEco()">
+    <span class="control-value" id="ec-b-val">100</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">c:</span>
+    <input type="range" class="control-slider" id="ec-c" min="1" max="6" value="2" step="0.1" oninput="updEco()">
+    <span class="control-value" id="ec-c-val">2.0</span>
+  </div>
+  <div class="control-row">
+    <span class="control-label">d:</span>
+    <input type="range" class="control-slider" id="ec-d" min="0" max="50" value="10" step="1" oninput="updEco()">
+    <span class="control-value" id="ec-d-val">10</span>
+  </div>
+</div>
+${buildCartFrame('plot-25', 340, 'Oferta y demanda')}
+<div class="result-display">
+  <div class="result-title">Equilibrio</div>
+  <div class="result-value" id="ec-out">p* = 15 · q* = 40</div>
+</div>`} },
+
+/* ═════ 26 · QUIZ INTERACTIVO ═════ */
+{ title:"26. Quiz", left:{ html:`
+<h2>26. Quiz interactivo</h2>
+<p style="font-size:.86rem">Pon a prueba lo aprendido. Cada respuesta te explicará la solución correcta.</p>
+<div class="warning-box">
+  <strong><i class="fa-solid fa-award"></i> Puntaje:</strong> <span class="quiz-score" id="score-value">0 / 0</span>
+</div>
+<div id="quiz-container"></div>
+<div style="text-align:center;margin-top:10px">
+  <button class="lab-btn accent" onclick="nextQuestion()"><i class="fa-solid fa-forward"></i> Siguiente</button>
+  <button class="lab-btn warn" onclick="restartQuiz()"><i class="fa-solid fa-rotate-right"></i> Reiniciar</button>
+</div>`}, right:{ html:`
+<h3>Banco de preguntas (10)</h3>
+<div class="clay-card" style="font-size:.84rem">
+  <p>Temas que cubre el quiz:</p>
+  <ol style="columns:2;column-gap:15px">
+    <li>Cuadrantes</li>
+    <li>Distancia entre puntos</li>
+    <li>Punto medio</li>
+    <li>División en razón</li>
+    <li>Pendiente</li>
+    <li>Ecuación de la recta</li>
+    <li>Paralelismo</li>
+    <li>Perpendicularidad</li>
+    <li>Distancia punto–recta</li>
+    <li>Fórmula de Herón</li>
+  </ol>
+</div>
+<div class="concept-box">
+  <strong>💡 Tips para el quiz</strong>
+  <ul style="font-size:.82rem">
+    <li>Dibuja siempre un bosquejo antes de calcular.</li>
+    <li>Si usas la fórmula de distancia, eleva al cuadrado primero — los signos desaparecen.</li>
+    <li>Para paralelismo, basta comparar pendientes.</li>
+    <li>Para perpendicularidad, el producto de pendientes debe ser $-1$.</li>
+    <li>La fórmula de Herón <em>solo</em> usa las longitudes de los lados.</li>
+  </ul>
+</div>`} },
+
+/* ═════ 27 · EVALUADOR / LABORATORIO UNIVERSAL ═════ */
+{ title:"27. Evaluador universal", left:{ html:`
+<h2>27. Laboratorio universal</h2>
+<p style="font-size:.86rem">Introduce dos puntos y obtén todos los cálculos que hemos estudiado en un solo tablero.</p>
+<div class="interactive-controls">
+  <div class="control-row">
+    <span class="control-label">P₁:</span>
+    (<input type="number" class="lab-input" id="ev-x1" value="1" step="0.5" onchange="updEval()">,
+     <input type="number" class="lab-input" id="ev-y1" value="2" step="0.5" onchange="updEval()">)
+  </div>
+  <div class="control-row">
+    <span class="control-label">P₂:</span>
+    (<input type="number" class="lab-input" id="ev-x2" value="7" step="0.5" onchange="updEval()">,
+     <input type="number" class="lab-input" id="ev-y2" value="6" step="0.5" onchange="updEval()">)
+  </div>
+  <div class="control-row"><button class="lab-btn" onclick="updEval()"><i class="fa-solid fa-calculator"></i> Analizar</button></div>
+</div>
+<div class="result-display"><div class="result-title">Distancia</div><div class="result-value" id="ev-d">d = 7.21</div></div>
+<div class="result-display" style="background:linear-gradient(135deg,var(--secondary),#0369a1)"><div class="result-title">Punto medio</div><div class="result-value" id="ev-m">M = (4, 4)</div></div>
+<div class="result-display" style="background:linear-gradient(135deg,var(--accent),#d97706)"><div class="result-title">Pendiente</div><div class="result-value" id="ev-p">m = 0.67</div></div>
+<div class="result-display" style="background:linear-gradient(135deg,var(--purple),#6d28d9)"><div class="result-title">Ecuación</div><div class="result-value" id="ev-eq">y = 0.67x + 1.33</div></div>`}, right:{ html:`
+<h3>Gráfica completa</h3>
+${buildCartFrame('plot-27', 460, 'Tablero universal')}
+<div class="glass-panel" style="font-size:.82rem">
+  <p>🔴 <strong>P₁</strong> &nbsp;&nbsp; 🔵 <strong>P₂</strong></p>
+  <p>🟣 <strong>M</strong> (punto medio)</p>
+  <p>🟢 <strong>L</strong> (recta y = mx + b)</p>
+  <p>🟡 Triángulo rectángulo de Pitágoras (catetos Δx y Δy)</p>
+</div>`} },
+
+/* ═════ 28 · REFERENCIAS ═════ */
+{ title:"28. Referencias", left:{ html:`
+<h2>28. Referencias bibliográficas</h2>
+<div class="clay-card" style="font-size:.86rem">
+  <ul>
+    <li><strong>Descartes, R.</strong> (1637). <em>La Géométrie</em>. Apéndice de <em>Discours de la méthode</em>. Leyden: Jan Maire.</li>
+    <li><strong>Lehmann, Charles H.</strong> (1989). <em>Geometría analítica</em>. Editorial Limusa.</li>
+    <li><strong>Swokowski, E.</strong> & Cole, J. (2011). <em>Álgebra y trigonometría con geometría analítica</em>. Cengage.</li>
+    <li><strong>Leithold, Louis</strong> (1998). <em>El cálculo</em> (7ª ed.). Oxford University Press.</li>
+    <li><strong>Stewart, James</strong> (2017). <em>Cálculo de una variable</em>. Cengage.</li>
+    <li><strong>Montoya Palacios, N. F.</strong> (2022). <em>Geometría analítica</em>. Universidad del Valle — Documento de clase.</li>
+  </ul>
+</div>
+<h3>Recursos digitales</h3>
+<div class="concept-box" style="font-size:.84rem">
+  <ul>
+    <li><a href="https://www.geogebra.org" style="color:var(--primary)">GeoGebra</a> — simuladores gratuitos.</li>
+    <li><a href="https://www.desmos.com" style="color:var(--primary)">Desmos</a> — graficadora en línea.</li>
+    <li><a href="https://www.wolframalpha.com" style="color:var(--primary)">WolframAlpha</a> — motor simbólico.</li>
+    <li><a href="https://www.khanacademy.org" style="color:var(--primary)">Khan Academy</a> — video–tutoriales.</li>
+    <li><a href="https://www.youtube.com/@nestormontoya1" style="color:var(--primary)">Canal YouTube del profesor</a>.</li>
+  </ul>
+</div>`}, right:{ html:`
+<h3>Competencias desarrolladas (ICFES)</h3>
+<div class="concept-box">
+  <p><strong>📐 Razonamiento y argumentación:</strong> demostrar propiedades del paralelismo y perpendicularidad.</p>
+  <p><strong>🎯 Resolución de problemas:</strong> modelar situaciones reales con rectas.</p>
+  <p><strong>💬 Comunicación:</strong> traducir entre lenguaje natural, algebraico y gráfico.</p>
+  <p><strong>🔗 Pensamiento variacional:</strong> interpretar la pendiente como tasa de cambio.</p>
+  <p><strong>📊 Pensamiento espacial:</strong> ubicar puntos, medir distancias y áreas.</p>
+</div>
+<h3>Frases célebres</h3>
+<div class="warning-box" style="font-size:.84rem">
+  <p><em>"No aceptéis jamás cosa alguna como verdadera que no supiera con evidencia que lo es."</em> — René Descartes (Discurso del método)</p>
+</div>
+<div class="warning-box" style="font-size:.84rem">
+  <p><em>"La geometría es una expresión del pensamiento. Si los dioses existen, son geómetras."</em> — Platón</p>
+</div>`} },
+
+/* ═════ 29 · CRÉDITOS ═════ */
+{ title:"Créditos", left:{ html:`
+<h2><i class="fa-solid fa-graduation-cap"></i> Créditos</h2>
+<div class="clay-card">
+  <div style="text-align:center">
+    <div style="font-size:3.2rem;color:var(--primary);margin-bottom:8px"><i class="fa-solid fa-chalkboard-user"></i></div>
+    <p style="font-size:1.1rem;font-weight:800;color:var(--primary-dark)">Msc. Néstor Fabio Montoya Palacios</p>
+    <p style="font-size:.86rem;color:var(--text-muted);margin-top:-4px">Magíster en Enseñanza de la Física · Docente de Matemáticas y Física</p>
+    <p style="font-size:.84rem;margin-top:8px">Colegio María Auxiliadora · Cartago, Valle del Cauca, Colombia</p>
+    <p style="font-size:.82rem;color:var(--text-muted);margin-top:6px">Material basado en el documento <em>Geometría Analítica</em> (Universidad del Valle, 2022)</p>
+  </div>
+</div>
+<h3>Agradecimientos</h3>
+<div class="glass-panel" style="font-size:.85rem">
+  <p>A los <strong>estudiantes del Colegio María Auxiliadora</strong>, cuyas preguntas inspiran cada página. A la <strong>Universidad del Valle</strong>, alma mater del material original. Y a todas las personas que creen que <em>aprender puede ser una experiencia hermosa</em>.</p>
+</div>
+<p style="font-size:.75rem;color:var(--text-muted);text-align:center;margin-top:14px;font-style:italic">
+  Cuaderno Interactivo · Versión 1.0 · Abril 2026<br>
+  MathJax, Canvas, Font Awesome y el motor CartPlot son la infraestructura técnica de este proyecto.
+</p>`}, right:{ html:`
+<div style="display:flex;flex-direction:column;justify-content:center;height:100%;text-align:center">
+  <div style="font-size:3.8rem;color:var(--primary)"><i class="fa-solid fa-chart-line"></i></div>
+  <h2 style="border:none;color:var(--primary);text-align:center">¡Gracias por estudiar!</h2>
+  <p style="font-style:italic;max-width:320px;margin:10px auto;font-size:.92rem">"Dadme un punto de apoyo y moveré el mundo."<br>— Arquímedes</p>
+  <div class="warning-box" style="margin-top:16px;text-align:left">
+    <strong><i class="fa-solid fa-wand-magic-sparkles"></i> Próximos cuadernos:</strong>
+    <ul style="font-size:.84rem;margin-left:14px;margin-top:4px">
+      <li>Función cuadrática y parábolas</li>
+      <li>Circunferencia y elipse</li>
+      <li>Función exponencial y logarítmica</li>
+      <li>Trigonometría básica</li>
+    </ul>
+  </div>
+  <div class="concept-box" style="margin-top:10px;text-align:left">
+    <strong><i class="fa-solid fa-rocket"></i> Superpoderes de este cuaderno:</strong>
+    <ul style="font-size:.8rem;margin-left:14px">
+      <li>27 planos cartesianos interactivos estilo GeoGebra</li>
+      <li>Calculadoras de distancia, punto medio, pendiente…</li>
+      <li>Quiz de 10 preguntas con retroalimentación</li>
+      <li>Laboratorio universal de análisis</li>
+      <li>Aplicaciones en física y economía</li>
+    </ul>
+  </div>
+</div>`} }
+
+]; // ← fin BOOK_DATA
+
+/* ══════════════════════════════════════════════════════════════════════════
+   🧠 LÓGICA INTERACTIVA DE CADA PÁGINA
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Helpers numéricos ── */
+const fmt = (n, d=2) => (Math.abs(n) < 1e-12 ? '0' : (+n.toFixed(d)).toString());
+const dist = (a,b) => Math.hypot(b[0]-a[0], b[1]-a[1]);
+const signed = n => (n >= 0 ? '+' + fmt(n) : fmt(n));
+
+/* ═════ P5 · Plano cartesiano con cuadrantes ═════ */
+function initPage5() {
+  _makePlot('plot-5', {
+    xMin:-6, xMax:6, yMin:-5, yMax:5, scale:40,
+    objects: [
+      { kind:'polygon', pts:[[0,0],[6,0],[6,5],[0,5]], fill:'rgba(16,185,129,.18)', color:'rgba(16,185,129,.0)' },
+      { kind:'polygon', pts:[[0,0],[-6,0],[-6,5],[0,5]], fill:'rgba(132,204,22,.18)', color:'rgba(132,204,22,.0)' },
+      { kind:'polygon', pts:[[0,0],[-6,0],[-6,-5],[0,-5]], fill:'rgba(245,158,11,.18)', color:'rgba(245,158,11,.0)' },
+      { kind:'polygon', pts:[[0,0],[6,0],[6,-5],[0,-5]], fill:'rgba(249,115,22,.18)', color:'rgba(249,115,22,.0)' },
+      { kind:'text', t:'I',   x: 3, y: 2.5, color:'#047857' },
+      { kind:'text', t:'II',  x:-3, y: 2.5, color:'#4d7c0f' },
+      { kind:'text', t:'III', x:-3, y:-2.5, color:'#b45309' },
+      { kind:'text', t:'IV',  x: 3, y:-2.5, color:'#c2410c' },
+    ]
+  });
+}
+
+/* ═════ P6 · Localizador ═════ */
+const locPts = [{x:3,y:4,c:'#1d4ed8'}, {x:-3,y:2,c:'#ef4444'}, {x:-5,y:-3,c:'#0f172a'}, {x:2,y:-1,c:'#f59e0b'}];
+function initPage6() {
+  renderPage6();
+}
+function renderPage6() {
+  const objs = locPts.map((p,i) => ({ kind:'point', x:p.x, y:p.y, color:p.c, r:6, label:`P${i+1}(${p.x}, ${p.y})`, labelDx:8, labelDy:-8 }));
+  _makePlot('plot-6', { xMin:-7, xMax:7, yMin:-5, yMax:5, scale:40, objects: objs });
+}
+function addLocPoint(){
+  const x = parseFloat(document.getElementById('loc-x').value);
+  const y = parseFloat(document.getElementById('loc-y').value);
+  if (isNaN(x) || isNaN(y)) return;
+  const colors = ['#1d4ed8','#ef4444','#10b981','#f59e0b','#8b5cf6','#06b6d4','#ec4899'];
+  locPts.push({ x, y, c: colors[locPts.length % colors.length] });
+  const q = (x>0&&y>0)?'I · (+, +)' : (x<0&&y>0)?'II · (−, +)' : (x<0&&y<0)?'III · (−, −)' : (x>0&&y<0)?'IV · (+, −)' : 'Sobre un eje';
+  document.getElementById('loc-quad').textContent = q;
+  renderPage6();
+}
+function clearLocPoints(){ locPts.length = 0; renderPage6(); document.getElementById('loc-quad').textContent = '—'; }
+
+/* ═════ P7 · Distancia visual ═════ */
+function initPage7() {
+  const P1=[-4,2], P2=[3,5];
+  _makePlot('plot-7', {
+    xMin:-6, xMax:6, yMin:-1, yMax:7, scale:42,
+    objects: [
+      { kind:'polygon', pts:[P1,[P2[0],P1[1]],P2], fill:'rgba(245,158,11,.25)', color:'rgba(245,158,11,0)' },
+      { kind:'segment', x1:P1[0], y1:P1[1], x2:P2[0], y2:P1[1], color:'#ef4444', dashed:true, label:'Δx = 7', labelDy:16 },
+      { kind:'segment', x1:P2[0], y1:P1[1], x2:P2[0], y2:P2[1], color:'#2563eb', dashed:true, label:'Δy = 3', labelDx:20, labelDy:-10 },
+      { kind:'segment', x1:P1[0], y1:P1[1], x2:P2[0], y2:P2[1], color:'#7c3aed', lineWidth:3, label:'d ≈ 7,62', labelDy:-14 },
+      { kind:'rightAngle', v:[P2[0],P1[1]], a:P1, b:P2, color:'#111' },
+      { kind:'point', x:P1[0], y:P1[1], color:'#ef4444', label:'P₁(−4, 2)', labelDy:-10 },
+      { kind:'point', x:P2[0], y:P2[1], color:'#1d4ed8', label:'P₂(3, 5)',  labelDy:-10 },
+    ]
+  });
+}
+
+/* ═════ P8 · Calculadora de distancia ═════ */
+function calcDist(){
+  const x1=+document.getElementById('d-x1').value, y1=+document.getElementById('d-y1').value;
+  const x2=+document.getElementById('d-x2').value, y2=+document.getElementById('d-y2').value;
+  const dx=x2-x1, dy=y2-y1;
+  const d = Math.hypot(dx, dy);
+  document.getElementById('d-out').textContent = `Δx=${fmt(dx)} · Δy=${fmt(dy)} → d = √(${fmt(dx*dx)}+${fmt(dy*dy)}) = ${fmt(d)}`;
+  _makePlot('plot-8', {
+    xMin:Math.min(x1,x2)-2, xMax:Math.max(x1,x2)+2, yMin:Math.min(y1,y2)-2, yMax:Math.max(y1,y2)+2, scale:null,
+    objects:[
+      { kind:'polygon', pts:[[x1,y1],[x2,y1],[x2,y2]], fill:'rgba(245,158,11,.22)', color:'rgba(0,0,0,0)' },
+      { kind:'segment', x1, y1, x2, y2:y1, color:'#ef4444', dashed:true, label:'Δx='+fmt(dx), labelDy:16 },
+      { kind:'segment', x1:x2, y1, x2, y2, color:'#2563eb', dashed:true, label:'Δy='+fmt(dy), labelDx:20 },
+      { kind:'segment', x1, y1, x2, y2, color:'#7c3aed', lineWidth:3, label:'d='+fmt(d), labelDy:-14 },
+      { kind:'point', x:x1, y:y1, color:'#ef4444', label:`P₁(${x1},${y1})` },
+      { kind:'point', x:x2, y:y2, color:'#1d4ed8', label:`P₂(${x2},${y2})` },
+    ]
+  });
+}
+function initPage8(){ calcDist(); }
+
+/* ═════ P9 · Punto medio ═════ */
+function calcMid(){
+  const x1=+document.getElementById('m-x1').value, y1=+document.getElementById('m-y1').value;
+  const x2=+document.getElementById('m-x2').value, y2=+document.getElementById('m-y2').value;
+  const mx=(x1+x2)/2, my=(y1+y2)/2;
+  document.getElementById('m-out').textContent = `M = (${fmt(mx)}, ${fmt(my)})`;
+  _makePlot('plot-9', {
+    xMin:Math.min(x1,x2)-2, xMax:Math.max(x1,x2)+2, yMin:Math.min(y1,y2)-2, yMax:Math.max(y1,y2)+2, scale:null,
+    objects:[
+      { kind:'segment', x1, y1, x2, y2, color:'#475569', lineWidth:2 },
+      { kind:'point', x:x1, y:y1, color:'#ef4444', label:`P₁(${x1},${y1})` },
+      { kind:'point', x:x2, y:y2, color:'#1d4ed8', label:`P₂(${x2},${y2})` },
+      { kind:'point', x:mx, y:my, color:'#8b5cf6', r:7, label:`M(${fmt(mx)}, ${fmt(my)})`, labelDy:-12 },
+    ]
+  });
+}
+function initPage9(){ calcMid(); }
+
+/* ═════ P10 · División en razón ═════ */
+function calcRazon(){
+  const x1=+document.getElementById('r-x1').value, y1=+document.getElementById('r-y1').value;
+  const x2=+document.getElementById('r-x2').value, y2=+document.getElementById('r-y2').value;
+  const k=+document.getElementById('r-k').value;
+  document.getElementById('r-k-val').textContent = fmt(k,1);
+  const px=(x1+k*x2)/(1+k), py=(y1+k*y2)/(1+k);
+  document.getElementById('r-out').textContent = `P = (${fmt(px)}, ${fmt(py)})`;
+  _makePlot('plot-10', {
+    xMin:Math.min(x1,x2,px)-2, xMax:Math.max(x1,x2,px)+2, yMin:Math.min(y1,y2,py)-2, yMax:Math.max(y1,y2,py)+2, scale:null,
+    objects:[
+      { kind:'segment', x1, y1, x2, y2, color:'#475569', lineWidth:2 },
+      { kind:'point', x:x1, y:y1, color:'#ef4444', label:`P₁` },
+      { kind:'point', x:x2, y:y2, color:'#1d4ed8', label:`P₂` },
+      { kind:'point', x:px, y:py, color:'#f59e0b', r:7, label:`P (k=${fmt(k,1)})`, labelDy:-12 },
+    ]
+  });
+}
+function initPage10(){ calcRazon(); }
+
+/* ═════ P11 · Pendiente ═════ */
+function initPage11() {
+  const x1=-4, y1=1, x2=4, y2=5;
+  const m=(y2-y1)/(x2-x1);
+  _makePlot('plot-11', {
+    xMin:-7, xMax:7, yMin:-2, yMax:7, scale:40,
+    objects:[
+      { kind:'line', m, b:y1-m*x1, color:'#1d4ed8', lineWidth:2, label:`y = ${fmt(m)}x + ${fmt(y1-m*x1)}`, labelX:1.5 },
+      { kind:'polygon', pts:[[x1,y1],[x2,y1],[x2,y2]], fill:'rgba(245,158,11,.22)', color:'rgba(0,0,0,0)' },
+      { kind:'segment', x1, y1, x2, y2:y1, color:'#ef4444', dashed:true, label:'Δx = 8', labelDy:16 },
+      { kind:'segment', x1:x2, y1, x2, y2, color:'#f59e0b', dashed:true, label:'Δy = 4', labelDx:18 },
+      { kind:'point', x:x1, y:y1, color:'#ef4444', label:'P₁(−4,1)' },
+      { kind:'point', x:x2, y:y2, color:'#1d4ed8', label:'P₂(4,5)' },
+    ]
+  });
+}
+
+/* ═════ P12 · Explorador pendiente ═════ */
+function explPend(){
+  const x1=+document.getElementById('e-x1').value, y1=+document.getElementById('e-y1').value;
+  const x2=+document.getElementById('e-x2').value, y2=+document.getElementById('e-y2').value;
+  document.getElementById('e-x1-val').textContent = fmt(x1,1);
+  document.getElementById('e-y1-val').textContent = fmt(y1,1);
+  document.getElementById('e-x2-val').textContent = fmt(x2,1);
+  document.getElementById('e-y2-val').textContent = fmt(y2,1);
+  let m, tipo, color;
+  if (Math.abs(x2-x1) < 1e-6) {
+    document.getElementById('e-m').textContent = 'm indefinida';
+    tipo='Vertical ⏐'; color='#8b5cf6';
+    _makePlot('plot-12', {
+      xMin:-8, xMax:8, yMin:-7, yMax:7, scale:30,
+      objects:[
+        { kind:'line', vertical:x1, color, lineWidth:3 },
+        { kind:'point', x:x1, y:y1, color:'#ef4444', label:'P₁' },
+        { kind:'point', x:x2, y:y2, color:'#1d4ed8', label:'P₂' },
+      ]
+    });
+  } else {
+    m = (y2-y1)/(x2-x1);
+    document.getElementById('e-m').textContent = `m = ${fmt(m,3)}  (${fmt(y2-y1,1)} / ${fmt(x2-x1,1)})`;
+    if (Math.abs(m) < 1e-6) { tipo='Horizontal ➖'; color='#0ea5e9'; }
+    else if (m > 0)         { tipo='Creciente 📈'; color='#10b981'; }
+    else                    { tipo='Decreciente 📉'; color='#ef4444'; }
+    _makePlot('plot-12', {
+      xMin:-8, xMax:8, yMin:-7, yMax:7, scale:30,
+      objects:[
+        { kind:'line', m, b:y1-m*x1, color, lineWidth:3, label:`m=${fmt(m,2)}`, labelX: (x1+x2)/2 },
+        { kind:'polygon', pts:[[x1,y1],[x2,y1],[x2,y2]], fill:'rgba(245,158,11,.22)', color:'rgba(0,0,0,0)' },
+        { kind:'segment', x1, y1, x2, y2:y1, color:'#ef4444', dashed:true, label:'Δx='+fmt(x2-x1,1), labelDy:14 },
+        { kind:'segment', x1:x2, y1, x2, y2, color:'#f59e0b', dashed:true, label:'Δy='+fmt(y2-y1,1), labelDx:18 },
+        { kind:'point', x:x1, y:y1, color:'#ef4444', label:'P₁' },
+        { kind:'point', x:x2, y:y2, color:'#1d4ed8', label:'P₂' },
+      ]
+    });
+  }
+  document.getElementById('e-tipo').textContent = tipo;
+}
+function initPage12(){ explPend(); }
+
+/* ═════ P13 · y = mx + b ═════ */
+function updY1(){
+  const m=+document.getElementById('y1-m').value, b=+document.getElementById('y1-b').value;
+  document.getElementById('y1-m-val').textContent = fmt(m,1);
+  document.getElementById('y1-b-val').textContent = fmt(b,1);
+  document.getElementById('y1-eq').textContent = `y = ${fmt(m,2)}x ${signed(b)}`;
+  _makePlot('plot-13', {
+    xMin:-7, xMax:7, yMin:-6, yMax:6, scale:30,
+    objects:[
+      { kind:'line', m, b, color:'#1d4ed8', lineWidth:3, label:`y = ${fmt(m,2)}x ${signed(b)}`, labelX:1.5 },
+      { kind:'point', x:0, y:b, color:'#f59e0b', r:7, label:`b=${fmt(b)}`, labelDx:10 }
+    ]
+  });
+}
+function initPage13(){ updY1(); }
+
+/* ═════ P14 · punto-pendiente ═════ */
+function updPP(){
+  const x1=+document.getElementById('pp-x1').value, y1=+document.getElementById('pp-y1').value, m=+document.getElementById('pp-m').value;
+  document.getElementById('pp-x1-val').textContent = fmt(x1,1);
+  document.getElementById('pp-y1-val').textContent = fmt(y1,1);
+  document.getElementById('pp-m-val').textContent = fmt(m,1);
+  const b = y1 - m*x1;
+  document.getElementById('pp-eq').textContent = `y = ${fmt(m,2)}x ${signed(b)}`;
+  _makePlot('plot-14', {
+    xMin:-8, xMax:8, yMin:-6, yMax:6, scale:30,
+    objects:[
+      { kind:'line', m, b, color:'#1d4ed8', lineWidth:3, label:`y = ${fmt(m)}(x ${signed(-x1)}) ${signed(y1)}`, labelX:1 },
+      { kind:'point', x:x1, y:y1, color:'#f59e0b', r:7, label:`P₁(${fmt(x1)}, ${fmt(y1)})`, labelDy:-10 }
+    ]
+  });
+}
+function initPage14(){ updPP(); }
+
+/* ═════ P15 · dos puntos ═════ */
+function updDP(){
+  const x1=+document.getElementById('dp-x1').value, y1=+document.getElementById('dp-y1').value;
+  const x2=+document.getElementById('dp-x2').value, y2=+document.getElementById('dp-y2').value;
+  if (Math.abs(x2-x1) < 1e-6) { document.getElementById('dp-eq').textContent = `x = ${fmt(x1)} (vertical)`;
+    _makePlot('plot-15', {xMin:-8,xMax:8,yMin:-6,yMax:6,scale:30,objects:[
+      {kind:'line', vertical:x1, color:'#8b5cf6', lineWidth:3},
+      {kind:'point', x:x1,y:y1,color:'#ef4444',label:'P₁'},
+      {kind:'point', x:x2,y:y2,color:'#1d4ed8',label:'P₂'}]}); return; }
+  const m = (y2-y1)/(x2-x1), b = y1 - m*x1;
+  document.getElementById('dp-eq').textContent = `y = ${fmt(m,3)}x ${signed(b)}`;
+  _makePlot('plot-15', {
+    xMin:Math.min(x1,x2)-3, xMax:Math.max(x1,x2)+3, yMin:Math.min(y1,y2)-3, yMax:Math.max(y1,y2)+3, scale:null,
+    objects:[
+      { kind:'line', m, b, color:'#10b981', lineWidth:3, label:`y = ${fmt(m,2)}x ${signed(b)}`, labelX:(x1+x2)/2 },
+      { kind:'point', x:x1, y:y1, color:'#ef4444', label:`P₁(${x1}, ${y1})` },
+      { kind:'point', x:x2, y:y2, color:'#1d4ed8', label:`P₂(${x2}, ${y2})` }
+    ]
+  });
+}
+function initPage15(){ updDP(); }
+
+/* ═════ P16 · Ax+By+C=0 ═════ */
+function updGen(){
+  const A=+document.getElementById('g-A').value, B=+document.getElementById('g-B').value, C=+document.getElementById('g-C').value;
+  document.getElementById('g-A-val').textContent = fmt(A,1);
+  document.getElementById('g-B-val').textContent = fmt(B,1);
+  document.getElementById('g-C-val').textContent = fmt(C,1);
+  if (Math.abs(B) < 1e-6) {
+    if (Math.abs(A) < 1e-6) {
+      document.getElementById('g-eq').textContent = 'No es una recta válida (A=B=0)';
+      _makePlot('plot-16', {xMin:-8,xMax:8,yMin:-6,yMax:6,scale:30,objects:[]}); return;
+    }
+    const x = -C/A;
+    document.getElementById('g-eq').textContent = `x = ${fmt(x)} (vertical)`;
+    _makePlot('plot-16', {xMin:-8,xMax:8,yMin:-6,yMax:6,scale:30,objects:[{kind:'line',vertical:x,color:'#8b5cf6',lineWidth:3}]});
+    return;
+  }
+  const m = -A/B, b = -C/B;
+  document.getElementById('g-eq').textContent = `y = ${fmt(m,3)}x ${signed(b)}  ·  m=${fmt(m,2)}, b=${fmt(b,2)}`;
+  _makePlot('plot-16', {
+    xMin:-8, xMax:8, yMin:-6, yMax:6, scale:30,
+    objects:[{ kind:'line', m, b, color:'#1d4ed8', lineWidth:3, label:`${fmt(A)}x ${signed(B)}y ${signed(C)} = 0`, labelX:1 }]
+  });
+}
+function initPage16(){ updGen(); }
+
+/* ═════ P17 · canónica ═════ */
+function updSeg(){
+  const a=+document.getElementById('s-a').value, b=+document.getElementById('s-b').value;
+  document.getElementById('s-a-val').textContent = fmt(a,1);
+  document.getElementById('s-b-val').textContent = fmt(b,1);
+  document.getElementById('s-can').textContent = `x/${fmt(a)} + y/${fmt(b)} = 1`;
+  if (Math.abs(a) < 1e-6 || Math.abs(b) < 1e-6) {
+    document.getElementById('s-mb').textContent = 'a y b deben ser distintos de 0';
+    _makePlot('plot-17', {xMin:-8,xMax:8,yMin:-8,yMax:8,scale:28,objects:[]}); return;
+  }
+  const m = -b/a;
+  document.getElementById('s-mb').textContent = `y = ${fmt(m,3)} x + ${fmt(b,2)}`;
+  _makePlot('plot-17', {
+    xMin:-8, xMax:8, yMin:-8, yMax:8, scale:26,
+    objects:[
+      { kind:'line', m, b, color:'#f59e0b', lineWidth:3, label:`x/${fmt(a)} + y/${fmt(b)} = 1`, labelX:1 },
+      { kind:'point', x:a, y:0, color:'#1d4ed8', r:7, label:`A(${fmt(a)}, 0)`, labelDy:16 },
+      { kind:'point', x:0, y:b, color:'#ef4444', r:7, label:`B(0, ${fmt(b)})`, labelDx:10 }
+    ]
+  });
+}
+function initPage17(){ updSeg(); }
+
+/* ═════ P18 · horizontal y vertical ═════ */
+function updHV(){
+  const k=+document.getElementById('hv-k').value, h=+document.getElementById('hv-h').value;
+  document.getElementById('hv-k-val').textContent = fmt(k,1);
+  document.getElementById('hv-h-val').textContent = fmt(h,1);
+  _makePlot('plot-18', {
+    xMin:-8, xMax:8, yMin:-7, yMax:7, scale:32,
+    objects:[
+      { kind:'line', m:0, b:k, color:'#10b981', lineWidth:3, label:`y = ${fmt(k)}`, labelX:4.5 },
+      { kind:'line', vertical:h, color:'#ef4444', lineWidth:3, label:`x = ${fmt(h)}`, labelX:h+.3 },
+      { kind:'point', x:0, y:k, color:'#10b981', r:6, label:`(0, ${fmt(k)})` },
+      { kind:'point', x:h, y:0, color:'#ef4444', r:6, label:`(${fmt(h)}, 0)`, labelDy:16 },
+      { kind:'point', x:h, y:k, color:'#8b5cf6', r:6, label:`(${fmt(h)}, ${fmt(k)})`, labelDy:-10 }
+    ]
+  });
+}
+function initPage18(){ updHV(); }
+
+/* ═════ P19 · paralelas ═════ */
+function updPar(){
+  const m=+document.getElementById('pa-m').value, b1=+document.getElementById('pa-b1').value, b2=+document.getElementById('pa-b2').value;
+  document.getElementById('pa-m-val').textContent = fmt(m,1);
+  document.getElementById('pa-b1-val').textContent = fmt(b1,1);
+  document.getElementById('pa-b2-val').textContent = fmt(b2,1);
+  document.getElementById('pa-ok').textContent = `✓ m₁ = m₂ = ${fmt(m,2)}`;
+  _makePlot('plot-19', {
+    xMin:-8, xMax:8, yMin:-8, yMax:8, scale:26,
+    objects:[
+      { kind:'line', m, b:b1, color:'#1d4ed8', lineWidth:3, label:`L₁: y = ${fmt(m,2)}x ${signed(b1)}`, labelX:-6 },
+      { kind:'line', m, b:b2, color:'#ef4444', lineWidth:3, label:`L₂: y = ${fmt(m,2)}x ${signed(b2)}`, labelX:-6 }
+    ]
+  });
+}
+function initPage19(){ updPar(); }
+
+/* ═════ P20 · perpendiculares ═════ */
+function updPerp(){
+  const m=+document.getElementById('pe-m').value, b1=+document.getElementById('pe-b1').value, b2=+document.getElementById('pe-b2').value;
+  document.getElementById('pe-m-val').textContent = fmt(m,1);
+  document.getElementById('pe-b1-val').textContent = fmt(b1,1);
+  document.getElementById('pe-b2-val').textContent = fmt(b2,1);
+  if (Math.abs(m) < 1e-6) { document.getElementById('pe-ok').textContent='Usa m ≠ 0'; return; }
+  const m2 = -1/m;
+  document.getElementById('pe-ok').textContent = `m₁·m₂ = ${fmt(m,2)} · ${fmt(m2,2)} = −1 ✓`;
+  _makePlot('plot-20', {
+    xMin:-8, xMax:8, yMin:-8, yMax:8, scale:26,
+    objects:[
+      { kind:'line', m, b:b1, color:'#1d4ed8', lineWidth:3, label:`L₁ (m=${fmt(m,2)})`, labelX:-6 },
+      { kind:'line', m:m2, b:b2, color:'#ef4444', lineWidth:3, label:`L₂ (m=${fmt(m2,2)})`, labelX:4 },
+      { kind:'text', t:'90°', x:0.2, y:0.2, color:'#0f172a' }
+    ]
+  });
+}
+function initPage20(){ updPerp(); }
+
+/* ═════ P21 · distancia punto-recta ═════ */
+function updDR(){
+  const A=+document.getElementById('dr-A').value, B=+document.getElementById('dr-B').value, C=+document.getElementById('dr-C').value;
+  const x=+document.getElementById('dr-x').value, y=+document.getElementById('dr-y').value;
+  const num = Math.abs(A*x + B*y + C);
+  const den = Math.hypot(A, B);
+  if (den < 1e-9) { document.getElementById('dr-out').textContent = 'A y B no pueden ser ambos 0'; return; }
+  const d = num/den;
+  document.getElementById('dr-out').textContent = `d = |${fmt(A)}·${fmt(x)}+${fmt(B)}·${fmt(y)}${signed(C)}| / √(${fmt(A*A)}+${fmt(B*B)}) = ${fmt(num)} / ${fmt(den,3)} ≈ ${fmt(d,3)}`;
+  // Pie perpendicular: proyección
+  const k = (A*x + B*y + C)/(A*A + B*B);
+  const px = x - A*k, py = y - B*k;
+  const objs = [];
+  if (Math.abs(B) > 1e-6) objs.push({ kind:'line', m:-A/B, b:-C/B, color:'#1d4ed8', lineWidth:3, label:`${fmt(A)}x ${signed(B)}y ${signed(C)} = 0`, labelX:-4 });
+  else objs.push({ kind:'line', vertical: -C/A, color:'#1d4ed8', lineWidth:3 });
+  objs.push({ kind:'segment', x1:x, y1:y, x2:px, y2:py, color:'#8b5cf6', dashed:true, lineWidth:2, label:`d=${fmt(d,2)}`, labelDx:10 });
+  objs.push({ kind:'point', x, y, color:'#ef4444', r:7, label:`P(${x},${y})`, labelDy:-10 });
+  objs.push({ kind:'point', x:px, y:py, color:'#f59e0b', r:5, label:'pie ⊥', labelDy:-10 });
+  _makePlot('plot-21', { xMin:-6, xMax:8, yMin:-4, yMax:7, scale:32, objects: objs });
+}
+function initPage21(){ updDR(); }
+
+/* ═════ P22 · Fórmula de Herón ═════ */
+function updHeron(){
+  const A=[+document.getElementById('h-ax').value, +document.getElementById('h-ay').value];
+  const B=[+document.getElementById('h-bx').value, +document.getElementById('h-by').value];
+  const C=[+document.getElementById('h-cx').value, +document.getElementById('h-cy').value];
+  const a=dist(B,C), b=dist(A,C), c=dist(A,B);
+  const P=a+b+c, s=P/2;
+  const disc = s*(s-a)*(s-b)*(s-c);
+  const area = disc > 0 ? Math.sqrt(disc) : 0;
+  document.getElementById('h-lados').textContent = `a=${fmt(a)} · b=${fmt(b)} · c=${fmt(c)}`;
+  document.getElementById('h-perim').textContent = `P=${fmt(P)} · s=${fmt(s)}`;
+  document.getElementById('h-area').textContent  = `A ≈ ${fmt(area)} u²`;
+  const xs=[A[0],B[0],C[0]], ys=[A[1],B[1],C[1]];
+  _makePlot('plot-22', {
+    xMin:Math.min(...xs)-2, xMax:Math.max(...xs)+2, yMin:Math.min(...ys)-2, yMax:Math.max(...ys)+2, scale:null,
+    objects:[
+      { kind:'polygon', pts:[A,B,C], fill:'rgba(245,158,11,.28)', color:'#f59e0b', lineWidth:2 },
+      { kind:'point', x:A[0], y:A[1], color:'#ef4444', label:`A(${A[0]},${A[1]})` },
+      { kind:'point', x:B[0], y:B[1], color:'#1d4ed8', label:`B(${B[0]},${B[1]})` },
+      { kind:'point', x:C[0], y:C[1], color:'#10b981', label:`C(${C[0]},${C[1]})` }
+    ]
+  });
+}
+function initPage22(){ updHeron(); }
+
+/* ═════ P23 · Temperaturas ═════ */
+function updTemp(){
+  const c=+document.getElementById('tc').value;
+  document.getElementById('tc-val').textContent = fmt(c,1);
+  const f = 9/5 * c + 32;
+  const k = c + 273.15;
+  document.getElementById('tf-out').textContent = `°F = (9/5)(${fmt(c)}) + 32 = ${fmt(f,1)}`;
+  document.getElementById('tk-out').textContent = `K = ${fmt(c)} + 273.15 = ${fmt(k,2)}`;
+  _makePlot('plot-23', {
+    xMin:-50, xMax:220, yMin:-60, yMax:260, scale:null,
+    objects:[
+      { kind:'line', m:9/5, b:32, color:'#ef4444', lineWidth:3, label:'°F = (9/5)°C + 32', labelX:20 },
+      { kind:'point', x:0,   y:32,  color:'#1d4ed8', r:7, label:'(0, 32)', labelDy:-12 },
+      { kind:'point', x:100, y:212, color:'#f59e0b', r:7, label:'(100, 212)', labelDy:-12 },
+      { kind:'point', x:c,   y:f,   color:'#10b981', r:7, label:`(${fmt(c)}, ${fmt(f,1)})`, labelDy:-12 }
+    ]
+  });
+}
+function initPage23(){ updTemp(); }
+
+/* ═════ P24 · MRU ═════ */
+function updMRU(){
+  const va=+document.getElementById('mru-va').value;
+  const x0b=+document.getElementById('mru-x0b').value;
+  const vb=+document.getElementById('mru-vb').value;
+  document.getElementById('mru-va-val').textContent = fmt(va);
+  document.getElementById('mru-x0b-val').textContent = fmt(x0b);
+  document.getElementById('mru-vb-val').textContent = fmt(vb);
+  const denom = va - vb;
+  let t=0, x=0;
+  if (Math.abs(denom) > 1e-6) { t = x0b / denom; x = va * t; }
+  document.getElementById('mru-out').textContent = (denom > 0 && t > 0)
+    ? `t = ${fmt(t,2)} h · x = ${fmt(x,1)} km`
+    : 'Los autos no se encuentran';
+  _makePlot('plot-24', {
+    xMin:0, xMax:Math.max(25, t*1.5), yMin:0, yMax:Math.max(x0b, x)*1.2, scale:null,
+    objects:[
+      { kind:'line', m:va,  b:0,    color:'#1d4ed8', lineWidth:3, label:`A: x=${va}t`,   labelX:5 },
+      { kind:'line', m:vb,  b:x0b,  color:'#ef4444', lineWidth:3, label:`B: x=${x0b}${signed(vb)}t`, labelX:5 },
+      ...(denom > 0 && t > 0 ? [{ kind:'point', x:t, y:x, color:'#8b5cf6', r:7, label:`(${fmt(t,1)}h, ${fmt(x,0)} km)`, labelDy:-12 }] : [])
+    ]
+  });
+}
+function initPage24(){ updMRU(); }
+
+/* ═════ P25 · Economía ═════ */
+function updEco(){
+  const a=+document.getElementById('ec-a').value, b=+document.getElementById('ec-b').value;
+  const c=+document.getElementById('ec-c').value, d=+document.getElementById('ec-d').value;
+  document.getElementById('ec-a-val').textContent = fmt(a,1);
+  document.getElementById('ec-b-val').textContent = fmt(b);
+  document.getElementById('ec-c-val').textContent = fmt(c,1);
+  document.getElementById('ec-d-val').textContent = fmt(d);
+  const pE = (b - d) / (a + c);
+  const qE = c * pE + d;
+  document.getElementById('ec-out').textContent = (pE > 0 && qE > 0)
+    ? `p* = ${fmt(pE,2)} · q* = ${fmt(qE,1)}`
+    : 'Sin equilibrio positivo';
+  _makePlot('plot-25', {
+    xMin:0, xMax:Math.max(30, pE*1.8), yMin:0, yMax:Math.max(120, qE*1.8), scale:null,
+    objects:[
+      { kind:'line', m:-a, b, color:'#ef4444', lineWidth:3, label:`qD = −${fmt(a)}p + ${fmt(b)}`, labelX:1 },
+      { kind:'line', m:c,  b:d, color:'#10b981', lineWidth:3, label:`qO = ${fmt(c)}p + ${fmt(d)}`, labelX:1 },
+      ...(pE > 0 && qE > 0 ? [{ kind:'point', x:pE, y:qE, color:'#8b5cf6', r:8, label:`E(${fmt(pE,1)}, ${fmt(qE,1)})`, labelDy:-12 }] : [])
+    ]
+  });
+}
+function initPage25(){ updEco(); }
+
+/* ═════ P26 · QUIZ ═════ */
+const QUIZ = [
+  { q:"¿En qué cuadrante está el punto P(-4, 3)?", options:["I","II","III","IV"], answer:1, explain:"x<0, y>0 → II cuadrante." },
+  { q:"Distancia entre P₁(1,2) y P₂(4,6):", options:["3","4","5","6"], answer:2, explain:"d = √(3²+4²) = √25 = 5." },
+  { q:"Punto medio de (−2, 4) y (6, 0):", options:["(2, 2)","(4, 4)","(2, 4)","(0, 2)"], answer:0, explain:"M = ((−2+6)/2, (4+0)/2) = (2, 2)." },
+  { q:"Pendiente de la recta que pasa por (0,0) y (4,8):", options:["0.5","1","2","4"], answer:2, explain:"m = (8−0)/(4−0) = 2." },
+  { q:"Ecuación pendiente-intercepto con m=−3 y b=5:", options:["y=3x−5","y=−3x+5","y=5x−3","y=−3x−5"], answer:1, explain:"y = mx + b = −3x + 5." },
+  { q:"¿Las rectas y = 2x + 1 y y = 2x − 5 son...?", options:["Iguales","Paralelas","Perpendiculares","Secantes"], answer:1, explain:"Tienen la misma pendiente m=2 → paralelas." },
+  { q:"La recta perpendicular a y = −2x + 1 tiene pendiente:", options:["−2","2","−1/2","1/2"], answer:3, explain:"m₂ = −1/m₁ = −1/(−2) = 1/2." },
+  { q:"Distancia de P(0,0) a la recta 3x + 4y − 10 = 0:", options:["1","2","3","4"], answer:1, explain:"d = |−10|/√(9+16) = 10/5 = 2." },
+  { q:"La recta x = 5 es:", options:["Horizontal","Vertical","Creciente","Decreciente"], answer:1, explain:"x = constante → recta vertical." },
+  { q:"El área de un triángulo por Herón con lados 3, 4, 5:", options:["5","6","7","12"], answer:1, explain:"s=6 → √(6·3·2·1) = √36 = 6." }
+];
+let quizIdx=0, quizScore=0, quizAnswered=false;
+function renderQuiz(){
+  const c=document.getElementById('quiz-container'); if(!c)return;
+  if (quizIdx >= QUIZ.length){
+    c.innerHTML = `<div class="example-box" style="text-align:center">
+      <span class="example-title"><i class="fas fa-trophy"></i> ¡Quiz terminado!</span>
+      <p style="font-size:1.1rem">Puntaje final: <strong>${quizScore} / ${QUIZ.length}</strong></p>
+      <p>${quizScore===QUIZ.length?'¡Perfecto! 🎉':quizScore>=QUIZ.length*.7?'¡Muy bien! 👏':'Sigue practicando 💪'}</p>
+    </div>`;
+    return;
+  }
+  const q=QUIZ[quizIdx];
+  c.innerHTML = `<div class="concept-box"><h4>Pregunta ${quizIdx+1} de ${QUIZ.length}</h4><p style="font-size:.95rem">${q.q}</p></div>` +
+    q.options.map((o,i)=>`<button class="quiz-option" data-i="${i}">${String.fromCharCode(65+i)}) ${o}</button>`).join('');
+  c.querySelectorAll('.quiz-option').forEach(btn=>{
+    btn.onclick=()=>{
+      if (quizAnswered) return;
+      quizAnswered=true;
+      const i=+btn.dataset.i, correct=i===q.answer;
+      if (correct){ btn.classList.add('correct'); quizScore++; }
+      else { btn.classList.add('wrong'); c.querySelectorAll('.quiz-option')[q.answer].classList.add('correct'); }
+      document.getElementById('score-value').textContent = `${quizScore} / ${quizIdx+1}`;
+      const exp=document.createElement('div'); exp.className='warning-box'; exp.style.marginTop='10px';
+      exp.innerHTML=`<strong><i class="fas fa-lightbulb"></i> Explicación:</strong><p>${q.explain}</p>`;
+      c.appendChild(exp);
+    };
+  });
+}
+window.nextQuestion = () => { if (!quizAnswered && quizIdx<QUIZ.length) return; quizIdx++; quizAnswered=false; renderQuiz(); };
+window.restartQuiz  = () => { quizIdx=0; quizScore=0; quizAnswered=false; document.getElementById('score-value').textContent='0 / 0'; renderQuiz(); };
+function initPage26(){ if (!document.querySelector('.quiz-option')) renderQuiz(); }
+
+/* ═════ P27 · evaluador universal ═════ */
+function updEval(){
+  const x1=+document.getElementById('ev-x1').value, y1=+document.getElementById('ev-y1').value;
+  const x2=+document.getElementById('ev-x2').value, y2=+document.getElementById('ev-y2').value;
+  const d=Math.hypot(x2-x1,y2-y1);
+  const mx=(x1+x2)/2, my=(y1+y2)/2;
+  const objs=[];
+  let mTxt, eqTxt;
+  if (Math.abs(x2-x1) < 1e-6) {
+    mTxt = 'm indefinida';
+    eqTxt = `x = ${fmt(x1)} (vertical)`;
+    objs.push({ kind:'line', vertical:x1, color:'#10b981', lineWidth:3 });
+  } else {
+    const m=(y2-y1)/(x2-x1), b=y1-m*x1;
+    mTxt = `m = ${fmt(m,3)}`;
+    eqTxt = `y = ${fmt(m,2)}x ${signed(b)}`;
+    objs.push({ kind:'line', m, b, color:'#10b981', lineWidth:3, label:eqTxt, labelX:(x1+x2)/2 });
+  }
+  document.getElementById('ev-d').textContent = `d = ${fmt(d,3)}`;
+  document.getElementById('ev-m').textContent = `M = (${fmt(mx)}, ${fmt(my)})`;
+  document.getElementById('ev-p').textContent = mTxt;
+  document.getElementById('ev-eq').textContent = eqTxt;
+  objs.push({ kind:'polygon', pts:[[x1,y1],[x2,y1],[x2,y2]], fill:'rgba(245,158,11,.22)', color:'rgba(0,0,0,0)' });
+  objs.push({ kind:'segment', x1, y1, x2, y2:y1, color:'#ef4444', dashed:true, label:'Δx', labelDy:14 });
+  objs.push({ kind:'segment', x1:x2, y1, x2, y2, color:'#2563eb', dashed:true, label:'Δy', labelDx:18 });
+  objs.push({ kind:'point', x:x1, y:y1, color:'#ef4444', label:`P₁(${x1},${y1})` });
+  objs.push({ kind:'point', x:x2, y:y2, color:'#1d4ed8', label:`P₂(${x2},${y2})` });
+  objs.push({ kind:'point', x:mx, y:my, color:'#8b5cf6', r:7, label:`M`, labelDy:-10 });
+  _makePlot('plot-27', {
+    xMin:Math.min(x1,x2)-2, xMax:Math.max(x1,x2)+2, yMin:Math.min(y1,y2)-2, yMax:Math.max(y1,y2)+2, scale:null,
+    objects: objs
+  });
+}
+function initPage27(){ updEval(); }
+
+/* ═════ Mapa conceptual SVG ═════ */
+function drawConceptMap(){
+  const svg=document.getElementById('cm-svg'); if(!svg)return;
+  const lines=[
+    [50,10,18,36],[50,10,50,36],[50,10,82,36],
+    [18,36,8,70],[18,36,22,70],[18,36,15,92],
+    [50,36,42,70],[50,36,58,70],[50,36,50,92],
+    [82,36,76,70],[82,36,92,70],[82,36,84,92]
+  ];
+  svg.innerHTML = lines.map(([x1,y1,x2,y2]) => `<line x1="${x1}%" y1="${y1}%" x2="${x2}%" y2="${y2}%" stroke="rgba(29,78,216,0.4)" stroke-width="2" stroke-dasharray="5,4"/>`).join('');
+}
+
+/* ══════════════════════════════════════════════════════════
+   🎬 RUNTIME — Navegación del libro
+   ══════════════════════════════════════════════════════════ */
+window.currentPage = 0;
+let mobileView = 'left';
+
+document.addEventListener('DOMContentLoaded', () => {
+  initSpine(); render(); handleResize();
+  window.addEventListener('resize', handleResize);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') nextPage();
+    if (e.key === 'ArrowLeft')  prevPage();
+    if (e.key === 'Escape')     hideIndex();
+  });
+  if (localStorage.getItem('flin-theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+    document.getElementById('theme-icon').className = 'fas fa-sun';
+  }
+});
+
+function initSpine(){
+  const s  = document.getElementById('spine');
+  const hL = document.getElementById('holes-l');
+  const hR = document.getElementById('holes-r');
+  s.innerHTML = hL.innerHTML = hR.innerHTML = '';
+  for (let i = 0; i < 15; i++) {
+    s.innerHTML  += '<div class="metal-ring"></div>';
+    hL.innerHTML += '<div class="paper-hole"></div>';
+    hR.innerHTML += '<div class="paper-hole"></div>';
+  }
+}
+
+function render(){
+  const d = BOOK_DATA[window.currentPage];
+  document.getElementById('c-left').innerHTML  = d.left.html;
+  document.getElementById('c-right').innerHTML = d.right.html;
+  document.getElementById('page-num').innerText =
+    window.currentPage === 0 ? "PORTADA"
+                             : `HOJA ${window.currentPage} / ${BOOK_DATA.length - 1}`;
+  document.getElementById('btn-prev').disabled = window.currentPage === 0;
+  document.getElementById('btn-next').disabled = window.currentPage === BOOK_DATA.length - 1;
+  document.getElementById('num-left').innerText  = window.currentPage > 0 ? window.currentPage * 2 : '';
+  document.getElementById('num-right').innerText = window.currentPage * 2 + 1;
+  if (window.MathJax?.typesetPromise) MathJax.typesetPromise().catch(()=>{});
+  handleResize();
+  setTimeout(initDiagrams, 120);
+}
+
+window.nextPage = () => { if (window.currentPage < BOOK_DATA.length - 1) { window.currentPage++; animatePage(1); } };
+window.prevPage = () => { if (window.currentPage > 0)                    { window.currentPage--; animatePage(-1); } };
+window.goToPage = n  => { window.currentPage = n; render(); };
+
+function animatePage(dir){
+  const b = document.getElementById('book-el');
+  b.style.transform = `rotateY(${dir * -4}deg) scale(.98)`;
+  setTimeout(() => { render(); b.style.transform = 'rotateY(0) scale(1)'; }, 250);
+}
+
+window.showIndex = () => {
+  const m = document.getElementById('index-modal');
+  const l = document.getElementById('index-list');
+  l.innerHTML = '';
+  BOOK_DATA.forEach((p, i) => {
+    const it = document.createElement('div');
+    it.className = 'index-item';
+    it.innerHTML = `<strong>${i}.</strong> ${p.title}`;
+    it.onclick = () => { goToPage(i); hideIndex(); };
+    l.appendChild(it);
+  });
+  m.classList.add('active');
+};
+window.hideIndex = () => document.getElementById('index-modal').classList.remove('active');
+
+window.toggleTheme = () => {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  localStorage.setItem('flin-theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-icon').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+  // Redibujar todos los plots (por tema)
+  Object.values(window._plots || {}).forEach(p => p && p.draw());
+};
+
+function handleResize(){
+  const isMob = window.innerWidth <= 900;
+  const l = document.getElementById('p-left');
+  const r = document.getElementById('p-right');
+  if (isMob) {
+    if (mobileView === 'left') { l.style.display='flex'; r.style.display='none'; document.getElementById('fab-text').textContent='Ver Der.'; }
+    else                        { l.style.display='none'; r.style.display='flex'; document.getElementById('fab-text').textContent='Ver Izq.'; }
+  } else { l.style.display='flex'; r.style.display='flex'; }
+  // Tras el resize, refitear los plots visibles
+  Object.values(window._plots || {}).forEach(p => { if (p && p.cv.offsetParent) { p._fit(); p.draw(); } });
+}
+window.toggleMobileSide = () => { mobileView = mobileView === 'left' ? 'right' : 'left'; handleResize(); };
+
+function initDiagrams(){
+  // Limpia referencias anteriores
+  window._plots = {};
+  const p = window.currentPage;
+  const map = {
+    4:  drawConceptMap,
+    5:  initPage5,  6: initPage6, 7: initPage7, 8: initPage8, 9: initPage9, 10: initPage10,
+    11: initPage11, 12: initPage12, 13: initPage13, 14: initPage14, 15: initPage15,
+    16: initPage16, 17: initPage17, 18: initPage18, 19: initPage19, 20: initPage20,
+    21: initPage21, 22: initPage22, 23: initPage23, 24: initPage24, 25: initPage25,
+    26: initPage26, 27: initPage27
+  };
+  if (map[p]) try { map[p](); } catch(e){ console.warn('Diagram init error p'+p, e); }
+}
+</script>
+</body>
+</html>
