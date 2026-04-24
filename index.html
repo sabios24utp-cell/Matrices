@@ -1,0 +1,2271 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         📐 MATEMÁTICAS INTERACTIVAS - Colegio María Auxiliadora de Cartago
+         ═══════════════════════════════════════════════════════════════════════════
+         📚 Autor: Msc. Néstor Fabio Montoya Palacios
+         📅 Versión: 3.7.2 - Abril 2026 (+ Cuaderno Función Lineal, + QuantumCalc)
+         🌐 URL: https://iemauxicartago.edu.co/Fisica/
+         ═══════════════════════════════════════════════════════════════════════════ -->
+
+    <title>Matemáticas Interactivas | Msc. Néstor Montoya</title>
+
+    <!-- 📝 META SEO -->
+    <meta name="description"
+        content="Plataforma educativa de Matemáticas para estudiantes del Colegio María Auxiliadora de Cartago. Cuadernos interactivos, simuladores, juegos y recursos para álgebra, cálculo, geometría, trigonometría, estadística y más.">
+    <meta name="keywords" content="matemáticas, educación, Colombia, álgebra, cálculo, trigonometría, geometría, estadística, probabilidad, álgebra lineal, GeoGebra, Desmos, MEN">
+    <meta name="author" content="Msc. Néstor Fabio Montoya Palacios">
+
+    <!-- 🔄 CONTROL DE CACHÉ DEL NAVEGADOR (especialmente para móviles) -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="Thu, 01 Jan 1970 00:00:00 GMT">
+
+    <!-- 📱 APP CONFIGURATION -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#10b981">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="apple-touch-icon" href="icon.svg">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Matemáticas">
+
+    <!-- 🔗 RECURSOS EXTERNOS -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Poppins:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.geogebra.org/apps/deployggb.js"></script>
+
+    <!-- 📐 MATHJAX para fórmulas matemáticas -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- 🎨 CONFIGURACIÓN DE TAILWIND -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        glass: {
+                            light: 'rgba(255, 255, 255, 0.65)',
+                            dark: 'rgba(30, 41, 59, 0.75)'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- 🎨 ESTILOS CSS PERSONALIZADOS -->
+    <style>
+        /* ═══════════════════════════════════════════════════════════════════════════
+           🌈 VARIABLES Y FONDOS ANIMADOS
+           ═══════════════════════════════════════════════════════════════════════════ */
+        :root {
+            /* 🎨 PALETA MATEMÁTICA · Esmeralda/Menta (máximo contraste con el índigo de Física) */
+            --bg-day: linear-gradient(125deg, #ECFCCB 0%, #A7F3D0 40%, #CFFAFE 100%);
+            --bg-night: linear-gradient(125deg, #0f172a 0%, #064e3b 40%, #134e4a 100%);
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-day);
+            background-size: 300% 300%;
+            animation: aurora 20s ease infinite;
+            overflow: hidden;
+            height: 100vh;
+            color: #1e293b;
+            transition: color 0.5s ease, background 0.5s ease;
+        }
+
+        body.dark {
+            background: var(--bg-night);
+            background-size: 300% 300%;
+            color: #e2e8f0;
+        }
+
+        @keyframes aurora {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════
+           🪟 PANELES DE CRISTAL (GLASSMORPHISM)
+           ═══════════════════════════════════════════════════════════════════════════ */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        .dark .glass-panel {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════
+           🔘 BOTONES ESTILO CLAY/NEUMORFISMO
+           ═══════════════════════════════════════════════════════════════════════════ */
+        .clay-btn {
+            background: #f8fafc;
+            border-radius: 12px;
+            box-shadow: inset -3px -3px 7px #d1d5db, inset 3px 3px 7px #ffffff, 4px 4px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+            color: #4f46e5;
+        }
+
+        .dark .clay-btn {
+            background: #1e293b;
+            box-shadow: inset -3px -3px 7px #0f172a, inset 3px 3px 7px #334155, 4px 4px 10px rgba(0, 0, 0, 0.3);
+            color: #818cf8;
+        }
+
+        .clay-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .clay-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════
+           📜 SCROLLBAR PERSONALIZADO
+           ═══════════════════════════════════════════════════════════════════════════ */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.4);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.6);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════
+           📋 MENÚ Y ETIQUETAS DE TIPO
+           ═══════════════════════════════════════════════════════════════════════════ */
+        .menu-item.active {
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.18) 0%, transparent 100%);
+            border-left: 4px solid #10b981;
+        }
+
+        .type-tag {
+            font-size: 8px;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .type-app {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .type-pdf {
+            background: #ffedd5;
+            color: #9a3412;
+        }
+
+        .type-yt {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .type-ggb {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .type-ext {
+            background: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════
+           🏷️ TOOLTIPS PARA EL MENÚ LATERAL
+           ═══════════════════════════════════════════════════════════════════════════ */
+        .menu-item {
+            position: relative;
+        }
+
+        .menu-item .tooltip-text {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 8px;
+            background: #1e293b;
+            color: #f1f5f9;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            z-index: 1000;
+            pointer-events: none;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            max-width: 280px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dark .menu-item .tooltip-text {
+            background: #6366f1;
+            color: #fff;
+        }
+
+        .menu-item .tooltip-text::before {
+            content: '';
+            position: absolute;
+            right: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 5px solid transparent;
+            border-right-color: #1e293b;
+        }
+
+        .dark .menu-item .tooltip-text::before {
+            border-right-color: #6366f1;
+        }
+
+        @media (min-width: 769px) {
+            .menu-item:hover .tooltip-text {
+                visibility: visible;
+                opacity: 1;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════
+           ⏳ SKELETON DE CARGA
+           ═══════════════════════════════════════════════════════════════════════════ */
+        .skeleton {
+            background: linear-gradient(90deg, #e2e8f0 25%, #cbd5e1 50%, #e2e8f0 75%);
+            background-size: 200% 100%;
+            animation: load 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes load {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════
+           ❌ BOTÓN DE CERRAR CON ANIMACIÓN
+           ═══════════════════════════════════════════════════════════════════════════ */
+        .close-btn {
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .close-btn:hover {
+            transform: rotate(180deg) scale(1.2);
+            color: #ef4444;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════
+           📊 TABLA DE CONSTANTES CIENTÍFICAS
+           ═══════════════════════════════════════════════════════════════════════════ */
+        .sc-table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
+
+        .sc-table th {
+            @apply text-left p-3 text-xs font-bold uppercase tracking-wider text-white bg-indigo-500 dark:bg-indigo-900 sticky top-0 z-10;
+        }
+
+        .sc-table td {
+            @apply p-3 text-sm text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-700 font-mono transition-colors;
+        }
+
+        .sc-table tr:nth-child(even) {
+            @apply bg-indigo-50/30 dark:bg-slate-700/20;
+        }
+
+        .sc-table tr:hover td {
+            @apply bg-indigo-100/50 dark:bg-slate-600/50;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════
+           📱 ESTILOS RESPONSIVE PARA MÓVILES
+           ═══════════════════════════════════════════════════════════════════════════ */
+
+        /* Móviles pequeños (hasta 480px) */
+        @media (max-width: 480px) {
+            body {
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+
+            .glass-panel {
+                padding: 0.5rem;
+            }
+
+            #sidebar {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .glass-card {
+                padding: 0.75rem;
+            }
+
+            #welcome-dashboard {
+                padding: 0.75rem;
+            }
+
+            #news-container {
+                grid-template-columns: 1fr !important;
+            }
+
+            .clay-btn {
+                padding: 0.5rem;
+            }
+        }
+
+        /* Tablets (481px a 768px) */
+        @media (min-width: 481px) and (max-width: 768px) {
+            #sidebar {
+                width: 280px !important;
+            }
+
+            #news-container {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* Asegura que el contenido sea visible en móviles */
+        @media (max-width: 768px) {
+            #main-container {
+                flex-direction: column;
+                height: calc(100vh - 4rem - 2rem);
+            }
+
+            #sidebar {
+                position: fixed;
+                top: 4rem;
+                left: 0;
+                height: calc(100vh - 4rem - 2rem);
+                z-index: 50;
+            }
+
+            main {
+                width: 100%;
+                margin: 0.5rem;
+            }
+
+            /* Overlay cuando sidebar está abierto */
+            #sidebar:not(.-translate-x-full)::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 100%;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        /* Desktop grande (más de 1200px) */
+        @media (min-width: 1200px) {
+            #news-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════
+           ✨ ANIMACIONES ADICIONALES
+           ═══════════════════════════════════════════════════════════════════════════ */
+        .animate-bounce-in {
+            animation: bounceIn 0.5s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.02);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Transición suave para elementos */
+        * {
+            transition-property: background-color, border-color, color, fill, stroke;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+
+        /* Limitar líneas de texto */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════════
+           📂 PANELES DE CATEGORÍA EXPANDIBLES/COLAPSABLES
+           ═══════════════════════════════════════════════════════════════════════════ */
+        #menu-container > div {
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 6px;
+            background: rgba(255,255,255,0.15);
+            transition: max-height 0.4s ease, background 0.3s ease;
+        }
+
+        .dark #menu-container > div {
+            background: rgba(30, 41, 59, 0.25);
+            border-color: rgba(100, 116, 139, 0.2);
+        }
+
+        /* Contenedor de items dentro de cada categoría: scroll vertical + horizontal */
+        #menu-container > div .cat-items-wrapper {
+            max-height: 220px;
+            overflow-y: auto;
+            overflow-x: auto;
+            resize: vertical;
+            scroll-behavior: smooth;
+            transition: max-height 0.4s ease;
+        }
+
+        /* Categoría colapsada */
+        #menu-container > div.cat-collapsed .cat-items-wrapper {
+            max-height: 0 !important;
+            overflow: hidden;
+        }
+
+        /* Indicador de expansión/colapso */
+        #menu-container > div h4 {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        #menu-container > div h4 .cat-toggle-icon {
+            transition: transform 0.3s ease;
+            font-size: 9px;
+            margin-left: 4px;
+            opacity: 0.5;
+        }
+
+        #menu-container > div.cat-collapsed h4 .cat-toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        /* Scrollbar personalizado dentro de las categorías */
+        .cat-items-wrapper::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        .cat-items-wrapper::-webkit-scrollbar-track {
+            background: rgba(148, 163, 184, 0.08);
+            border-radius: 4px;
+        }
+
+        .cat-items-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(16, 185, 129, 0.35);
+            border-radius: 4px;
+        }
+
+        .cat-items-wrapper::-webkit-scrollbar-thumb:hover {
+            background: rgba(16, 185, 129, 0.55);
+        }
+
+        /* Hover en panel de categoría */
+        #menu-container > div:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .dark #menu-container > div:hover {
+            background: rgba(30, 41, 59, 0.4);
+        }
+    </style>
+</head>
+
+<body class="flex flex-col transition-colors duration-500">
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         🎯 1. HEADER / RIBBON SUPERIOR
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <header class="glass-panel h-16 flex items-center justify-between px-3 md:px-5 z-50 shrink-0 relative shadow-sm">
+        <!-- Logo y Título -->
+        <div class="flex items-center gap-2 md:gap-4 cursor-pointer group" onclick="showWelcomeScreen()">
+            <div
+                class="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-lg group-hover:rotate-180 transition-transform duration-700">
+                <i class="fa-solid fa-square-root-variable text-sm md:fa-lg"></i>
+            </div>
+            <div>
+                <h1
+                    class="font-poppins font-bold text-lg md:text-xl tracking-tight text-slate-800 dark:text-white leading-none">
+                    MATEMÁTICAS <span class="text-emerald-600 dark:text-emerald-400">INTERACTIVAS</span>
+                </h1>
+                <p class="text-[8px] md:text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5"
+                    id="header-prof-name">
+                    Msc. Néstor Montoya
+                </p>
+            </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="flex items-center gap-2 md:gap-3">
+            <button id="notify-bell-btn" onclick="toggleNotifications()"
+                class="clay-btn w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-full relative"
+                title="Activar notificaciones de nuevo contenido">
+                <i id="notify-bell-icon" class="fa-solid fa-bell text-sm"></i>
+                <span id="notify-bell-dot" class="hidden absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-800 animate-pulse"></span>
+            </button>
+            <button onclick="toggleTheme()"
+                class="clay-btn w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-full"
+                title="Modo Oscuro/Claro">
+                <i id="theme-icon" class="fa-solid fa-moon text-sm"></i>
+            </button>
+            <button onclick="openModal('modal-quiz')"
+                class="hidden md:flex clay-btn px-3 py-2 items-center gap-2 text-sm font-semibold"
+                title="EvalLab — Evaluación Interactiva">
+                <i class="fa-solid fa-flask-vial"></i> <span>EvalLab</span>
+            </button>
+            <!-- 📤 COMPARTIR en redes sociales (WhatsApp, Telegram, etc.) -->
+            <button onclick="openSharePanel()"
+                class="clay-btn w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-full"
+                title="Compartir recurso">
+                <i class="fa-solid fa-share-nodes text-sm"></i>
+            </button>
+            <!-- 🎬 GRABAR VIDEO de simulaciones (oculto en móviles pequeños) -->
+            <button onclick="startRecording()"
+                class="hidden sm:flex clay-btn w-8 h-8 md:w-9 md:h-9 items-center justify-center rounded-full"
+                title="Grabar video de la pantalla / simulación">
+                <i class="fa-solid fa-video text-sm"></i>
+            </button>
+            <button onclick="openModal('modal-help')"
+                class="clay-btn w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-full"
+                title="Manual de Usuario">
+                <i data-lucide="help-circle" class="w-4 h-4"></i>
+            </button>
+            <button id="mobile-toggle" class="md:hidden clay-btn px-2 py-2 text-indigo-600" aria-label="Abrir menú">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         📦 2. CONTENEDOR PRINCIPAL
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <div class="flex flex-1 overflow-hidden relative" id="main-container">
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             📋 SIDEBAR / PANEL IZQUIERDO
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <aside id="sidebar"
+            class="glass-panel flex flex-col w-80 min-w-[240px] max-w-[500px] z-40 transition-transform duration-300 absolute md:relative transform -translate-x-full md:translate-x-0 h-full">
+
+            <!-- Barra de búsqueda -->
+            <div class="p-3 md:p-4 space-y-2 md:space-y-3">
+                <div class="relative group">
+                    <input type="text" id="search-input" placeholder="🔍 Buscar tema o guía..."
+                        class="w-full pl-3 pr-3 py-2 bg-white/50 dark:bg-slate-700/50 rounded-lg text-xs border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-indigo-400 dark:text-white shadow-sm">
+                </div>
+                <div class="relative group">
+                    <input type="text" id="wiki-input" placeholder="📖 Investigar en Wikipedia..."
+                        class="w-full pl-3 pr-3 py-2 bg-white/50 dark:bg-slate-700/50 rounded-lg text-xs border border-slate-200 dark:border-slate-600 focus:ring-2 focus:ring-indigo-400 dark:text-white shadow-sm"
+                        onkeypress="if(event.key==='Enter') triggerWikiSearch()">
+                </div>
+            </div>
+
+            <!-- Menú de Recursos -->
+            <nav class="flex-1 overflow-y-auto px-2 md:px-3 pb-4 space-y-2 custom-scrollbar" id="menu-container">
+                <!-- El contenido se genera dinámicamente desde app.js -->
+            </nav>
+
+            <!-- Plataformas Externas -->
+            <div
+                class="p-2 md:p-3 bg-white/30 dark:bg-slate-800/30 border-t border-white/40 dark:border-slate-600 mt-auto">
+                <p
+                    class="text-[9px] md:text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-2 px-1 uppercase tracking-wider flex items-center gap-1">
+                    <i class="fa-solid fa-network-wired"></i> Mis Plataformas
+                </p>
+                <div class="grid grid-cols-4 md:grid-cols-6 gap-1 md:gap-2" id="platforms-container">
+                    <!-- Se genera desde app.js -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Controlador de redimensionamiento (solo desktop) -->
+        <div id="resizer"
+            class="hidden md:flex flex-col justify-center items-center hover:bg-indigo-400/20 transition cursor-col-resize w-2 z-50">
+            <div class="h-8 w-1 bg-slate-300 dark:bg-slate-500 rounded-full"></div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             🖥️ VISOR CENTRAL / ÁREA DE CONTENIDO
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <main
+            class="flex-1 bg-white/60 dark:bg-slate-900/60 relative flex flex-col overflow-hidden m-1 md:m-2 rounded-xl md:rounded-2xl shadow-inner backdrop-blur-sm border border-white/50 dark:border-slate-700/50">
+
+            <!-- Header del visor (cuando hay contenido cargado) -->
+            <div id="viewer-header"
+                class="h-10 md:h-12 border-b border-white/50 dark:border-slate-700/50 flex items-center px-3 md:px-5 bg-white/40 dark:bg-slate-800/40 hidden justify-between">
+                <span id="current-title"
+                    class="font-bold text-slate-700 dark:text-slate-200 text-xs md:text-sm flex items-center gap-2 truncate"></span>
+                <div class="flex gap-1 md:gap-2 shrink-0">
+                    <button onclick="showWelcomeScreen()"
+                        class="p-1.5 text-slate-500 hover:text-indigo-500 dark:text-slate-400 transition"
+                        title="Inicio">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="reloadFrame()"
+                        class="p-1.5 text-slate-500 hover:text-indigo-500 dark:text-slate-400 transition"
+                        title="Recargar">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="if(_currentLoadedItem)window.open(_currentLoadedItem.url,'_blank')"
+                        class="p-1.5 text-slate-500 hover:text-emerald-500 dark:text-slate-400 transition"
+                        title="Abrir en nueva pestaña">
+                        <i data-lucide="external-link" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="toggleFullscreen()"
+                        class="p-1.5 text-slate-500 hover:text-indigo-500 dark:text-slate-400 transition"
+                        title="Pantalla completa">
+                        <i data-lucide="maximize" class="w-4 h-4"></i>
+                    </button>
+                    <!-- 📤 COMPARTIR recurso actual -->
+                    <button onclick="openSharePanel()"
+                        class="p-1.5 text-slate-500 hover:text-green-500 dark:text-slate-400 transition"
+                        title="Compartir este recurso">
+                        <i data-lucide="share-2" class="w-4 h-4"></i>
+                    </button>
+                    <!-- 🎬 GRABAR VIDEO de la simulación -->
+                    <button onclick="startRecording()"
+                        class="p-1.5 text-slate-500 hover:text-red-500 dark:text-slate-400 transition"
+                        title="Grabar video de esta simulación">
+                        <i data-lucide="video" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════════════════
+                 🏠 DASHBOARD DE BIENVENIDA
+                 ═══════════════════════════════════════════════════════════════════ -->
+            <div id="welcome-dashboard" class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-10 scroll-smooth">
+
+                <!-- Frase Célebre -->
+                <div class="glass-card p-4 md:p-6 mb-4 md:mb-6 relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 right-0 p-4 opacity-10 group-hover:rotate-12 transition transform duration-700">
+                        <i
+                            class="fa-solid fa-quote-right text-6xl md:text-8xl text-indigo-900 dark:text-indigo-200"></i>
+                    </div>
+                    <h2
+                        class="text-[10px] md:text-xs font-bold text-indigo-500 dark:text-indigo-300 uppercase tracking-widest mb-2">
+                        <i class="fa-solid fa-lightbulb"></i> Pensamiento Científico
+                    </h2>
+                    <blockquote id="quote-display"
+                        class="font-serif italic text-lg md:text-2xl text-slate-800 dark:text-slate-100 mb-3 md:mb-4 transition-opacity duration-500">
+                        ...
+                    </blockquote>
+                    <div class="flex justify-between items-center relative z-10">
+                        <cite id="quote-author"
+                            class="font-bold text-sm md:text-base text-slate-600 dark:text-slate-400 not-italic">...</cite>
+                        <button onclick="renderRandomQuote()"
+                            class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+                            <i class="fa-solid fa-arrows-rotate mr-1"></i> Nueva Frase
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Centro de Referencias Rápidas -->
+                <div
+                    class="glass-card p-4 md:p-6 mb-4 md:mb-6 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-900 border-l-4 border-emerald-500">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4">
+                        <div>
+                            <h3 class="font-bold text-base md:text-lg text-slate-800 dark:text-white mb-1">
+                                <i class="fa-solid fa-book-atlas text-emerald-500 mr-2"></i>Centro de Referencias
+                            </h3>
+                            <p class="text-[10px] md:text-xs text-slate-500 dark:text-slate-400">
+                                Herramientas esenciales para el estudiante y docente de matemáticas.
+                            </p>
+                        </div>
+                        <div class="flex gap-2 flex-wrap md:justify-end flex-1">
+                            <button onclick="openModal('modal-greek')"
+                                class="clay-btn px-3 py-2 text-[10px] md:text-xs font-bold flex items-center gap-1 md:gap-2 hover:scale-105 transition">
+                                <i class="fa-solid fa-language"></i> <span class="hidden sm:inline">Alfabeto</span>
+                                Griego
+                            </button>
+                            <button onclick="openModal('modal-constants')"
+                                class="clay-btn px-3 py-2 text-[10px] md:text-xs font-bold flex items-center gap-1 md:gap-2 hover:scale-105 transition">
+                                <i class="fa-solid fa-calculator"></i> Constantes
+                            </button>
+                            <button onclick="openModal('modal-identities')"
+                                class="clay-btn px-3 py-2 text-[10px] md:text-xs font-bold flex items-center gap-1 md:gap-2 hover:scale-105 transition text-emerald-600 dark:text-emerald-400">
+                                <i class="fa-solid fa-wave-square"></i> Identidades Trig.
+                            </button>
+                            <button onclick="openModal('modal-derivatives')"
+                                class="clay-btn px-3 py-2 text-[10px] md:text-xs font-bold flex items-center gap-1 hover:scale-105 transition text-amber-600">
+                                <i class="fa-solid fa-chart-line"></i> Derivadas
+                            </button>
+                            <button onclick="openModal('modal-trig')"
+                                class="clay-btn px-3 py-2 text-[10px] md:text-xs font-bold flex items-center gap-1 hover:scale-105 transition text-blue-600">
+                                <i class="fa-solid fa-superscript"></i> Trigonometría
+                            </button>
+                            <button onclick="openModal('modal-integrals')"
+                                class="clay-btn px-3 py-2 text-[10px] md:text-xs font-bold flex items-center gap-1 hover:scale-105 transition text-orange-600">
+                                <i class="fa-solid fa-infinity"></i> Integrales
+                            </button>
+                            <button onclick="openModal('modal-series')"
+                                class="clay-btn px-3 py-2 text-[10px] md:text-xs font-bold flex items-center gap-1 hover:scale-105 transition text-purple-600">
+                                <i class="fa-solid fa-wave-square"></i> Series Notables
+                            </button>
+                            <button onclick="openModal('modal-theorems')"
+                                class="clay-btn px-3 py-2 text-[10px] md:text-xs font-bold flex items-center gap-1 hover:scale-105 transition text-rose-600">
+                                <i class="fa-solid fa-landmark"></i> Teoremas
+                            </button>
+                            <button onclick="openModal('modal-formulas')"
+                                class="clay-btn px-3 py-2 text-[10px] md:text-xs font-bold flex items-center gap-1 hover:scale-105 transition text-indigo-600">
+                                <i class="fa-solid fa-square-root-variable"></i> Fórmulas
+                            </button>
+                            <button onclick="loadContent({t:'html',url:'aplicaciones/editor-ecuaciones.html',title:'Editor de Ecuaciones',icon:'fa-solid fa-function',lvl:'HERRAMIENTA'},null)"
+                                class="clay-btn px-3 py-2 text-[10px] md:text-xs font-bold flex items-center gap-1 hover:scale-105 transition text-fuchsia-600 dark:text-fuchsia-400"
+                                title="Editor visual de ecuaciones matemáticas">
+                                <i class="fa-solid fa-function"></i> <span class="hidden sm:inline">Editor</span> Ecuaciones
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid Principal: Noticias y Hub IA -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+
+                    <!-- Noticias Científicas (2 columnas en desktop) -->
+                    <div class="lg:col-span-2 space-y-3 md:space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-base md:text-lg text-slate-700 dark:text-slate-200">
+                                <i class="fa-solid fa-satellite-dish text-indigo-500"></i> Noticias Científicas
+                            </h3>
+                            <button onclick="fetchMultiSourceNews()"
+                                class="text-slate-400 hover:text-indigo-500 transition p-2" title="Actualizar noticias">
+                                <i class="fa-solid fa-arrows-rotate"></i>
+                            </button>
+                        </div>
+                        <div id="news-container" class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4" style="position:relative">
+                            <!-- Las noticias se cargan dinámicamente - Post-It Manager las convierte -->
+                        </div>
+                    </div>
+
+                    <!-- Hub de Inteligencia Artificial -->
+                    <div class="glass-card p-3 md:p-4 h-fit">
+                        <h3
+                            class="font-bold text-[10px] md:text-xs text-slate-500 dark:text-slate-400 uppercase mb-2 md:mb-3">
+                            <i class="fa-solid fa-robot mr-1"></i> Asistentes I.A.
+                        </h3>
+                        <div class="grid grid-cols-3 gap-1 md:gap-2" id="ai-hub-container">
+                            <!-- Se genera desde app.js -->
+                        </div>
+                        <button onclick="openModal('modal-quiz')"
+                            class="w-full mt-3 md:mt-4 clay-btn py-2 text-[10px] md:text-xs font-bold bg-indigo-50 dark:bg-indigo-900/20">
+                            <i class="fa-solid fa-flask-vial mr-1"></i> Ir a EvalLab
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- iFrame para contenido externo -->
+            <iframe id="main-frame" class="hidden w-full h-full bg-white" src="" allowfullscreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share">
+            </iframe>
+
+            <!-- Contenedor GeoGebra -->
+            <div id="ggb-container" class="hidden w-full h-full bg-white relative overflow-hidden">
+                <div id="ggb-element" class="w-full h-full"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         📱 FAB MÓVIL — botón flotante de escape (solo en móvil, cuando hay iframe)
+         Aparece en la esquina inferior izquierda cuando se carga un recurso.
+         Permite volver al inicio o abrir el menú sin perder el contexto.
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <div id="mobile-fab"
+        class="hidden fixed bottom-20 left-3 z-[200] flex flex-col gap-2 md:hidden"
+        style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.35));">
+
+        <!-- Botón principal: INICIO -->
+        <button onclick="showWelcomeScreen(); hideMobileFab()"
+            title="Volver al inicio"
+            class="w-12 h-12 rounded-full bg-emerald-500 hover:bg-emerald-400 active:scale-90 flex items-center justify-center text-white transition-all duration-200 shadow-lg">
+            <i class="fa-solid fa-house text-lg"></i>
+        </button>
+
+        <!-- Botón: MENÚ lateral -->
+        <button onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')"
+            title="Abrir/cerrar menú"
+            class="w-12 h-12 rounded-full bg-indigo-500 hover:bg-indigo-400 active:scale-90 flex items-center justify-center text-white transition-all duration-200 shadow-lg">
+            <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+
+        <!-- Botón: CERRAR / salir de pantalla completa -->
+        <button onclick="if(document.fullscreenElement){document.exitFullscreen();}else{showWelcomeScreen();hideMobileFab();}"
+            title="Cerrar / salir de pantalla completa"
+            class="w-12 h-12 rounded-full bg-rose-500 hover:bg-rose-400 active:scale-90 flex items-center justify-center text-white transition-all duration-200 shadow-lg">
+            <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+    </div>
+
+    <script>
+    /* ── FAB móvil: mostrar/ocultar según si hay recurso cargado ── */
+    function showMobileFab() {
+        var fab = document.getElementById('mobile-fab');
+        if (fab && window.innerWidth < 768) fab.classList.remove('hidden');
+    }
+    function hideMobileFab() {
+        var fab = document.getElementById('mobile-fab');
+        if (fab) fab.classList.add('hidden');
+    }
+
+    /* Interceptar showWelcomeScreen para ocultar el FAB al volver al inicio */
+    document.addEventListener('DOMContentLoaded', function () {
+        var _orig = window.showWelcomeScreen;
+        if (typeof _orig === 'function') {
+            window.showWelcomeScreen = function () {
+                _orig.apply(this, arguments);
+                hideMobileFab();
+            };
+        }
+
+        /* Observar cuándo el iframe o ggb-container se vuelven visibles */
+        var targets = ['main-frame', 'ggb-container'];
+        targets.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            new MutationObserver(function () {
+                if (!el.classList.contains('hidden')) {
+                    showMobileFab();
+                } else {
+                    /* Solo ocultar si ambos están hidden */
+                    var allHidden = targets.every(function (tid) {
+                        var t = document.getElementById(tid);
+                        return !t || t.classList.contains('hidden');
+                    });
+                    if (allHidden) hideMobileFab();
+                }
+            }).observe(el, { attributes: true, attributeFilter: ['class'] });
+        });
+    });
+    </script>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         🦶 3. FOOTER
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <footer
+        class="glass-panel h-7 md:h-8 flex items-center justify-center text-[8px] md:text-[10px] font-medium text-slate-500 dark:text-slate-400 shrink-0 z-50 px-2">
+        <p class="text-center">
+            Diseñado por <span class="font-bold text-indigo-700 dark:text-indigo-400">Profesor Msc. Néstor Fabio Montoya
+                Palacios</span>
+            © 2026 | I.E. María Auxiliadora de Cartago-Universidad del Valle-Universidad Tecnológica de Pereira (UTP)
+        </p>
+    </footer>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         🪟 MODALES
+         ═══════════════════════════════════════════════════════════════════════════ -->
+
+    <!-- Manual de Usuario: ver modal completo más abajo -->
+
+    <!-- Modal: Identidades Trigonométricas -->
+    <div id="modal-identities"
+        class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 md:p-4">
+        <div class="glass-card bg-white dark:bg-slate-800 p-0 w-full max-w-5xl relative animate-bounce-in max-h-[95vh] md:max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="p-4 md:p-6 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30">
+                <button onclick="closeModal('modal-identities')" class="absolute top-3 right-3 md:top-4 md:right-4 text-slate-400 close-btn hover:text-red-500">
+                    <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
+                </button>
+                <div class="flex items-center gap-3 md:gap-4">
+                    <div class="w-10 h-10 md:w-14 md:h-14 rounded-xl bg-emerald-600 flex items-center justify-center text-white text-lg md:text-2xl shadow-lg shadow-emerald-500/30">
+                        <i class="fa-solid fa-wave-square"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-poppins font-bold text-xl md:text-2xl text-slate-800 dark:text-white leading-none mb-1">Identidades Trigonométricas</h3>
+                        <p class="text-[10px] md:text-xs text-emerald-600 dark:text-emerald-400 uppercase tracking-wide font-bold">Catálogo pedagógico</p>
+                    </div>
+                </div>
+            </div>
+            <div class="overflow-y-auto p-4 md:p-6 custom-scrollbar space-y-5 bg-slate-50 dark:bg-slate-900/50">
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-4 md:p-5 shadow-sm border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-emerald-700 dark:text-emerald-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-circle-dot"></i> Fundamentales (Pitagóricas)</h4>
+                    <ul class="space-y-2 text-sm md:text-base">
+                        <li>$\sin^2\theta + \cos^2\theta = 1$</li>
+                        <li>$1 + \tan^2\theta = \sec^2\theta$</li>
+                        <li>$1 + \cot^2\theta = \csc^2\theta$</li>
+                    </ul>
+                </div>
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-4 md:p-5 shadow-sm border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-blue-700 dark:text-blue-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-plus"></i> Suma y diferencia de ángulos</h4>
+                    <ul class="space-y-2 text-sm md:text-base">
+                        <li>$\sin(\alpha \pm \beta) = \sin\alpha\cos\beta \pm \cos\alpha\sin\beta$</li>
+                        <li>$\cos(\alpha \pm \beta) = \cos\alpha\cos\beta \mp \sin\alpha\sin\beta$</li>
+                        <li>$\tan(\alpha \pm \beta) = \dfrac{\tan\alpha \pm \tan\beta}{1 \mp \tan\alpha\tan\beta}$</li>
+                    </ul>
+                </div>
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-4 md:p-5 shadow-sm border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-amber-700 dark:text-amber-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-2"></i> Ángulo doble y mitad</h4>
+                    <ul class="space-y-2 text-sm md:text-base">
+                        <li>$\sin(2\theta) = 2\sin\theta\cos\theta$</li>
+                        <li>$\cos(2\theta) = \cos^2\theta - \sin^2\theta = 1-2\sin^2\theta = 2\cos^2\theta-1$</li>
+                        <li>$\tan(2\theta) = \dfrac{2\tan\theta}{1-\tan^2\theta}$</li>
+                        <li>$\sin^2(\theta/2) = \dfrac{1-\cos\theta}{2},\quad \cos^2(\theta/2) = \dfrac{1+\cos\theta}{2}$</li>
+                    </ul>
+                </div>
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-4 md:p-5 shadow-sm border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-purple-700 dark:text-purple-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-arrows-left-right"></i> Producto a suma</h4>
+                    <ul class="space-y-2 text-sm md:text-base">
+                        <li>$\sin\alpha\cos\beta = \tfrac{1}{2}[\sin(\alpha+\beta)+\sin(\alpha-\beta)]$</li>
+                        <li>$\cos\alpha\cos\beta = \tfrac{1}{2}[\cos(\alpha-\beta)+\cos(\alpha+\beta)]$</li>
+                        <li>$\sin\alpha\sin\beta = \tfrac{1}{2}[\cos(\alpha-\beta)-\cos(\alpha+\beta)]$</li>
+                    </ul>
+                </div>
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-4 md:p-5 shadow-sm border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-rose-700 dark:text-rose-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-ruler-combined"></i> Leyes del triángulo</h4>
+                    <ul class="space-y-2 text-sm md:text-base">
+                        <li><b>Ley de senos:</b> $\dfrac{a}{\sin A} = \dfrac{b}{\sin B} = \dfrac{c}{\sin C}$</li>
+                        <li><b>Ley de cosenos:</b> $c^2 = a^2 + b^2 - 2ab\cos C$</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Alfabeto Griego -->
+    <div id="modal-greek"
+        class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 md:p-4">
+        <div
+            class="glass-card bg-white dark:bg-slate-800 p-4 md:p-6 w-11/12 max-w-4xl relative animate-bounce-in max-h-[95vh] md:max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('modal-greek')"
+                class="absolute top-3 right-3 md:top-4 md:right-4 text-slate-400 close-btn">
+                <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
+            </button>
+            <h3 class="font-bold text-xl md:text-2xl text-indigo-700 dark:text-indigo-400 mb-4 md:mb-6 border-b pb-2">
+                🇬🇷 Alfabeto Griego
+            </h3>
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 md:gap-3" id="greek-container"></div>
+        </div>
+    </div>
+
+    <!-- Modal: Constantes Matemáticas -->
+    <div id="modal-constants"
+        class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 md:p-4">
+        <div
+            class="glass-card bg-white dark:bg-slate-800 p-0 w-full max-w-5xl relative animate-bounce-in h-[95vh] md:h-[90vh] flex flex-col overflow-hidden">
+            <div
+                class="p-4 md:p-6 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4 shrink-0">
+                <div>
+                    <h3
+                        class="font-bold text-xl md:text-2xl text-indigo-700 dark:text-indigo-400 flex items-center gap-2">
+                        <i class="fa-solid fa-flask"></i> Constantes Fundamentales
+                    </h3>
+                    <p class="text-[10px] md:text-xs text-slate-500">Valores CODATA (NIST)</p>
+                </div>
+                <div class="relative w-full md:w-64">
+                    <input type="text" id="constants-search" placeholder="Buscar constante..."
+                        class="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                </div>
+                <button onclick="closeModal('modal-constants')"
+                    class="absolute top-3 right-3 md:top-4 md:right-4 text-slate-400 close-btn hover:text-red-500">
+                    <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-0 bg-white dark:bg-slate-900">
+                <table class="sc-table w-full">
+                    <thead class="bg-indigo-600 text-white sticky top-0 shadow-md">
+                        <tr>
+                            <th class="w-1/3">Magnitud</th>
+                            <th class="w-1/6 text-center">Símbolo</th>
+                            <th class="w-1/3">Valor</th>
+                            <th class="w-1/6">Unidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id="constants-body" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
+                </table>
+            </div>
+            <div
+                class="p-2 bg-slate-100 dark:bg-slate-800 text-[10px] text-center text-slate-500 border-t border-slate-200 dark:border-slate-700 shrink-0">
+                Mostrando <span id="constants-count" class="font-bold">0</span> constantes matemáticas.
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         🔬 MODALES DE HERRAMIENTAS CIENTÍFICAS (NUEVOS)
+         ═══════════════════════════════════════════════════════════════════════════ -->
+
+    <!-- Modal: Tabla de Derivadas -->
+    <div id="modal-derivatives"
+        class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 md:p-4">
+        <div class="glass-card bg-white dark:bg-slate-800 p-4 md:p-6 w-11/12 max-w-5xl max-h-[90vh] overflow-y-auto relative animate-bounce-in custom-scrollbar">
+            <button onclick="closeModal('modal-derivatives')" class="absolute top-3 right-3 md:top-4 md:right-4 text-slate-400 close-btn z-10">
+                <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
+            </button>
+            <h3 class="font-bold text-lg md:text-xl text-amber-700 dark:text-amber-400 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-chart-line"></i> Tabla de Derivadas Comunes
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-amber-700 dark:text-amber-400 mb-2">Básicas</h4>
+                    <ul class="text-sm space-y-1.5">
+                        <li>$\dfrac{d}{dx}(c) = 0$</li>
+                        <li>$\dfrac{d}{dx}(x^n) = n\,x^{n-1}$</li>
+                        <li>$\dfrac{d}{dx}(e^x) = e^x$</li>
+                        <li>$\dfrac{d}{dx}(a^x) = a^x \ln a$</li>
+                        <li>$\dfrac{d}{dx}(\ln x) = \dfrac{1}{x}$</li>
+                        <li>$\dfrac{d}{dx}(\log_a x) = \dfrac{1}{x\ln a}$</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-blue-700 dark:text-blue-400 mb-2">Trigonométricas</h4>
+                    <ul class="text-sm space-y-1.5">
+                        <li>$\dfrac{d}{dx}(\sin x) = \cos x$</li>
+                        <li>$\dfrac{d}{dx}(\cos x) = -\sin x$</li>
+                        <li>$\dfrac{d}{dx}(\tan x) = \sec^2 x$</li>
+                        <li>$\dfrac{d}{dx}(\cot x) = -\csc^2 x$</li>
+                        <li>$\dfrac{d}{dx}(\sec x) = \sec x\tan x$</li>
+                        <li>$\dfrac{d}{dx}(\csc x) = -\csc x\cot x$</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-purple-700 dark:text-purple-400 mb-2">Inversas trigonométricas</h4>
+                    <ul class="text-sm space-y-1.5">
+                        <li>$\dfrac{d}{dx}(\arcsin x) = \dfrac{1}{\sqrt{1-x^2}}$</li>
+                        <li>$\dfrac{d}{dx}(\arccos x) = -\dfrac{1}{\sqrt{1-x^2}}$</li>
+                        <li>$\dfrac{d}{dx}(\arctan x) = \dfrac{1}{1+x^2}$</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-rose-700 dark:text-rose-400 mb-2">Reglas operativas</h4>
+                    <ul class="text-sm space-y-1.5">
+                        <li><b>Suma:</b> $(f+g)' = f'+g'$</li>
+                        <li><b>Producto:</b> $(fg)' = f'g + fg'$</li>
+                        <li><b>Cociente:</b> $\left(\dfrac{f}{g}\right)' = \dfrac{f'g - fg'}{g^2}$</li>
+                        <li><b>Cadena:</b> $(f\circ g)'(x) = f'(g(x))\,g'(x)$</li>
+                        <li><b>Inversa:</b> $(f^{-1})'(y) = \dfrac{1}{f'(x)}$</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Identidades Trigonométricas -->
+    <div id="modal-trig"
+        class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 md:p-4">
+        <div
+            class="glass-card bg-white dark:bg-slate-800 p-4 md:p-6 w-11/12 max-w-5xl max-h-[90vh] overflow-y-auto relative animate-bounce-in custom-scrollbar">
+            <button onclick="closeModal('modal-trig')"
+                class="absolute top-3 right-3 md:top-4 md:right-4 text-slate-400 close-btn z-10">
+                <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
+            </button>
+            <h3 class="font-bold text-lg md:text-xl text-blue-700 dark:text-blue-400 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-superscript"></i> Identidades Trigonométricas
+            </h3>
+            <div id="trig-body" class="space-y-4">
+                <!-- El contenido se genera dinámicamente desde science-modals.js -->
+                <div class="glass-card p-4 skeleton h-40"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Tabla de Integrales -->
+    <div id="modal-integrals"
+        class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 md:p-4">
+        <div class="glass-card bg-white dark:bg-slate-800 p-4 md:p-6 w-11/12 max-w-6xl max-h-[90vh] overflow-y-auto relative animate-bounce-in custom-scrollbar">
+            <button onclick="closeModal('modal-integrals')" class="absolute top-3 right-3 md:top-4 md:right-4 text-slate-400 close-btn z-10">
+                <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
+            </button>
+            <h3 class="font-bold text-lg md:text-xl text-orange-700 dark:text-orange-400 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-infinity"></i> Tabla de Integrales Comunes
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3 italic">Nota: se omite la constante de integración $+C$ en cada expresión.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-orange-700 dark:text-orange-400 mb-2">Básicas</h4>
+                    <ul class="text-sm space-y-1.5">
+                        <li>$\int x^n\,dx = \dfrac{x^{n+1}}{n+1}$ (si $n\ne -1$)</li>
+                        <li>$\int \dfrac{1}{x}\,dx = \ln|x|$</li>
+                        <li>$\int e^x\,dx = e^x$</li>
+                        <li>$\int a^x\,dx = \dfrac{a^x}{\ln a}$</li>
+                        <li>$\int \ln x\,dx = x\ln x - x$</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-blue-700 dark:text-blue-400 mb-2">Trigonométricas</h4>
+                    <ul class="text-sm space-y-1.5">
+                        <li>$\int \sin x\,dx = -\cos x$</li>
+                        <li>$\int \cos x\,dx = \sin x$</li>
+                        <li>$\int \tan x\,dx = -\ln|\cos x|$</li>
+                        <li>$\int \sec^2 x\,dx = \tan x$</li>
+                        <li>$\int \sec x\,dx = \ln|\sec x + \tan x|$</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-purple-700 dark:text-purple-400 mb-2">Con raíces y racionales</h4>
+                    <ul class="text-sm space-y-1.5">
+                        <li>$\int \dfrac{dx}{\sqrt{1-x^2}} = \arcsin x$</li>
+                        <li>$\int \dfrac{dx}{1+x^2} = \arctan x$</li>
+                        <li>$\int \dfrac{dx}{x\sqrt{x^2-1}} = \text{arcsec}\,|x|$</li>
+                        <li>$\int \dfrac{dx}{\sqrt{x^2+a^2}} = \ln\bigl|x+\sqrt{x^2+a^2}\bigr|$</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-rose-700 dark:text-rose-400 mb-2">Técnicas</h4>
+                    <ul class="text-sm space-y-1.5">
+                        <li><b>Sustitución:</b> $\int f(g(x))g'(x)dx = \int f(u)\,du$</li>
+                        <li><b>Por partes:</b> $\int u\,dv = uv - \int v\,du$</li>
+                        <li><b>Fracciones parciales</b> (para cocientes de polinomios)</li>
+                        <li><b>Sustitución trigonométrica</b> ($\sqrt{a^2-x^2},\sqrt{a^2+x^2},\sqrt{x^2-a^2}$)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Series y Sucesiones Notables -->
+    <div id="modal-series"
+        class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 md:p-4">
+        <div class="glass-card bg-white dark:bg-slate-800 p-4 md:p-6 w-11/12 max-w-5xl max-h-[90vh] overflow-y-auto relative animate-bounce-in custom-scrollbar">
+            <button onclick="closeModal('modal-series')" class="absolute top-3 right-3 md:top-4 md:right-4 text-slate-400 close-btn z-10">
+                <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
+            </button>
+            <h3 class="font-bold text-lg md:text-xl text-purple-700 dark:text-purple-400 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-wave-square"></i> Series y Sucesiones Notables
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-purple-700 dark:text-purple-400 mb-2">Taylor / McLaurin</h4>
+                    <ul class="text-sm space-y-1.5">
+                        <li>$e^x = \displaystyle\sum_{n=0}^{\infty} \dfrac{x^n}{n!} = 1 + x + \dfrac{x^2}{2!} + \cdots$</li>
+                        <li>$\sin x = \displaystyle\sum_{n=0}^{\infty} \dfrac{(-1)^n x^{2n+1}}{(2n+1)!}$</li>
+                        <li>$\cos x = \displaystyle\sum_{n=0}^{\infty} \dfrac{(-1)^n x^{2n}}{(2n)!}$</li>
+                        <li>$\ln(1+x) = \displaystyle\sum_{n=1}^{\infty} \dfrac{(-1)^{n+1}x^n}{n}$, $|x|\le 1$</li>
+                        <li>$\arctan x = \displaystyle\sum_{n=0}^{\infty} \dfrac{(-1)^n x^{2n+1}}{2n+1}$, $|x|\le 1$</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-blue-700 dark:text-blue-400 mb-2">Series clásicas</h4>
+                    <ul class="text-sm space-y-1.5">
+                        <li><b>Geométrica:</b> $\displaystyle\sum_{n=0}^{\infty} r^n = \dfrac{1}{1-r}$, $|r|<1$</li>
+                        <li><b>Armónica:</b> $\displaystyle\sum_{n=1}^{\infty} \dfrac{1}{n}$ (diverge)</li>
+                        <li><b>Basilea:</b> $\displaystyle\sum_{n=1}^{\infty} \dfrac{1}{n^2} = \dfrac{\pi^2}{6}$</li>
+                        <li><b>Leibniz:</b> $1 - \tfrac{1}{3} + \tfrac{1}{5} - \tfrac{1}{7} + \cdots = \dfrac{\pi}{4}$</li>
+                        <li><b>Zeta de Riemann:</b> $\zeta(s) = \displaystyle\sum_{n=1}^{\infty} \dfrac{1}{n^s}$</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-emerald-700 dark:text-emerald-400 mb-2">Sumas finitas</h4>
+                    <ul class="text-sm space-y-1.5">
+                        <li>$\displaystyle\sum_{k=1}^{n} k = \dfrac{n(n+1)}{2}$</li>
+                        <li>$\displaystyle\sum_{k=1}^{n} k^2 = \dfrac{n(n+1)(2n+1)}{6}$</li>
+                        <li>$\displaystyle\sum_{k=1}^{n} k^3 = \left(\dfrac{n(n+1)}{2}\right)^2$</li>
+                        <li><b>Geométrica finita:</b> $\displaystyle\sum_{k=0}^{n} r^k = \dfrac{1-r^{n+1}}{1-r}$</li>
+                        <li><b>Binomio de Newton:</b> $(a+b)^n = \displaystyle\sum_{k=0}^{n} \binom{n}{k} a^{n-k} b^k$</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-amber-700 dark:text-amber-400 mb-2">Sucesiones famosas</h4>
+                    <ul class="text-sm space-y-1.5">
+                        <li><b>Fibonacci:</b> $F_{n} = F_{n-1} + F_{n-2}$ con $F_0=0,\,F_1=1$ → 0, 1, 1, 2, 3, 5, 8, 13…</li>
+                        <li><b>Razón áurea:</b> $\displaystyle\lim_{n\to\infty}\dfrac{F_{n+1}}{F_n} = \varphi$</li>
+                        <li><b>Catalán:</b> $C_n = \dfrac{1}{n+1}\binom{2n}{n}$ → 1, 1, 2, 5, 14, 42…</li>
+                        <li><b>Primos:</b> 2, 3, 5, 7, 11, 13, 17, 19, 23, 29…</li>
+                        <li><b>Triangulares:</b> $T_n = \dfrac{n(n+1)}{2}$ → 1, 3, 6, 10, 15…</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Teoremas Fundamentales -->
+    <div id="modal-theorems"
+        class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 md:p-4">
+        <div class="glass-card bg-white dark:bg-slate-800 p-4 md:p-6 w-11/12 max-w-6xl max-h-[90vh] overflow-y-auto relative animate-bounce-in custom-scrollbar">
+            <button onclick="closeModal('modal-theorems')" class="absolute top-3 right-3 md:top-4 md:right-4 text-slate-400 close-btn z-10">
+                <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
+            </button>
+            <h3 class="font-bold text-lg md:text-xl text-rose-700 dark:text-rose-400 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-landmark"></i> Teoremas Fundamentales
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-rose-700 dark:text-rose-400 mb-2">Geometría</h4>
+                    <ul class="text-sm space-y-2">
+                        <li><b>Pitágoras:</b> En un triángulo rectángulo, $a^2 + b^2 = c^2$ (siendo $c$ la hipotenusa).</li>
+                        <li><b>Thales:</b> Si varias paralelas cortan a dos rectas secantes, los segmentos determinados son proporcionales.</li>
+                        <li><b>Euclides (altura):</b> $h^2 = m\cdot n$ (proyecciones sobre la hipotenusa).</li>
+                        <li><b>Suma de ángulos interiores:</b> En un polígono de $n$ lados: $(n-2)\cdot 180°$.</li>
+                        <li><b>Ángulo inscrito:</b> Mide la mitad del arco que abarca.</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-emerald-700 dark:text-emerald-400 mb-2">Cálculo</h4>
+                    <ul class="text-sm space-y-2">
+                        <li><b>Fundamental del Cálculo:</b> $\displaystyle\int_a^b f'(x)\,dx = f(b) - f(a)$.</li>
+                        <li><b>Valor medio (integral):</b> $\exists c\in[a,b]$ tal que $f(c) = \dfrac{1}{b-a}\displaystyle\int_a^b f(x)\,dx$.</li>
+                        <li><b>Valor medio (derivada, Lagrange):</b> $f'(c) = \dfrac{f(b)-f(a)}{b-a}$.</li>
+                        <li><b>Rolle:</b> Si $f(a)=f(b)$ entonces $\exists c$ con $f'(c)=0$.</li>
+                        <li><b>Bolzano:</b> Si $f$ es continua en $[a,b]$ y $f(a)\cdot f(b)<0$, $\exists c$ con $f(c)=0$.</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-blue-700 dark:text-blue-400 mb-2">Álgebra</h4>
+                    <ul class="text-sm space-y-2">
+                        <li><b>Fundamental del Álgebra:</b> Todo polinomio de grado $n\ge 1$ tiene exactamente $n$ raíces complejas (contadas con multiplicidad).</li>
+                        <li><b>Resto:</b> $p(x)$ dividido por $(x-a)$ deja resto $p(a)$.</li>
+                        <li><b>Factor:</b> $p(a)=0 \iff (x-a)\mid p(x)$.</li>
+                        <li><b>Binomio de Newton:</b> $(a+b)^n = \displaystyle\sum_{k=0}^{n}\binom{n}{k}a^{n-k}b^k$.</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-purple-700 dark:text-purple-400 mb-2">Otros clásicos</h4>
+                    <ul class="text-sm space-y-2">
+                        <li><b>Teorema de Gauss (aritmética):</b> Todo entero $>1$ se factoriza de forma única como producto de primos.</li>
+                        <li><b>Infinitud de los primos (Euclides):</b> Existen infinitos números primos.</li>
+                        <li><b>Pequeño teorema de Fermat:</b> Si $p$ es primo y $\gcd(a,p)=1$, entonces $a^{p-1}\equiv 1\pmod{p}$.</li>
+                        <li><b>Incompletitud de Gödel:</b> En todo sistema formal consistente suficientemente potente existen enunciados verdaderos no demostrables dentro del propio sistema.</li>
+                        <li><b>Bayes:</b> $P(A|B) = \dfrac{P(B|A)\,P(A)}{P(B)}$.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Fórmulas de Matemáticas -->
+    <div id="modal-formulas"
+        class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 md:p-4">
+        <div
+            class="glass-card bg-white dark:bg-slate-800 p-4 md:p-6 w-11/12 max-w-6xl max-h-[90vh] overflow-y-auto relative animate-bounce-in custom-scrollbar">
+            <button onclick="closeModal('modal-formulas')"
+                class="absolute top-3 right-3 md:top-4 md:right-4 text-slate-400 close-btn z-10">
+                <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
+            </button>
+            <h3 class="font-bold text-lg md:text-xl text-indigo-700 dark:text-indigo-400 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-square-root-variable"></i> Manual de Fórmulas Matemáticas
+            </h3>
+            <div id="formulas-body" class="space-y-4">
+                <!-- El contenido se genera dinámicamente desde science-modals.js -->
+                <div class="glass-card p-4 skeleton h-40"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         📖 MODAL: MANUAL DE USUARIO v2.0 — Con pestañas y contenido completo
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <div id="modal-help"
+        class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 md:p-4">
+        <div class="glass-card bg-white dark:bg-slate-800 p-0 w-full max-w-5xl relative animate-bounce-in max-h-[95vh] overflow-hidden flex flex-col">
+
+            <!-- ── Header con gradiente ── -->
+            <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white p-4 md:p-6 shrink-0">
+                <button onclick="closeModal('modal-help')"
+                    class="absolute top-3 right-3 md:top-4 md:right-4 text-white/80 hover:text-white close-btn z-10 hover:rotate-90 transition-transform duration-300">
+                    <i data-lucide="x" class="w-6 h-6 md:w-7 md:h-7"></i>
+                </button>
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-white/20 flex items-center justify-center">
+                        <i class="fa-solid fa-book-open-reader text-3xl md:text-4xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl md:text-2xl">📖 Manual de Usuario</h3>
+                        <p class="text-white/80 text-sm">Matemáticas Interactivas · Guía Completa v2.0</p>
+                    </div>
+                </div>
+                <!-- ── Pestañas ── -->
+                <div class="flex gap-2 mt-4 flex-wrap" id="manual-tabs">
+                    <button onclick="manualTab(0)" class="manual-tab active px-4 py-2 rounded-full text-sm font-bold transition-all bg-white/25 hover:bg-white/35" data-tab="0">
+                        <i class="fa-solid fa-compass mr-1"></i> Guía
+                    </button>
+                    <button onclick="manualTab(1)" class="manual-tab px-4 py-2 rounded-full text-sm font-bold transition-all bg-white/10 hover:bg-white/25" data-tab="1">
+                        <i class="fa-solid fa-toolbox mr-1"></i> Herramientas
+                    </button>
+                    <button onclick="manualTab(2)" class="manual-tab px-4 py-2 rounded-full text-sm font-bold transition-all bg-white/10 hover:bg-white/25" data-tab="2">
+                        <i class="fa-solid fa-flask-vial mr-1"></i> EvalLab
+                    </button>
+                    <button onclick="manualTab(3)" class="manual-tab px-4 py-2 rounded-full text-sm font-bold transition-all bg-white/10 hover:bg-white/25" data-tab="3">
+                        <i class="fa-solid fa-scale-balanced mr-1"></i> Legal
+                    </button>
+                </div>
+            </div>
+
+            <!-- ── Contenido con scroll ── -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar">
+
+            <!-- ════════════════════════════════════════════════════════════════════ -->
+            <!-- TAB 0: GUÍA DE USO                                                  -->
+            <!-- ════════════════════════════════════════════════════════════════════ -->
+            <div class="manual-panel p-4 md:p-6 space-y-4" data-panel="0">
+
+                <!-- Bienvenida -->
+                <details class="group rounded-xl overflow-hidden border-2 border-indigo-200 dark:border-indigo-800" open>
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white cursor-pointer hover:from-indigo-600 hover:to-indigo-700 transition">
+                        <i class="fa-solid fa-hand-wave text-xl group-open:animate-bounce"></i>
+                        <span class="font-bold text-lg">¡Bienvenido a Matemáticas Interactivas!</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-indigo-50 dark:bg-indigo-900/30 space-y-3">
+                        <p class="text-indigo-800 dark:text-indigo-200">
+                            <strong class="text-indigo-600 dark:text-indigo-400">🎓 Matemáticas Interactivas</strong> es una
+                            plataforma educativa diseñada por el <strong>Msc. Néstor Fabio Montoya Palacios</strong> para los estudiantes del
+                            <strong>Colegio María Auxiliadora de Cartago, Valle del Cauca, Colombia</strong>.
+                            Desarrollada bajo los lineamientos del Ministerio de Educación Nacional para fortalecer las competencias científicas mediante el uso de TICs.
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded-lg border-l-4 border-indigo-500">
+                                <p class="font-bold text-indigo-600 dark:text-indigo-400 text-sm">🎯 Objetivo</p>
+                                <p class="text-xs text-slate-600 dark:text-slate-300">Facilitar el aprendizaje de las matemáticas mediante cuadernos interactivos, simuladores y herramientas científicas.</p>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded-lg border-l-4 border-purple-500">
+                                <p class="font-bold text-purple-600 dark:text-purple-400 text-sm">🌟 Filosofía</p>
+                                <p class="text-xs text-slate-600 dark:text-slate-300">Aprender haciendo: cuadernos interactivos, laboratorios virtuales y evaluación inteligente con IA.</p>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded-lg border-l-4 border-pink-500">
+                                <p class="font-bold text-pink-600 dark:text-pink-400 text-sm">💡 Innovación</p>
+                                <p class="text-xs text-slate-600 dark:text-slate-300">Integración de IA (Gemini), GeoGebra, aplicaciones HTML5, chatbot tutor y sistema de evaluación EvalLab.</p>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Navegación -->
+                <details class="group rounded-xl overflow-hidden border-2 border-blue-200 dark:border-blue-800">
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white cursor-pointer hover:from-blue-600 hover:to-blue-700 transition">
+                        <i class="fa-solid fa-compass text-xl"></i>
+                        <span class="font-bold text-lg">Navegación de la Plataforma</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-blue-50 dark:bg-blue-900/30 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-blue-200 dark:border-blue-700">
+                                <h4 class="font-bold text-blue-600 dark:text-blue-400 mb-2 flex items-center gap-2">
+                                    <i class="fa-solid fa-list"></i> Panel Izquierdo (Menú)
+                                </h4>
+                                <ul class="text-sm text-slate-600 dark:text-slate-300 space-y-2">
+                                    <li>🔍 <strong class="text-blue-600">Búsqueda inteligente:</strong> Filtra por nombre, categoría o tipo. Soporta sinónimos (ej: "mru" encuentra cinemática), errores de escritura y navegación con teclado (↑↓ Enter).</li>
+                                    <li>📖 <strong class="text-blue-600">Wikipedia:</strong> Busca conceptos directamente.</li>
+                                    <li>📂 <strong class="text-blue-600">Categorías:</strong> 12 temas de matemáticas organizados. Clic para expandir/contraer.</li>
+                                    <li>🏷️ <strong class="text-blue-600">Etiquetas:</strong> Identifican el tipo (PDF, App, GGB, Simulador, Web).</li>
+                                    <li>🔗 <strong class="text-blue-600">Plataformas:</strong> Acceso rápido a GeoGebra, Python, Jupyter, YouTube.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-blue-200 dark:border-blue-700">
+                                <h4 class="font-bold text-blue-600 dark:text-blue-400 mb-2 flex items-center gap-2">
+                                    <i class="fa-solid fa-desktop"></i> Panel Central (Visor)
+                                </h4>
+                                <ul class="text-sm text-slate-600 dark:text-slate-300 space-y-2">
+                                    <li>🏠 <strong class="text-blue-600">Dashboard:</strong> Pantalla de bienvenida con frases célebres, noticias científicas y herramientas.</li>
+                                    <li>📄 <strong class="text-blue-600">Visor de contenido:</strong> Muestra PDFs, apps HTML, simulaciones GeoGebra.</li>
+                                    <li>🔄 <strong class="text-blue-600">Recargar:</strong> Reinicia el contenido actual.</li>
+                                    <li>⛶ <strong class="text-blue-600">Pantalla completa:</strong> Maximiza la simulación.</li>
+                                    <li>🌙 <strong class="text-blue-600">Tema:</strong> Alterna entre modo claro y oscuro.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-blue-900/50 dark:to-cyan-900/50 p-3 rounded-lg border border-blue-300 dark:border-blue-600">
+                            <p class="text-sm text-blue-800 dark:text-blue-200">
+                                <i class="fa-solid fa-lightbulb text-yellow-500 mr-2"></i>
+                                <strong>Tip:</strong> En móviles, usa el botón <i class="fa-solid fa-bars mx-1"></i> para abrir/cerrar el menú lateral.
+                            </p>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Tipos de recursos -->
+                <details class="group rounded-xl overflow-hidden border-2 border-emerald-200 dark:border-emerald-800">
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white cursor-pointer hover:from-emerald-600 hover:to-teal-700 transition">
+                        <i class="fa-solid fa-layer-group text-xl"></i>
+                        <span class="font-bold text-lg">Tipos de Recursos Disponibles</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-emerald-50 dark:bg-emerald-900/30">
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                            <div class="text-center p-3 bg-white dark:bg-slate-800 rounded-xl border border-emerald-200 dark:border-slate-600">
+                                <div class="w-12 h-12 mx-auto mb-2 rounded-lg bg-red-500 text-white flex items-center justify-center text-xl"><i class="fa-solid fa-file-pdf"></i></div>
+                                <p class="font-bold text-red-600 text-sm">PDF</p>
+                                <p class="text-[10px] text-slate-500">Guías y talleres</p>
+                            </div>
+                            <div class="text-center p-3 bg-white dark:bg-slate-800 rounded-xl border border-emerald-200 dark:border-slate-600">
+                                <div class="w-12 h-12 mx-auto mb-2 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xl"><i class="fa-solid fa-laptop-code"></i></div>
+                                <p class="font-bold text-emerald-600 text-sm">APP</p>
+                                <p class="text-[10px] text-slate-500">Cuadernos interactivos</p>
+                            </div>
+                            <div class="text-center p-3 bg-white dark:bg-slate-800 rounded-xl border border-emerald-200 dark:border-slate-600">
+                                <div class="w-12 h-12 mx-auto mb-2 rounded-lg bg-blue-500 text-white flex items-center justify-center text-xl"><i class="fa-solid fa-shapes"></i></div>
+                                <p class="font-bold text-blue-600 text-sm">GeoGebra</p>
+                                <p class="text-[10px] text-slate-500">Simulaciones</p>
+                            </div>
+                            <div class="text-center p-3 bg-white dark:bg-slate-800 rounded-xl border border-emerald-200 dark:border-slate-600">
+                                <div class="w-12 h-12 mx-auto mb-2 rounded-lg bg-purple-500 text-white flex items-center justify-center text-xl"><i class="fa-solid fa-atom"></i></div>
+                                <p class="font-bold text-purple-600 text-sm">Simulador</p>
+                                <p class="text-[10px] text-slate-500">Laboratorios virtuales</p>
+                            </div>
+                            <div class="text-center p-3 bg-white dark:bg-slate-800 rounded-xl border border-emerald-200 dark:border-slate-600">
+                                <div class="w-12 h-12 mx-auto mb-2 rounded-lg bg-orange-500 text-white flex items-center justify-center text-xl"><i class="fa-solid fa-link"></i></div>
+                                <p class="font-bold text-orange-600 text-sm">Web</p>
+                                <p class="text-[10px] text-slate-500">Enlaces externos</p>
+                            </div>
+                            <div class="text-center p-3 bg-white dark:bg-slate-800 rounded-xl border border-emerald-200 dark:border-slate-600">
+                                <div class="w-12 h-12 mx-auto mb-2 rounded-lg bg-indigo-500 text-white flex items-center justify-center text-xl"><i class="fa-solid fa-flask-vial"></i></div>
+                                <p class="font-bold text-indigo-600 text-sm">EvalLab</p>
+                                <p class="text-[10px] text-slate-500">Evaluación con IA</p>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Temas de matemáticas -->
+                <details class="group rounded-xl overflow-hidden border-2 border-indigo-200 dark:border-indigo-800">
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-indigo-500 to-violet-600 text-white cursor-pointer hover:from-indigo-600 hover:to-violet-700 transition">
+                        <i class="fa-solid fa-square-root-variable text-xl"></i>
+                        <span class="font-bold text-lg">12 Temas de Matemáticas Cubiertos</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-indigo-50 dark:bg-indigo-900/30">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <div class="p-3 bg-white dark:bg-slate-800 rounded-lg border-l-4 border-indigo-500 text-center"><p class="font-bold text-indigo-600 text-xs">1. Aritmética y Números</p></div>
+                            <div class="p-3 bg-white dark:bg-slate-800 rounded-lg border-l-4 border-violet-500 text-center"><p class="font-bold text-violet-600 text-xs">2. Álgebra</p></div>
+                            <div class="p-3 bg-white dark:bg-slate-800 rounded-lg border-l-4 border-purple-500 text-center"><p class="font-bold text-purple-600 text-xs">3. Trigonometría</p></div>
+                            <div class="p-3 bg-white dark:bg-slate-800 rounded-lg border-l-4 border-blue-500 text-center"><p class="font-bold text-blue-600 text-xs">4. Geometría</p></div>
+                            <div class="p-3 bg-white dark:bg-slate-800 rounded-lg border-l-4 border-fuchsia-500 text-center"><p class="font-bold text-fuchsia-600 text-xs">5. Cálculo Diferencial</p></div>
+                            <div class="p-3 bg-white dark:bg-slate-800 rounded-lg border-l-4 border-pink-500 text-center"><p class="font-bold text-pink-600 text-xs">6. Cálculo Integral</p></div>
+                            <div class="p-3 bg-white dark:bg-slate-800 rounded-lg border-l-4 border-emerald-500 text-center"><p class="font-bold text-emerald-600 text-xs">7. Estadística</p></div>
+                            <div class="p-3 bg-white dark:bg-slate-800 rounded-lg border-l-4 border-teal-500 text-center"><p class="font-bold text-teal-600 text-xs">8. Probabilidad y Combinatoria</p></div>
+                            <div class="p-3 bg-white dark:bg-slate-800 rounded-lg border-l-4 border-cyan-500 text-center"><p class="font-bold text-cyan-600 text-xs">9. Álgebra Lineal</p></div>
+                            <div class="p-3 bg-white dark:bg-slate-800 rounded-lg border-l-4 border-sky-500 text-center"><p class="font-bold text-sky-600 text-xs">10. Ecuaciones Diferenciales</p></div>
+                            <div class="p-3 bg-white dark:bg-slate-800 rounded-lg border-l-4 border-slate-500 text-center"><p class="font-bold text-slate-600 text-xs">11. Lógica y Conjuntos</p></div>
+                            <div class="p-3 bg-white dark:bg-slate-800 rounded-lg border-l-4 border-rose-500 text-center"><p class="font-bold text-rose-600 text-xs">12. Matemáticas Discretas</p></div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Tips -->
+                <details class="group rounded-xl overflow-hidden border-2 border-rose-200 dark:border-rose-800">
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-rose-500 to-red-600 text-white cursor-pointer hover:from-rose-600 hover:to-red-700 transition">
+                        <i class="fa-solid fa-keyboard text-xl"></i>
+                        <span class="font-bold text-lg">Tips y Accesibilidad</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-rose-50 dark:bg-rose-900/30">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded-lg text-sm text-slate-600 dark:text-slate-300 space-y-2">
+                                <h4 class="font-bold text-rose-600 dark:text-rose-400 flex items-center gap-2 mb-2"><i class="fa-solid fa-lightbulb"></i> Consejos Pro</h4>
+                                <p>💡 <strong class="text-rose-600">Redimensionar:</strong> Arrastra el borde entre el menú y el visor.</p>
+                                <p>🌙 <strong class="text-rose-600">Modo oscuro:</strong> Reduce fatiga visual en sesiones largas.</p>
+                                <p>⛶ <strong class="text-rose-600">Pantalla completa:</strong> Mejor experiencia con simulaciones.</p>
+                                <p>🔍 <strong class="text-rose-600">Buscar por tipo:</strong> Escribe "simulador" o "pdf" para filtrar.</p>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded-lg text-sm text-slate-600 dark:text-slate-300 space-y-2">
+                                <h4 class="font-bold text-rose-600 dark:text-rose-400 flex items-center gap-2 mb-2"><i class="fa-solid fa-universal-access"></i> Accesibilidad</h4>
+                                <p>📱 <strong class="text-rose-600">Responsive:</strong> Funciona en móviles, tablets y PC.</p>
+                                <p>🔤 <strong class="text-rose-600">Zoom:</strong> Usa Ctrl + / Ctrl - para ajustar tamaño.</p>
+                                <p>📖 <strong class="text-rose-600">MathJax:</strong> Las fórmulas se renderizan automáticamente.</p>
+                                <p>💾 <strong class="text-rose-600">Offline:</strong> Muchos recursos funcionan sin internet.</p>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ════════════════════════════════════════════════════════════════════ -->
+            <!-- TAB 1: HERRAMIENTAS                                                 -->
+            <!-- ════════════════════════════════════════════════════════════════════ -->
+            <div class="manual-panel p-4 md:p-6 space-y-4 hidden" data-panel="1">
+
+                <!-- Physics Genius - Chatbot IA -->
+                <details class="group rounded-xl overflow-hidden border-2 border-violet-200 dark:border-violet-800" open>
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-violet-500 to-purple-600 text-white cursor-pointer hover:from-violet-600 hover:to-purple-700 transition">
+                        <i class="fa-solid fa-robot text-xl"></i>
+                        <span class="font-bold text-lg">Math Genius — Chatbot Tutor con IA</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-violet-50 dark:bg-violet-900/30 space-y-3">
+                        <p class="text-sm text-slate-600 dark:text-slate-300">Tu tutor personal de matemáticas, impulsado por <strong class="text-violet-600">Google Gemini</strong>. Te acompaña un matemático animado que responde tus preguntas con explicaciones claras, demostraciones paso a paso y notación rigurosa.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded-lg border-l-4 border-violet-500">
+                                <p class="font-bold text-violet-600 text-sm mb-1">🧑‍🔬 Científicos animados</p>
+                                <p class="text-xs text-slate-500">Einstein, Curie, Hawking, Feynman, Newton... cada uno con personalidad única, frases célebres y mini-simulaciones SVG animadas en su badge.</p>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded-lg border-l-4 border-purple-500">
+                                <p class="font-bold text-purple-600 text-sm mb-1">✨ Funcionalidades</p>
+                                <p class="text-xs text-slate-500">Preguntas de matemáticas con respuestas pedagógicas, generación de post-its desde el chat, exportar conversación a PDF, sugerencias contextuales y resúmenes automáticos.</p>
+                            </div>
+                        </div>
+                        <div class="bg-violet-100 dark:bg-violet-900/50 p-3 rounded-lg text-sm text-violet-800 dark:text-violet-200">
+                            <i class="fa-solid fa-circle-info mr-2"></i>
+                            <strong>¿Cómo usarlo?</strong> Haz clic en el badge circular del científico que aparece en la esquina inferior derecha de la pantalla.
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Post-Its -->
+                <details class="group rounded-xl overflow-hidden border-2 border-amber-200 dark:border-amber-800">
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white cursor-pointer hover:from-amber-600 hover:to-orange-700 transition">
+                        <i class="fa-solid fa-note-sticky text-xl"></i>
+                        <span class="font-bold text-lg">Post-Its — Notas Interactivas</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-amber-50 dark:bg-amber-900/30 space-y-3">
+                        <p class="text-sm text-slate-600 dark:text-slate-300">Sistema de notas arrastrables para tomar apuntes mientras estudias. Funcionan como las notas adhesivas de un escritorio real.</p>
+                        <ul class="text-sm text-slate-600 dark:text-slate-300 space-y-1">
+                            <li>📌 <strong class="text-amber-600">Arrastrar y soltar</strong> — Mueve las notas libremente por la pantalla (funciona con mouse y pantalla táctil).</li>
+                            <li>📐 <strong class="text-amber-600">Redimensionar</strong> — Arrastra la esquina inferior derecha para cambiar el tamaño.</li>
+                            <li>🗂️ <strong class="text-amber-600">Dos modos</strong> — Grid ordenado (cuadrícula) o modo libre (ventanas flotantes).</li>
+                            <li>➖ <strong class="text-amber-600">Minimizar/Maximizar</strong> — Oculta notas temporalmente sin perder el contenido.</li>
+                            <li>💾 <strong class="text-amber-600">Persistencia</strong> — Tus notas se guardan automáticamente en el navegador (localStorage).</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <!-- Grabación de video -->
+                <details class="group rounded-xl overflow-hidden border-2 border-red-200 dark:border-red-800">
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-red-500 to-rose-600 text-white cursor-pointer hover:from-red-600 hover:to-rose-700 transition">
+                        <i class="fa-solid fa-video text-xl"></i>
+                        <span class="font-bold text-lg">Grabación de Video</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-red-50 dark:bg-red-900/30 space-y-3">
+                        <p class="text-sm text-slate-600 dark:text-slate-300">Graba cualquier simulación o contenido del visor como video para descargar y compartir. Ideal para evidencias de laboratorios virtuales.</p>
+                        <ul class="text-sm text-slate-600 dark:text-slate-300 space-y-1">
+                            <li>🔴 <strong class="text-red-600">Iniciar/Pausar/Detener</strong> — Controles intuitivos en la barra superior.</li>
+                            <li>⏱️ <strong class="text-red-600">Indicador de tiempo</strong> — Muestra la duración de la grabación en vivo.</li>
+                            <li>💾 <strong class="text-red-600">Descarga automática</strong> — El video se exporta en formato WebM al detener la grabación.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <!-- Compartir -->
+                <details class="group rounded-xl overflow-hidden border-2 border-green-200 dark:border-green-800">
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white cursor-pointer hover:from-green-600 hover:to-emerald-700 transition">
+                        <i class="fa-solid fa-share-nodes text-xl"></i>
+                        <span class="font-bold text-lg">Compartir en Redes Sociales</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-green-50 dark:bg-green-900/30">
+                        <p class="text-sm text-slate-600 dark:text-slate-300 mb-3">Panel arrastrable que te permite compartir cualquier recurso de la plataforma por múltiples canales:</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 rounded-full bg-green-500 text-white text-xs font-bold"><i class="fa-brands fa-whatsapp mr-1"></i>WhatsApp</span>
+                            <span class="px-3 py-1 rounded-full bg-blue-500 text-white text-xs font-bold"><i class="fa-brands fa-telegram mr-1"></i>Telegram</span>
+                            <span class="px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold"><i class="fa-brands fa-facebook mr-1"></i>Facebook</span>
+                            <span class="px-3 py-1 rounded-full bg-sky-500 text-white text-xs font-bold"><i class="fa-brands fa-twitter mr-1"></i>Twitter/X</span>
+                            <span class="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-bold"><i class="fa-solid fa-envelope mr-1"></i>Correo</span>
+                            <span class="px-3 py-1 rounded-full bg-slate-700 text-white text-xs font-bold"><i class="fa-solid fa-qrcode mr-1"></i>Código QR</span>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Herramientas matemáticas -->
+                <details class="group rounded-xl overflow-hidden border-2 border-emerald-200 dark:border-emerald-800">
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white cursor-pointer hover:from-emerald-600 hover:to-teal-700 transition">
+                        <i class="fa-solid fa-square-root-variable text-xl"></i>
+                        <span class="font-bold text-lg">Herramientas Matemáticas de Referencia</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-emerald-50 dark:bg-emerald-900/30">
+                        <p class="text-sm text-slate-600 dark:text-slate-300 mb-3">Tablas y catálogos de referencia disponibles desde el Centro de Referencias en la barra superior:</p>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            <div class="bg-white dark:bg-slate-800 p-2 rounded-lg text-center text-xs"><i class="fa-solid fa-language text-blue-500 text-lg mb-1 block"></i><strong>Alfabeto Griego</strong><br>α β γ δ... Ω</div>
+                            <div class="bg-white dark:bg-slate-800 p-2 rounded-lg text-center text-xs"><i class="fa-solid fa-square-root-variable text-purple-500 text-lg mb-1 block"></i><strong>Constantes</strong><br>π, e, φ, γ, ζ(3)...</div>
+                            <div class="bg-white dark:bg-slate-800 p-2 rounded-lg text-center text-xs"><i class="fa-solid fa-wave-square text-emerald-500 text-lg mb-1 block"></i><strong>Identidades Trig.</strong><br>sen², cos(2θ), leyes</div>
+                            <div class="bg-white dark:bg-slate-800 p-2 rounded-lg text-center text-xs"><i class="fa-solid fa-chart-line text-amber-500 text-lg mb-1 block"></i><strong>Derivadas</strong><br>tabla y reglas</div>
+                            <div class="bg-white dark:bg-slate-800 p-2 rounded-lg text-center text-xs"><i class="fa-solid fa-infinity text-orange-500 text-lg mb-1 block"></i><strong>Integrales</strong><br>tabla y técnicas</div>
+                            <div class="bg-white dark:bg-slate-800 p-2 rounded-lg text-center text-xs"><i class="fa-solid fa-superscript text-blue-600 text-lg mb-1 block"></i><strong>Trigonometría</strong><br>Valores notables</div>
+                            <div class="bg-white dark:bg-slate-800 p-2 rounded-lg text-center text-xs"><i class="fa-solid fa-wave-square text-purple-500 text-lg mb-1 block"></i><strong>Series Notables</strong><br>Taylor, Fibonacci…</div>
+                            <div class="bg-white dark:bg-slate-800 p-2 rounded-lg text-center text-xs"><i class="fa-solid fa-landmark text-rose-500 text-lg mb-1 block"></i><strong>Teoremas</strong><br>Pitágoras, TFC, Gauss</div>
+                            <div class="bg-white dark:bg-slate-800 p-2 rounded-lg text-center text-xs"><i class="fa-solid fa-square-root-variable text-indigo-500 text-lg mb-1 block"></i><strong>Fórmulas</strong><br>Manual matemático</div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Noticias y Hub IA -->
+                <details class="group rounded-xl overflow-hidden border-2 border-fuchsia-200 dark:border-fuchsia-800">
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-fuchsia-500 to-pink-600 text-white cursor-pointer hover:from-fuchsia-600 hover:to-pink-700 transition">
+                        <i class="fa-solid fa-newspaper text-xl"></i>
+                        <span class="font-bold text-lg">Noticias Científicas y Hub de IA</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-fuchsia-50 dark:bg-fuchsia-900/30 space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded-lg">
+                                <p class="font-bold text-fuchsia-600 text-sm mb-2"><i class="fa-solid fa-satellite-dish mr-1"></i> 6 fuentes de noticias</p>
+                                <ul class="text-xs text-slate-500 space-y-1">
+                                    <li>📰 El País Ciencia · 🌍 BBC Mundo · 🚀 NASA</li>
+                                    <li>🔬 Muy Interesante · 🦁 National Geographic · 🧬 ScienceDaily</li>
+                                </ul>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded-lg">
+                                <p class="font-bold text-fuchsia-600 text-sm mb-2"><i class="fa-solid fa-robot mr-1"></i> 9 asistentes de IA</p>
+                                <ul class="text-xs text-slate-500 space-y-1">
+                                    <li>💬 ChatGPT · 💎 Gemini · 🧡 Claude · 🐳 DeepSeek</li>
+                                    <li>🤖 Copilot · 📓 NotebookLM · 🧪 AI Studio · 🌬️ Mistral · 🤖 Qwen</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ════════════════════════════════════════════════════════════════════ -->
+            <!-- TAB 2: EVALLAB                                                      -->
+            <!-- ════════════════════════════════════════════════════════════════════ -->
+            <div class="manual-panel p-4 md:p-6 space-y-4 hidden" data-panel="2">
+
+                <!-- Qué es EvalLab -->
+                <details class="group rounded-xl overflow-hidden border-2 border-indigo-200 dark:border-indigo-800" open>
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-indigo-500 to-violet-600 text-white cursor-pointer hover:from-indigo-600 hover:to-violet-700 transition">
+                        <i class="fa-solid fa-flask-vial text-xl"></i>
+                        <span class="font-bold text-lg">¿Qué es EvalLab?</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-indigo-50 dark:bg-indigo-900/30 space-y-3">
+                        <p class="text-sm text-slate-600 dark:text-slate-300"><strong class="text-indigo-600">EvalLab</strong> es el Laboratorio de Evaluación Interactiva integrado en <strong class="text-indigo-600">Matemáticas Interactivas</strong>. Funciona como un sistema tipo Google Classroom donde el docente crea actividades de álgebra, cálculo, geometría, estadística, etc., los estudiantes las resuelven y las calificaciones se registran automáticamente.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded-lg border-l-4 border-teal-500 text-center">
+                                <p class="text-2xl mb-1">👨‍🎓</p>
+                                <p class="font-bold text-teal-600 text-sm">Estudiante</p>
+                                <p class="text-[10px] text-slate-500">Resuelve actividades, sube trabajos, consulta notas</p>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded-lg border-l-4 border-orange-500 text-center">
+                                <p class="text-2xl mb-1">👨‍🏫</p>
+                                <p class="font-bold text-orange-600 text-sm">Docente</p>
+                                <p class="text-[10px] text-slate-500">Crea actividades, califica con IA, gestiona grupos</p>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded-lg border-l-4 border-slate-400 text-center">
+                                <p class="text-2xl mb-1">👁️</p>
+                                <p class="font-bold text-slate-500 text-sm">Invitado</p>
+                                <p class="text-[10px] text-slate-500">Explora la plataforma sin registrarse</p>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Exámenes automáticos -->
+                <details class="group rounded-xl overflow-hidden border-2 border-emerald-200 dark:border-emerald-800">
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-emerald-500 to-green-600 text-white cursor-pointer hover:from-emerald-600 hover:to-green-700 transition">
+                        <i class="fa-solid fa-check-double text-xl"></i>
+                        <span class="font-bold text-lg">Exámenes y Juegos (Nota Automática)</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-emerald-50 dark:bg-emerald-900/30 space-y-3">
+                        <p class="text-sm text-slate-600 dark:text-slate-300">Los exámenes tipo ICFES, quizzes y juegos educativos se califican <strong class="text-emerald-600">automáticamente</strong>. No interviene la IA ni el docente: el sistema calcula tu nota al instante.</p>
+                        <div class="bg-white dark:bg-slate-800 p-3 rounded-lg text-sm text-slate-600 dark:text-slate-300 space-y-2">
+                            <p>1️⃣ El docente asigna la actividad desde EvalLab.</p>
+                            <p>2️⃣ Tú la abres y resuelves las preguntas (con timer si aplica).</p>
+                            <p>3️⃣ Al entregar, el sistema calcula: <code class="bg-indigo-100 dark:bg-indigo-900 px-2 py-0.5 rounded text-indigo-700 dark:text-indigo-300">correctas ÷ total × 5.0</code></p>
+                            <p>4️⃣ La nota se envía automáticamente a Firebase y aparece en tu historial.</p>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Entregas de trabajos -->
+                <details class="group rounded-xl overflow-hidden border-2 border-violet-200 dark:border-violet-800">
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-violet-500 to-purple-600 text-white cursor-pointer hover:from-violet-600 hover:to-purple-700 transition">
+                        <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+                        <span class="font-bold text-lg">Entregas de Trabajos</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-violet-50 dark:bg-violet-900/30 space-y-3">
+                        <p class="text-sm text-slate-600 dark:text-slate-300">Para talleres, laboratorios e informes, puedes subir tus archivos directamente desde la plataforma. El docente los revisa y califica (manual o con ayuda de IA).</p>
+                        <ul class="text-sm text-slate-600 dark:text-slate-300 space-y-1">
+                            <li>📎 <strong class="text-violet-600">Formatos aceptados:</strong> PDF, Word (.docx), imágenes (JPG, PNG, WebP), texto (.txt).</li>
+                            <li>🖱️ <strong class="text-violet-600">Drag & drop:</strong> Arrastra los archivos al área de carga o haz clic para seleccionar.</li>
+                            <li>🗜️ <strong class="text-violet-600">Compresión automática:</strong> Las imágenes (fotos de cuaderno) se comprimen automáticamente para ahorrar espacio.</li>
+                            <li>📝 <strong class="text-violet-600">Comentario:</strong> Puedes agregar un mensaje al docente con tu entrega.</li>
+                            <li>🔄 <strong class="text-violet-600">Estado:</strong> Verás si tu entrega está "Pendiente" o "Calificada".</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <!-- Calificación con IA -->
+                <details class="group rounded-xl overflow-hidden border-2 border-pink-200 dark:border-pink-800">
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-pink-500 to-rose-600 text-white cursor-pointer hover:from-pink-600 hover:to-rose-700 transition">
+                        <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+                        <span class="font-bold text-lg">Calificación con Inteligencia Artificial</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-pink-50 dark:bg-pink-900/30 space-y-3">
+                        <p class="text-sm text-slate-600 dark:text-slate-300">El docente puede usar <strong class="text-pink-600">Gemini Flash 2.5</strong> como asistente para evaluar trabajos con criterios pedagógicos. La IA sugiere una nota, pero el docente siempre tiene la última palabra.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded-lg border-l-4 border-blue-500">
+                                <p class="font-bold text-blue-600 text-xs">📝 Preset: Examen</p>
+                                <p class="text-[10px] text-slate-500">Procedimiento (30%), Respuesta (30%), Presentación (20%), Argumentación (20%)</p>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded-lg border-l-4 border-green-500">
+                                <p class="font-bold text-green-600 text-xs">📋 Preset: Taller</p>
+                                <p class="text-[10px] text-slate-500">Contenido (25%), Procedimiento (25%), Gráficas (20%), Estética (15%), Pensamiento crítico (15%)</p>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded-lg border-l-4 border-purple-500">
+                                <p class="font-bold text-purple-600 text-xs">🔬 Preset: Laboratorio</p>
+                                <p class="text-[10px] text-slate-500">Datos (20%), Análisis (25%), Conclusiones (20%), Procedimiento (20%), Informe (15%)</p>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Ver notas -->
+                <details class="group rounded-xl overflow-hidden border-2 border-sky-200 dark:border-sky-800">
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-sky-500 to-blue-600 text-white cursor-pointer hover:from-sky-600 hover:to-blue-700 transition">
+                        <i class="fa-solid fa-chart-line text-xl"></i>
+                        <span class="font-bold text-lg">Consultar Mis Notas</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-sky-50 dark:bg-sky-900/30">
+                        <p class="text-sm text-slate-600 dark:text-slate-300 mb-3">Como estudiante, puedes ver tu historial de calificaciones al iniciar sesión en EvalLab. Las notas están clasificadas por nivel según la escala colombiana:</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 rounded-full bg-green-500 text-white text-xs font-bold">🏆 Superior (4.5 - 5.0)</span>
+                            <span class="px-3 py-1 rounded-full bg-blue-500 text-white text-xs font-bold">⭐ Alto (3.5 - 4.4)</span>
+                            <span class="px-3 py-1 rounded-full bg-amber-500 text-white text-xs font-bold">📘 Básico (3.0 - 3.4)</span>
+                            <span class="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-bold">📕 Bajo (0.0 - 2.9)</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- ════════════════════════════════════════════════════════════════════ -->
+            <!-- TAB 3: LEGAL                                                        -->
+            <!-- ════════════════════════════════════════════════════════════════════ -->
+            <div class="manual-panel p-4 md:p-6 space-y-4 hidden" data-panel="3">
+
+                <!-- Derechos de autor -->
+                <details class="group rounded-xl overflow-hidden border-2 border-amber-200 dark:border-amber-800" open>
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-600 to-orange-700 text-white cursor-pointer hover:from-amber-700 hover:to-orange-800 transition">
+                        <i class="fa-solid fa-copyright text-xl"></i>
+                        <span class="font-bold text-lg">Derechos de Autor y Propiedad Intelectual</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-amber-50 dark:bg-amber-900/30 space-y-3">
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-amber-300 dark:border-amber-700">
+                            <p class="text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
+                                © 2024–2026 <strong>Msc. Néstor Fabio Montoya Palacios</strong>. Todos los derechos reservados.
+                            </p>
+                            <p class="text-sm text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
+                                La totalidad del contenido de la plataforma <strong>Matemáticas Interactivas</strong> y el sistema <strong>EvalLab</strong> —incluyendo pero no limitado a: código fuente, cuadernos interactivos, simulaciones, guías teóricas, diseño gráfico, interfaz de usuario, textos pedagógicos, algoritmos de evaluación y módulos de inteligencia artificial— constituye obra protegida por la legislación colombiana sobre derechos de autor (Ley 23 de 1982 y Decisión Andina 351 de 1993) y los tratados internacionales suscritos por la República de Colombia.
+                            </p>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-amber-300 dark:border-amber-700">
+                            <p class="font-bold text-amber-700 dark:text-amber-400 text-sm mb-2">Licencia de Uso Educativo</p>
+                            <ul class="text-sm text-slate-600 dark:text-slate-300 space-y-2">
+                                <li>✅ Se autoriza el uso de esta plataforma con fines exclusivamente <strong>educativos y sin ánimo de lucro</strong> por parte de estudiantes y docentes de las instituciones donde el autor ejerce su labor docente.</li>
+                                <li>✅ Se permite la visualización, descarga e impresión de materiales (PDFs, guías) para uso personal académico.</li>
+                                <li>❌ Queda <strong>expresamente prohibida</strong> la reproducción, distribución, modificación, ingeniería inversa, publicación o comercialización total o parcial del código fuente, las aplicaciones o cualquier otro componente de la plataforma sin autorización escrita del autor.</li>
+                                <li>❌ No se permite la creación de obras derivadas, la extracción sistemática de contenido o el uso en plataformas comerciales de terceros.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-amber-300 dark:border-amber-700">
+                            <p class="font-bold text-amber-700 dark:text-amber-400 text-sm mb-2">Atribución de Herramientas de Terceros</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                Esta plataforma integra tecnologías de código abierto y servicios de terceros, cada uno sujeto a sus respectivas licencias:
+                                <strong>GeoGebra</strong> (licencia no comercial), <strong>Firebase</strong> (Google LLC), <strong>Gemini API</strong> (Google LLC),
+                                <strong>MathJax</strong> (Apache 2.0), <strong>Chart.js</strong> (MIT), <strong>TailwindCSS</strong> (MIT), <strong>Lucide Icons</strong> (ISC),
+                                <strong>Font Awesome</strong> (licencia Font Awesome Free), <strong>SweetAlert2</strong> (MIT).
+                                El uso de estas herramientas no implica afiliación, patrocinio ni respaldo por parte de sus respectivos titulares.
+                            </p>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Política de privacidad -->
+                <details class="group rounded-xl overflow-hidden border-2 border-blue-200 dark:border-blue-800">
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white cursor-pointer hover:from-blue-700 hover:to-indigo-800 transition">
+                        <i class="fa-solid fa-shield-halved text-xl"></i>
+                        <span class="font-bold text-lg">Política de Privacidad y Tratamiento de Datos</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-blue-50 dark:bg-blue-900/30 space-y-3">
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-blue-300 dark:border-blue-700">
+                            <p class="font-bold text-blue-700 dark:text-blue-400 text-sm mb-2">Datos que se recopilan</p>
+                            <ul class="text-sm text-slate-600 dark:text-slate-300 space-y-1">
+                                <li>📋 <strong>EvalLab:</strong> nombre del estudiante, grupo, institución, calificaciones, archivos de entregas y respuestas a actividades.</li>
+                                <li>💾 <strong>Navegador local (localStorage):</strong> preferencias de tema (claro/oscuro), notas post-it, API key del chatbot (opcional) y científico seleccionado.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-blue-300 dark:border-blue-700">
+                            <p class="font-bold text-blue-700 dark:text-blue-400 text-sm mb-2">Datos que NO se recopilan</p>
+                            <ul class="text-sm text-slate-600 dark:text-slate-300 space-y-1">
+                                <li>🚫 No se recopila ubicación geográfica, contactos, historial de navegación, datos biométricos ni información financiera.</li>
+                                <li>🚫 No se utilizan cookies de rastreo ni herramientas de analítica de terceros con fines publicitarios.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-blue-300 dark:border-blue-700">
+                            <p class="font-bold text-blue-700 dark:text-blue-400 text-sm mb-2">Almacenamiento y seguridad</p>
+                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                Los datos de EvalLab se almacenan en <strong>Google Firebase</strong> (Firestore), cuyos servidores cumplen con los estándares de seguridad SOC 1, SOC 2, SOC 3 e ISO 27001. El tratamiento de datos personales se realiza de conformidad con la <strong>Ley Estatutaria 1581 de 2012</strong> (Ley de Protección de Datos Personales de Colombia) y el <strong>Decreto 1377 de 2013</strong>. Los titulares de los datos pueden ejercer sus derechos de acceso, rectificación, cancelación y oposición contactando al docente responsable.
+                            </p>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Términos de uso -->
+                <details class="group rounded-xl overflow-hidden border-2 border-slate-300 dark:border-slate-600">
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-slate-600 to-slate-800 text-white cursor-pointer hover:from-slate-700 hover:to-slate-900 transition">
+                        <i class="fa-solid fa-file-contract text-xl"></i>
+                        <span class="font-bold text-lg">Términos de Uso</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-slate-100 dark:bg-slate-900/50 space-y-3">
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-300 dark:border-slate-600 text-sm text-slate-600 dark:text-slate-300 space-y-2 leading-relaxed">
+                            <p><strong class="text-slate-700 dark:text-slate-200">1. Ámbito de aplicación.</strong> Estos términos rigen el uso de la plataforma Matemáticas Interactivas y EvalLab, disponibles en el dominio iemauxicartago.edu.co.</p>
+                            <p><strong class="text-slate-700 dark:text-slate-200">2. Uso autorizado.</strong> La plataforma está destinada exclusivamente a fines educativos dentro del marco de la enseñanza de las matemáticas y la física. El acceso es gratuito para estudiantes matriculados en las instituciones educativas donde el autor ejerce su labor docente.</p>
+                            <p><strong class="text-slate-700 dark:text-slate-200">3. Responsabilidad del usuario.</strong> El estudiante es responsable del contenido que sube a la plataforma (entregas, archivos). Queda prohibido el uso de la plataforma para transmitir material ofensivo, ilegal o que vulnere derechos de terceros.</p>
+                            <p><strong class="text-slate-700 dark:text-slate-200">4. Calificaciones e IA.</strong> Las calificaciones asistidas por inteligencia artificial (Gemini) constituyen una sugerencia. El docente conserva la potestad exclusiva de asignar la nota definitiva. Ninguna calificación generada por IA es vinculante sin la aprobación del docente.</p>
+                            <p><strong class="text-slate-700 dark:text-slate-200">5. Disponibilidad.</strong> La plataforma se ofrece "tal como está" (as is), sin garantías de disponibilidad ininterrumpida. El autor se reserva el derecho de modificar, suspender o descontinuar funcionalidades sin previo aviso.</p>
+                            <p><strong class="text-slate-700 dark:text-slate-200">6. Modificaciones.</strong> Estos términos pueden actualizarse periódicamente. La versión vigente estará siempre disponible en este manual.</p>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Créditos y tecnologías -->
+                <details class="group rounded-xl overflow-hidden border-2 border-indigo-200 dark:border-indigo-800">
+                    <summary class="flex items-center gap-3 p-4 bg-gradient-to-r from-indigo-600 to-purple-700 text-white cursor-pointer hover:from-indigo-700 hover:to-purple-800 transition">
+                        <i class="fa-solid fa-user-graduate text-xl"></i>
+                        <span class="font-bold text-lg">Créditos y Contacto</span>
+                        <i class="fa-solid fa-chevron-down ml-auto transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="p-4 bg-indigo-50 dark:bg-indigo-900/30 space-y-4">
+                        <div class="flex flex-col md:flex-row items-center gap-4">
+                            <img src="Avatar/avatarNestor.png" alt="Msc. Néstor Fabio Montoya Palacios"
+                                class="w-28 h-28 rounded-2xl object-cover shadow-lg border-4 border-indigo-300 dark:border-indigo-600">
+                            <div class="text-center md:text-left">
+                                <h4 class="font-bold text-xl text-slate-800 dark:text-white">Msc. Néstor Fabio Montoya Palacios</h4>
+                                <p class="text-slate-500 dark:text-slate-400">Magíster en Enseñanza de la Física · Docente de Matemáticas y Física</p>
+                                <div class="flex flex-wrap gap-2 mt-2 justify-center md:justify-start">
+                                    <span class="px-2 py-1 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold">I.E. María Auxiliadora</span>
+                                    <span class="px-2 py-1 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 text-[10px] font-bold">Univalle – Sede Cartago</span>
+                                    <span class="px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-[10px] font-bold">UTP – Pereira</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <a href="https://www.youtube.com/@nestormontoya1" target="_blank"
+                                class="flex items-center gap-2 p-3 bg-red-100 dark:bg-red-900/30 rounded-lg hover:bg-red-200 dark:hover:bg-red-800/50 transition">
+                                <i class="fa-brands fa-youtube text-red-600 text-xl"></i>
+                                <span class="text-red-700 dark:text-red-300 text-sm font-bold">Canal de YouTube</span>
+                            </a>
+                            <a href="https://iemauxicartago.edu.co/" target="_blank"
+                                class="flex items-center gap-2 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800/50 transition">
+                                <i class="fa-solid fa-school text-blue-600 text-xl"></i>
+                                <span class="text-blue-700 dark:text-blue-300 text-sm font-bold">Web Institucional</span>
+                            </a>
+                            <a href="https://iemauxicartago.edu.co/Fisica/" target="_blank"
+                                class="flex items-center gap-2 p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-800/50 transition">
+                                <i class="fa-solid fa-atom text-purple-600 text-xl"></i>
+                                <span class="text-purple-700 dark:text-purple-300 text-sm font-bold">Matemáticas Interactivas</span>
+                            </a>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-lg">
+                            <p class="font-bold text-indigo-600 text-sm mb-2">Stack Tecnológico</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-700 text-[10px] font-bold text-slate-600 dark:text-slate-300">HTML5 / CSS3 / JS</span>
+                                <span class="px-2 py-1 rounded bg-cyan-100 dark:bg-cyan-900/50 text-[10px] font-bold text-cyan-700 dark:text-cyan-300">TailwindCSS</span>
+                                <span class="px-2 py-1 rounded bg-amber-100 dark:bg-amber-900/50 text-[10px] font-bold text-amber-700 dark:text-amber-300">Firebase</span>
+                                <span class="px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/50 text-[10px] font-bold text-blue-700 dark:text-blue-300">Gemini AI</span>
+                                <span class="px-2 py-1 rounded bg-green-100 dark:bg-green-900/50 text-[10px] font-bold text-green-700 dark:text-green-300">GeoGebra</span>
+                                <span class="px-2 py-1 rounded bg-purple-100 dark:bg-purple-900/50 text-[10px] font-bold text-purple-700 dark:text-purple-300">MathJax</span>
+                                <span class="px-2 py-1 rounded bg-red-100 dark:bg-red-900/50 text-[10px] font-bold text-red-700 dark:text-red-300">Chart.js</span>
+                                <span class="px-2 py-1 rounded bg-indigo-100 dark:bg-indigo-900/50 text-[10px] font-bold text-indigo-700 dark:text-indigo-300">SheetJS</span>
+                            </div>
+                        </div>
+                        <div class="text-center p-3 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-lg">
+                            <p class="text-sm text-slate-600 dark:text-slate-300">
+                                <i class="fa-solid fa-heart text-red-500 mr-1"></i>
+                                Hecho con pasión por la enseñanza de las matemáticas
+                            </p>
+                            <p class="text-xs text-slate-400 mt-1">Matemáticas Interactivas v1.2.0 · EvalLab v5.3 · © 2024–2026</p>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            </div><!-- fin scroll container -->
+
+            <!-- ── Pie del Modal ── -->
+            <div class="bg-slate-100 dark:bg-slate-900 p-3 text-center border-t border-slate-200 dark:border-slate-700 shrink-0">
+                <p class="text-sm text-slate-500">
+                    <i class="fa-solid fa-question-circle text-indigo-500 mr-1"></i>
+                    ¿Necesitas más ayuda? Contacta a tu profesor · <a href="https://www.youtube.com/@nestormontoya1" target="_blank" class="text-indigo-500 hover:underline">Canal de YouTube</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script: Navegación por pestañas del manual -->
+    <script>
+    function manualTab(n) {
+        document.querySelectorAll('.manual-tab').forEach((t, i) => {
+            t.classList.toggle('active', i === n);
+            t.style.background = i === n ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)';
+        });
+        document.querySelectorAll('.manual-panel').forEach((p, i) => {
+            p.classList.toggle('hidden', i !== n);
+        });
+    }
+    </script>
+
+
+        <!-- Modal: EvalLab Access -->
+    <div id="modal-quiz"
+        class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 md:p-4">
+        <div class="glass-card bg-white dark:bg-slate-800 p-0 w-11/12 max-w-2xl relative animate-bounce-in overflow-hidden" style="border-radius:22px">
+            <button onclick="closeModal('modal-quiz')"
+                class="absolute top-3 right-3 md:top-4 md:right-4 text-slate-400 close-btn z-10">
+                <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
+            </button>
+            <!-- Header -->
+            <div class="p-5 md:p-7 text-center border-b border-slate-200/50 dark:border-slate-700/50 bg-gradient-to-b from-indigo-50/60 to-transparent dark:from-indigo-900/20">
+                <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-700 flex items-center justify-center text-2xl mb-3 shadow-xl shadow-indigo-500/25">
+                    <i class="fa-solid fa-flask-vial text-white"></i>
+                </div>
+                <h3 class="font-bold text-xl md:text-2xl text-slate-800 dark:text-white" style="font-family:Poppins,sans-serif">
+                    Eval<span class="text-indigo-600 dark:text-indigo-400">Lab</span>
+                </h3>
+                <p class="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 mt-1 font-semibold">Laboratorio de Evaluación Interactiva</p>
+            </div>
+            <!-- Cards -->
+            <div class="p-4 md:p-6 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+                <!-- Estudiante -->
+                <a href="evallab/?mode=est" target="_blank"
+                    class="block p-4 md:p-5 rounded-2xl text-center transition-all duration-300 border-2 border-transparent hover:border-indigo-300 dark:hover:border-indigo-600 hover:-translate-y-1 hover:shadow-lg bg-indigo-50/80 dark:bg-indigo-900/20 group">
+                    <div class="w-12 h-12 mx-auto rounded-xl bg-indigo-100 dark:bg-indigo-800/40 flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-graduation-cap text-indigo-600 dark:text-indigo-400"></i>
+                    </div>
+                    <h4 class="font-bold text-sm text-slate-800 dark:text-white mb-1">Estudiante</h4>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">Ingresa para ver tus cursos, realizar actividades y consultar calificaciones</p>
+                    <div class="mt-3 py-1.5 px-3 rounded-lg bg-indigo-500 text-white text-[10px] font-bold inline-flex items-center gap-1">
+                        <i class="fa-solid fa-right-to-bracket"></i> Ingresar
+                    </div>
+                </a>
+                <!-- Docente -->
+                <a href="evallab/?mode=doc" target="_blank"
+                    class="block p-4 md:p-5 rounded-2xl text-center transition-all duration-300 border-2 border-transparent hover:border-emerald-300 dark:hover:border-emerald-600 hover:-translate-y-1 hover:shadow-lg bg-emerald-50/80 dark:bg-emerald-900/20 group">
+                    <div class="w-12 h-12 mx-auto rounded-xl bg-emerald-100 dark:bg-emerald-800/40 flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-chalkboard-user text-emerald-600 dark:text-emerald-400"></i>
+                    </div>
+                    <h4 class="font-bold text-sm text-slate-800 dark:text-white mb-1">Docente</h4>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">Administra grupos, actividades, calificaciones y anuncios</p>
+                    <div class="mt-3 py-1.5 px-3 rounded-lg bg-emerald-500 text-white text-[10px] font-bold inline-flex items-center gap-1">
+                        <i class="fa-solid fa-lock"></i> Administrar
+                    </div>
+                </a>
+                <!-- Invitado -->
+                <a href="evallab/?mode=guest" target="_blank"
+                    class="block p-4 md:p-5 rounded-2xl text-center transition-all duration-300 border-2 border-transparent hover:border-amber-300 dark:hover:border-amber-600 hover:-translate-y-1 hover:shadow-lg bg-amber-50/80 dark:bg-amber-900/20 group">
+                    <div class="w-12 h-12 mx-auto rounded-xl bg-amber-100 dark:bg-amber-800/40 flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-eye text-amber-600 dark:text-amber-400"></i>
+                    </div>
+                    <h4 class="font-bold text-sm text-slate-800 dark:text-white mb-1">Invitado</h4>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">Explora y practica sin cuenta. Las notas no se guardan</p>
+                    <div class="mt-3 py-1.5 px-3 rounded-lg bg-amber-500 text-white text-[10px] font-bold inline-flex items-center gap-1">
+                        <i class="fa-solid fa-eye"></i> Explorar
+                    </div>
+                </a>
+            </div>
+            <!-- Footer -->
+            <div class="px-5 pb-4 text-center">
+                <p class="text-[9px] text-slate-400 dark:text-slate-500"><i class="fa-solid fa-shield-halved mr-1"></i>Las calificaciones se almacenan de forma segura en la nube</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         📜 SCRIPTS JAVASCRIPT
+         ═══════════════════════════════════════════════════════════════════════════ -->
+
+    <!-- 🔄 SISTEMA DE VERSIONADO AUTOMÁTICO
+         ═══════════════════════════════════════════════════════════════════════════
+         📝 Para actualizar en celulares: cambia SITE_VERSION
+            (ej: '1.5.0' → '1.5.1'). Los scripts JS se recargan cada hora automáticamente.
+         ═══════════════════════════════════════════════════════════════════════════ -->
+
+        <!-- 🧹 SISTEMA ANTI-CACHÉ INTELIGENTE PARA MÓVILES -->
+        <script>
+            (function () {
+                var SITE_VERSION = '1.5.0';
+                var VERSION_KEY = 'matematicas_version';
+                var storedVersion = localStorage.getItem(VERSION_KEY);
+                var versionChanged = storedVersion !== SITE_VERSION;
+
+                if (versionChanged) {
+                    console.log('🔄 Nueva versión Matemáticas: ' + SITE_VERSION);
+                    localStorage.setItem(VERSION_KEY, SITE_VERSION);
+                }
+
+                // ⚠️ No se limpian cachés aquí para que el SW (PWA) pueda funcionar.
+                // El SW actualiza su caché automáticamente con estrategia network-first.
+
+                if (versionChanged && storedVersion !== null) {
+                    var rk = 'matematicas_reloaded_' + SITE_VERSION;
+                    if (!sessionStorage.getItem(rk)) {
+                        sessionStorage.setItem(rk, '1');
+                        setTimeout(function () { location.reload(true); }, 300);
+                    }
+                }
+
+                // Exponer versión para cache-busting de scripts
+                window.__CACHE_V = SITE_VERSION + '.' + Math.floor(Date.now() / 3600000);
+            })();
+    </script>
+
+    <!-- Base de datos de constantes matemáticas (se mantiene en el HTML por ahora) -->
+    <script>
+        const CONSTANTS_DB = [
+            // Fundamentales
+            { cat: "Fundamentales", n: "Pi", s: "$\\pi$", v: "3.141 592 653 589 793", u: "adimensional" },
+            { cat: "Fundamentales", n: "Número de Euler", s: "$e$", v: "2.718 281 828 459 045", u: "adimensional" },
+            { cat: "Fundamentales", n: "Unidad imaginaria", s: "$i$", v: "√(-1)", u: "adimensional" },
+            { cat: "Fundamentales", n: "Razón áurea", s: "$\\varphi$", v: "1.618 033 988 749 895", u: "adimensional" },
+            { cat: "Fundamentales", n: "Razón áurea recíproca", s: "$1/\\varphi$", v: "0.618 033 988 749 895", u: "adimensional" },
+            { cat: "Fundamentales", n: "Identidad de Euler", s: "$e^{i\\pi}+1$", v: "0", u: "adimensional" },
+
+            // Raíces notables
+            { cat: "Raíces Notables", n: "Raíz cuadrada de 2 (Pitágoras)", s: "$\\sqrt{2}$", v: "1.414 213 562 373 095", u: "adimensional" },
+            { cat: "Raíces Notables", n: "Raíz cuadrada de 3 (Teodoro)", s: "$\\sqrt{3}$", v: "1.732 050 807 568 877", u: "adimensional" },
+            { cat: "Raíces Notables", n: "Raíz cuadrada de 5", s: "$\\sqrt{5}$", v: "2.236 067 977 499 789", u: "adimensional" },
+            { cat: "Raíces Notables", n: "Raíz cúbica de 2 (delíaco)", s: "$\\sqrt[3]{2}$", v: "1.259 921 049 894 873", u: "adimensional" },
+
+            // Teoría de números
+            { cat: "Teoría de Números", n: "Constante de Euler-Mascheroni", s: "$\\gamma$", v: "0.577 215 664 901 533", u: "adimensional" },
+            { cat: "Teoría de Números", n: "Constante de Apéry", s: "$\\zeta(3)$", v: "1.202 056 903 159 594", u: "adimensional" },
+            { cat: "Teoría de Números", n: "Constante de Catalan", s: "$G$", v: "0.915 965 594 177 219", u: "adimensional" },
+            { cat: "Teoría de Números", n: "Constante de los números primos gemelos", s: "$C_2$", v: "0.660 161 815 846 869", u: "adimensional" },
+
+            // Análisis y cálculo
+            { cat: "Análisis", n: "Zeta de Riemann en 2 (Basilea)", s: "$\\zeta(2)=\\pi^2/6$", v: "1.644 934 066 848 226", u: "adimensional" },
+            { cat: "Análisis", n: "Logaritmo natural de 2", s: "$\\ln 2$", v: "0.693 147 180 559 945", u: "adimensional" },
+            { cat: "Análisis", n: "Logaritmo natural de 10", s: "$\\ln 10$", v: "2.302 585 092 994 046", u: "adimensional" },
+            { cat: "Análisis", n: "Logaritmo decimal de e", s: "$\\log_{10} e$", v: "0.434 294 481 903 252", u: "adimensional" },
+
+            // Trigonometría
+            { cat: "Trigonometría", n: "Radianes en una vuelta", s: "$2\\pi$", v: "6.283 185 307 179 586", u: "rad" },
+            { cat: "Trigonometría", n: "Radianes a grados (factor)", s: "$180/\\pi$", v: "57.295 779 513 082 32", u: "°/rad" },
+            { cat: "Trigonometría", n: "Grados a radianes (factor)", s: "$\\pi/180$", v: "0.017 453 292 519 943", u: "rad/°" },
+
+            // Otras famosas
+            { cat: "Especiales", n: "Constante de Chaitin (aprox.)", s: "$\\Omega$", v: "≈ 0.007 875 … (incalculable exacta)", u: "adimensional" },
+            { cat: "Especiales", n: "Constante de Khinchin", s: "$K_0$", v: "2.685 452 001 065 306", u: "adimensional" },
+            { cat: "Especiales", n: "Constante de Feigenbaum δ", s: "$\\delta$", v: "4.669 201 609 102 990", u: "adimensional" },
+            { cat: "Especiales", n: "Constante de Feigenbaum α", s: "$\\alpha$", v: "2.502 907 875 095 892", u: "adimensional" },
+            { cat: "Especiales", n: "Constante de Gelfond", s: "$e^{\\pi}$", v: "23.140 692 632 779 27", u: "adimensional" },
+            { cat: "Especiales", n: "Constante de Gelfond-Schneider", s: "$2^{\\sqrt{2}}$", v: "2.665 144 142 690 225", u: "adimensional" }
+        ];
+    </script>
+
+    <!-- 🔄 Scripts con cache-busting automático (cambia cada hora) -->
+    <script>
+        var v = window.__CACHE_V || '3.7.2';
+        document.write('<scr' + 'ipt src="js/config.js?v=' + v + '"><\/scr' + 'ipt>');
+        document.write('<scr' + 'ipt src="js/smart-search.js?v=' + v + '"><\/scr' + 'ipt>');
+        document.write('<scr' + 'ipt src="js/app.js?v=' + v + '"><\/scr' + 'ipt>');
+        document.write('<scr' + 'ipt src="js/science-data.js?v=' + v + '"><\/scr' + 'ipt>');
+        document.write('<scr' + 'ipt src="js/science-modals.js?v=' + v + '"><\/scr' + 'ipt>');
+        document.write('<scr' + 'ipt src="js/chatbot-widget.js?v=' + v + '"><\/scr' + 'ipt>');
+        document.write('<scr' + 'ipt src="js/postit-manager.js?v=' + v + '"><\/scr' + 'ipt>');
+        document.write('<scr' + 'ipt src="js/share-social.js?v=' + v + '"><\/scr' + 'ipt>');
+        document.write('<scr' + 'ipt src="js/screen-recorder.js?v=' + v + '"><\/scr' + 'ipt>');
+    </script>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         ↔️ REDIMENSIONAMIENTO HORIZONTAL DEL SIDEBAR
+         ═══════════════════════════════════════════════════════════════════════════
+         El #resizer es la barra entre el sidebar y el visor central.
+         Solo activo en desktop (≥768px). En móviles el sidebar es overlay fijo.
+         Doble clic en la barra → restaura ancho por defecto (320px).
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <script>
+    (function () {
+        var resizer  = document.getElementById('resizer');
+        var sidebar  = document.getElementById('sidebar');
+        var MIN_W    = 200;
+        var MAX_W    = 600;
+        var dragging = false;
+        var startX, startW;
+
+        if (!resizer || !sidebar) return;
+
+        resizer.addEventListener('pointerdown', function (e) {
+            if (window.innerWidth < 768) return;
+            dragging = true;
+            startX   = e.clientX;
+            startW   = sidebar.getBoundingClientRect().width;
+            resizer.setPointerCapture(e.pointerId);
+            document.body.style.cursor     = 'col-resize';
+            document.body.style.userSelect = 'none';
+            resizer.classList.add('bg-indigo-400/30');
+        });
+
+        resizer.addEventListener('pointermove', function (e) {
+            if (!dragging) return;
+            var newW = Math.min(MAX_W, Math.max(MIN_W, startW + (e.clientX - startX)));
+            sidebar.style.width    = newW + 'px';
+            sidebar.style.minWidth = newW + 'px';
+        });
+
+        resizer.addEventListener('pointerup', function () {
+            if (!dragging) return;
+            dragging = false;
+            document.body.style.cursor     = '';
+            document.body.style.userSelect = '';
+            resizer.classList.remove('bg-indigo-400/30');
+            localStorage.setItem('mat_sidebar_w', sidebar.getBoundingClientRect().width);
+        });
+
+        /* Restaurar ancho guardado */
+        var saved = parseInt(localStorage.getItem('mat_sidebar_w'));
+        if (saved && saved >= MIN_W && saved <= MAX_W && window.innerWidth >= 768) {
+            sidebar.style.width    = saved + 'px';
+            sidebar.style.minWidth = saved + 'px';
+        }
+
+        /* Doble clic → reset a 320px */
+        resizer.addEventListener('dblclick', function () {
+            sidebar.style.width    = '320px';
+            sidebar.style.minWidth = '240px';
+            localStorage.removeItem('mat_sidebar_w');
+        });
+    })();
+    </script>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         ↕️ RESIZE VERTICAL DE PANELES DE CATEGORÍA
+         ═══════════════════════════════════════════════════════════════════════════
+         Espera a que app.js genere el menú y luego activa resize:vertical
+         en cada .cat-items-wrapper. Guarda la altura en localStorage por índice.
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <script>
+    (function () {
+        function initCatResize() {
+            var wrappers = document.querySelectorAll('.cat-items-wrapper');
+            if (!wrappers.length) {
+                setTimeout(initCatResize, 400);
+                return;
+            }
+            wrappers.forEach(function (wrap, idx) {
+                wrap.style.overflow  = 'auto';
+                wrap.style.resize    = 'vertical';
+                wrap.style.minHeight = '60px';
+                wrap.style.maxHeight = '600px';
+
+                /* Restaurar altura guardada */
+                var saved = localStorage.getItem('mat_cat_h_' + idx);
+                if (saved) wrap.style.height = saved + 'px';
+
+                /* Persistir cambios con ResizeObserver */
+                if (window.ResizeObserver) {
+                    new ResizeObserver(function () {
+                        localStorage.setItem('mat_cat_h_' + idx, wrap.offsetHeight);
+                    }).observe(wrap);
+                }
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initCatResize);
+        } else {
+            initCatResize();
+        }
+    })();
+    </script>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         📲 PWA · REGISTRO DEL SERVICE WORKER
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/Matematicas/sw.js')
+                    .then(function (reg) {
+                        console.log('✅ SW Matemáticas registrado:', reg.scope);
+                    })
+                    .catch(function (err) {
+                        console.warn('⚠️ SW no registrado:', err);
+                    });
+            });
+        }
+    </script>
+
+</body>
+
+</html>

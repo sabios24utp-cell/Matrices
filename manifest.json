@@ -1,0 +1,43 @@
+{
+  "name": "Matemáticas Interactivas · Néstor Montoya",
+  "short_name": "Matemáticas",
+  "description": "Plataforma educativa de Matemáticas del Colegio María Auxiliadora de Cartago. Cuadernos interactivos, simuladores y recursos para álgebra, cálculo, geometría y más.",
+  "start_url": "/Matematicas/",
+  "scope": "/Matematicas/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#064e3b",
+  "theme_color": "#10b981",
+  "lang": "es",
+  "dir": "ltr",
+  "categories": ["education"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "EvalLab · Estudiante",
+      "short_name": "EvalLab",
+      "description": "Ingresa a tus actividades y calificaciones",
+      "url": "/Matematicas/evallab/?mode=est",
+      "icons": [{ "src": "icon.svg", "sizes": "any" }]
+    }
+  ]
+}
